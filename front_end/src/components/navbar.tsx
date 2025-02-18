@@ -12,14 +12,14 @@ export function Navbar() {
   const { setTheme } = useTheme()
 
   return (
-    <nav className="flex items-center justify-between p-2 px-4 bg-lightBackGround shadow-md dark:bg-darkBackGround dark:shadow-gray-700">
-      <div className="text-2xl font-bold text-primary">
+    <nav className="flex items-center justify-between p-2 px-4 bg-lightBackGround shadow-md dark:bg-darkBackGround dark:shadow-darkGray">
+      <div className="text-2xl font-bold text-secondary">
         <Link href="/">DEIP</Link>
       </div>
       <div className="flex items-center space-x-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="bg-gray-100 dark:bg-gray-700">
+            <Button variant="outline" size="icon" className="bg-gray-100 dark:bg-darkGray dark:bg-opacity-20">
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <span className="sr-only">Toggle theme</span>
