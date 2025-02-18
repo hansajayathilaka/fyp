@@ -12,7 +12,7 @@ export function Navbar() {
   const { setTheme } = useTheme()
 
   return (
-    <nav className="flex items-center justify-between p-2 px-4 bg-lightBackGround shadow-md dark:bg-darkBackGround dark:shadow-darkGray">
+    <nav className="sticky top-0 flex items-center justify-between p-2 px-4 bg-lightBackGround shadow-md dark:bg-darkBackGround dark:shadow-darkGray">
       <div className="text-2xl font-bold text-secondary">
         <Link href="/">DEIP</Link>
       </div>
