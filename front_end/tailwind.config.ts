@@ -15,7 +15,8 @@ export default {
   			foreground: 'var(--foreground)',
 			lightBackGround: "#ffffff",
 			darkBackGround: "#000000",
-			darkGray: "#2d3748",
+			darkGray: "#374151",
+			secondary: "#25aef3",
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
