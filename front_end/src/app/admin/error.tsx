@@ -16,7 +16,7 @@ export default function Error({
 
   return (
     <div className="flex flex-col h-screen items-center justify-center space-y-4">
-      <h2 className="text-red-300">Something went wrong!</h2>
+      <h2 className="text-red-400 dark:text-red-300">Something went wrong!</h2>
       <Button onClick={() => reset()}>Try again</Button>
     </div>
   );
