@@ -9,8 +9,8 @@ import Footer from "@/components/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "DEIP App",
-  description: "DEIP application with responsive navbar",
+  title: "DEIP",
+  description: "Decentralized Equlity Investment Platform",
 };
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
