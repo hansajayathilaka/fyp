@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import Footer from "@/components/footer";
+import { SkeletonTheme } from "react-loading-skeleton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,9 +24,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <div className="px-8 pt-2 min-h-screen">{children}</div>
-          <Footer />
+          <SkeletonTheme baseColor="#202020" highlightColor="#444">
+            <Navbar />
+            <div className="px-8 pt-2 min-h-screen">{children}</div>
+            <Footer />
+          </SkeletonTheme>
         </ThemeProvider>
       </body>
     </html>
