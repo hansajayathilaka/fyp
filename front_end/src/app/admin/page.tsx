@@ -1,4 +1,4 @@
-import User from "../../models/user";
+import User from "../../types/user";
 
 const AdminPage = async () => {
   const users = await fetch("https://jsonplaceholder.typicode.com/users");
