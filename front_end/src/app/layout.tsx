@@ -17,7 +17,9 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`bg-lightBackGround text-black dark:bg-darkBackGround dark:text-white ${inter.className}`}>
+      <body
+        className={`bg-lightBackGround text-black dark:bg-darkBackGround dark:text-white ${inter.className}`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -26,8 +28,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         >
           <SkeletonTheme baseColor="#202020" highlightColor="#444">
             <Navbar />
-          <div className="px-8 pt-2 min-h-screen">{children}</div>
-          <Footer />
+            <div className="px-8 pt-2 min-h-screen">{children}</div>
+            <Footer />
           </SkeletonTheme>
         </ThemeProvider>
       </body>
