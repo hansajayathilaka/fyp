@@ -14,7 +14,9 @@ export default {
   			background: 'var(--background)',
   			foreground: 'var(--foreground)',
   			lightBackGround: '#ffffff',
-  			darkBackGround: '#000000',
+  			darkBackGround: '#010D36',
+			darkSecondary: '#3ABDE0',
+			buttonHover: '#0891b2',
   			darkGray: '#374151',
   			secondary: '#25aef3'
   		},
