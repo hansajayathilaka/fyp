@@ -7,6 +7,8 @@ const __dirname = dirname(__filename);
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
+  output: 'standalone',
+  reactStrictMode: true,
 });
 
 const eslintConfig = [
