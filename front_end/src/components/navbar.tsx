@@ -22,23 +22,13 @@ const Navbar = () => {
     <nav className="w-full flex md:justify-center justify-between items-center p-4">
       <div className="md:flex-[0.5] flex-initial justify-center items-center">
         <Link href="/">
-          {theme === "dark" ? (
-            <Image
-              src={"/icons/logo_dark.png"}
-              alt="logo"
-              width={74}
-              height={82}
-              className="cursor-pointer"
-            />
-          ) : (
-            <Image
-              src={"/icons/logo_light.png"}
-              alt="logo"
-              width={74}
-              height={82}
-              className="cursor-pointer"
-            />
-          )}
+          <Image
+            src={"/icons/logo.png"}
+            alt="logo"
+            width={74}
+            height={82}
+            className="cursor-pointer"
+          />
         </Link>
       </div>
       <ul className="md:flex hidden list-none flex-row justify-between items-center">
