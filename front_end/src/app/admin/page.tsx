@@ -5,7 +5,7 @@ const AdminPage = async () => {
   const usersJson: User[] = await users.json();
 
   if (!users.ok) {
-    return { message: 'Error while fetching the data' }
+    return { message: "Error while fetching the data" };
   }
 
   return (
