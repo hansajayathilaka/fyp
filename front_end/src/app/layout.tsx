@@ -27,9 +27,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           disableTransitionOnChange
         >
           <SkeletonTheme baseColor="#202020" highlightColor="#444">
-            <Navbar />
-          <div className="px-8 pt-2 min-h-screen">{children}</div>
-          <Footer />
+            <div className="px-8">
+              <Navbar />
+              <div className="px-8 pt-2 min-h-screen">{children}</div>
+              <Footer />
+            </div>
           </SkeletonTheme>
         </ThemeProvider>
       </body>

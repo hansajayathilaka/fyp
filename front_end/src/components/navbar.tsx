@@ -33,8 +33,8 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="w-full flex md:justify-center justify-between items-center p-4">
-      <div className="md:flex-[0.5] flex-initial justify-center items-center">
+    <nav className="w-full flex lg:justify-center justify-between items-center p-4">
+      <div className="flex-1 justify-center items-center">
         <Link href="/">
           <Image
             src={"/icons/logo.png"}
@@ -45,7 +45,7 @@ const Navbar = () => {
           />
         </Link>
       </div>
-      <ul className="md:flex hidden list-none flex-row justify-between items-center">
+      <ul className="lg:flex hidden list-none flex-row justify-between items-center">
         {["Home", "About", "Features", "How it Works", "Contact"].map(
           (item, index) => (
             <NavbarItem title={item} key={item + index} classProps="text-lg" />
@@ -80,16 +80,16 @@ const Navbar = () => {
         {!togleMenu && (
           <TiThMenu
             fontSize="28"
-            className="dark:text-white text-black cursor-pointer md:hidden"
+            className="dark:text-white text-black cursor-pointer lg:hidden"
             onClick={() => setTogleMenu(!togleMenu)}
           />
         )}
         {togleMenu && (
-          <ul className="z-10 fixed top-0 -right-2 p-3 w-[70vw] h-screen shadow-2xl md:hiddne list-none flex flex-col justify-start items-end rounded-md text-white animate-slide-in">
+          <ul className="z-10 fixed top-0 -right-2 p-3 w-[70vw] h-screen shadow-2xl md:hiddne list-none flex flex-col justify-start items-end rounded-md dark:text-white text-black animate-slide-in">
             <li className="text-xl w-full my-2">
               <IoCloseCircleSharp
                 fontSize="28"
-                className="dark:text-white text-black cursor-pointer md:hidden"
+                className="dark:text-white text-black cursor-pointer"
                 onClick={() => setTogleMenu(false)}
               />
             </li>
