@@ -11,7 +11,11 @@ import Link from "next/link";
 
 const NavbarItem = ({ title, classProps }: NavbarItemProps) => {
   return (
-    <li className={`mx-7 cursor-pointer text-base ${classProps} dark:text-white text-black`}>{title}</li>
+    <li
+      className={`mx-7 cursor-pointer text-base ${classProps} dark:text-white text-black`}
+    >
+      {title}
+    </li>
   );
 };
 
