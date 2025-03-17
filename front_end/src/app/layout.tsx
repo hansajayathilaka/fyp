@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/navbar";
 import Footer from "@/components/footer";
 import { SkeletonTheme } from "react-loading-skeleton";
+import Navbar from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`bg-lightBackGround text-black dark:bg-darkBackGround dark:text-white ${inter.className}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
