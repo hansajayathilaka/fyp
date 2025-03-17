@@ -14,6 +14,29 @@ const NavbarItem = ({ title, classProps }: NavbarItemProps) => {
   );
 };
 
+const navBarData = [
+  {
+    title: "Home",
+    link: "/",
+  },
+  {
+    title: "About",
+    link: "/about",
+  },
+  {
+    title: "Features",
+    link: "/features",
+  },
+  {
+    title: "How it Works",
+    link: "/how-it-works",
+  },
+  {
+    title: "Contact",
+    link: "/contact",
+  }
+]
+
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const [togleMenu, setTogleMenu] = useState(false);
@@ -32,12 +55,12 @@ const Navbar = () => {
         </Link>
       </div>
       <ul className="md:flex hidden list-none flex-row justify-between items-center">
-        {["Home", "About", "Features", "How it Works", "Contact"].map(
+        {navBarData.map(
           (item, index) => {
             return (
               <NavbarItem
-                title={item}
-                key={item + index}
+                title={item.title}
+                key={index}
                 classProps="text-lg"
               />
             );
