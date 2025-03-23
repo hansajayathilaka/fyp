@@ -1,5 +1,29 @@
 import { Star } from "lucide-react";
 
+const Rating = ({ rating }: { rating: number }) => {
+  const maxStars = 5;
+  const starsArray = Array.from({ length: maxStars }, (_, index) =>
+    index < Math.floor(rating) ? "full" : "empty"
+  );
+
+  return (
+    <div className="bg-white dark:bg-gray-200text-black dark:text-gray-500 px-3 py-1 rounded-lg flex items-center gap-1 shadow-md 
+      sm:px-2 sm:py-1 sm:gap-0.5">
+      
+      {starsArray.map((type, i) => (
+        <Star
+          key={i}
+          className={type === "full" ? "text-yellow-400" : "text-gray-400"}
+          size={16} 
+          fill={type === "full" ? "yellow" : "gray"}
+        />
+      ))}
+
+      <span className="ml-2 font-semibold sm:ml-1 text-sm sm:text-xs">{rating.toFixed(1)}</span>
+    </div>
+  );
+};
+
 export const AboutSection = () => {
   return (
     <div className="text-black dark:text-white p-6 rounded-xl relative max-w-4xl mx-auto">
@@ -17,14 +41,7 @@ export const AboutSection = () => {
         </div>
 
         <div>
-          <div className="bg-white text-black px-3 py-1 rounded-lg flex items-center gap-1 shadow-md">
-            <Star className="text-yellow-400" size={16} fill="yellow" />
-            <Star className="text-yellow-400" size={16} fill="yellow" />
-            <Star className="text-yellow-400" size={16} fill="yellow" />
-            <Star className="text-yellow-400" size={16} fill="yellow" />
-            <Star className="text-gray-400" size={16} fill="gray" />
-            <span className="ml-2 font-semibold">4.5</span>
-          </div>
+        <Rating rating={4.5} />
         </div>
       </div>
     </div>
