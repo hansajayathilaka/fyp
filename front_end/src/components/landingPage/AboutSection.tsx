@@ -8,7 +8,7 @@ const Rating = ({ rating }: { rating: number }) => {
   );
 
   return (
-    <div className="bg-white dark:bg-gray-200text-black dark:text-gray-500 px-3 py-1 rounded-lg flex items-center gap-1 shadow-md 
+    <div className="bg-white dark:bg-gray-200 text-black dark:text-gray-500 px-3 py-2 rounded-lg flex items-center gap-1 shadow-md 
       sm:px-2 sm:py-1 sm:gap-0.5">
 
       {starsArray.map((type, i) => (
@@ -34,14 +34,14 @@ export const AboutSection = () => {
 
           <div className="mt-2 flex flex-col items-center gap-4 sm:flex-row">
             <div>
-              <p className="text-gray-400 leading-relaxed mt-4">
+              <p className="text-gray-400 leading-relaxed mt-4 text-md">
                 When you invest with our platform, you’re more than just an investor—you’re a valued stakeholder.
                 As a part of our decentralized ecosystem, you gain access to exclusive equity investment opportunities typically reserved for large institutions.
                 Our platform is built to empower you with secure, transparent, and innovative investment options tailored to your needs.
               </p>
             </div>
 
-            <div>
+            <div className="mx-10">
               <Rating rating={4.5} />
             </div>
           </div>
