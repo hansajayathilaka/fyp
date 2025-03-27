@@ -1,3 +1,4 @@
+import React from "react";
 import { Star } from "lucide-react";
 
 const Rating = ({ rating }: { rating: number }) => {
@@ -36,7 +37,7 @@ export const AboutSection = () => {
           Our Decentralized Equity Investment Platform
         </h2>
 
-        <div className="mt-2 flex flex-col items-center gap-4 sm:flex-row">
+        <div className="mt-2 flex flex-col items-center gap-4 md:gap-24 xl:gap-40 sm:flex-row">
           <div>
             <p className="text-gray-400 leading-relaxed mt-4 text-md">
               When you invest with our platform, you’re more than just an
@@ -54,16 +55,6 @@ export const AboutSection = () => {
           </div>
         </div>
       </div>
-
-      {/* <div className="hidden sm:flex justify-center items-center mt-4">
-        <Image
-          src="/images/Group34.png"
-          alt="bg image"
-          width={400}
-          height={600}
-          className="opacity-90"
-        />
-      </div> */}
     </div>
   );
 };
