@@ -21,7 +21,7 @@ export const FooterSection = () => {
         </div>
         <div className="flex items-center gap-4 text-gray-600 mt-2 text-sm">
           <FaEnvelope />
-          <p>Info@Deip.Com</p>
+          <p>info@deip.Com</p>
         </div>
       </div>
       <div className="flex items-center gap-4 text-gray-600 text-sm mt-3 w-sm md:justify-end">
