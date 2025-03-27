@@ -1,5 +1,4 @@
 import { Star } from "lucide-react";
-import Image from "next/image";
 
 const Rating = ({ rating }: { rating: number }) => {
   const maxStars = 5;
@@ -56,7 +55,7 @@ export const AboutSection = () => {
         </div>
       </div>
 
-      <div>
+      {/* <div className="hidden sm:flex justify-center items-center mt-4">
         <Image
           src="/images/Group34.png"
           alt="bg image"
@@ -64,7 +63,7 @@ export const AboutSection = () => {
           height={600}
           className="opacity-90"
         />
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -29,7 +29,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           <SkeletonTheme baseColor="#202020" highlightColor="#444">
             <div className="px-8">
               <Navbar />
-              <div className="px-8 pt-2 min-h-screen">{children}</div>
+              <div>{children}</div>
               <Footer />
             </div>
           </SkeletonTheme>
