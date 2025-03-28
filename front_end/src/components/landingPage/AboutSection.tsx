@@ -9,6 +9,7 @@ const Rating = ({ rating }: { rating: number }) => {
 
   return (
     <div
+      id="about"
       className="bg-white dark:bg-gray-200 text-black dark:text-gray-500 px-3 py-2 rounded-lg flex items-center gap-1 shadow-md 
       sm:px-2 sm:py-1 sm:gap-0.5"
     >
