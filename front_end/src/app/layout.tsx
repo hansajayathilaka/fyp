@@ -23,8 +23,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+          enableSystem={true}
+          disableTransitionOnChange={true}
         >
           <SkeletonTheme baseColor="#202020" highlightColor="#444">
             <div className="px-8">

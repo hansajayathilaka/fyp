@@ -5,7 +5,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="relative">
       {/* Background Image */}
       <div
-        className="absolute top-0 right-[-42px] w-[300px] h-[500px] opacity-30 sm:opacity-90 "
+        className="absolute top-[100vh] right-[-32px] w-[300px] h-[500px] opacity-30 sm:opacity-90 "
         style={{
           backgroundImage: "url('/images/Group34.png')",
           backgroundSize: "cover",
