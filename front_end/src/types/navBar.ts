@@ -4,7 +4,6 @@ export interface NavBarItemType {
   url: string;
 }
 
-
 export interface LightDarkSwitcherButtonProps {
   styles?: string;
 }
