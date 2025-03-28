@@ -9,7 +9,7 @@ import { ConnectWalletButton } from "./ConnectWalletButton";
 export const MobileNavBar = ({ setTogleMenu }: MobileNavBarProps) => {
   return (
     <motion.div
-      className="z-10 fixed top-0 right-0 p-3 w-[70vw] h-screen shadow-2xl list-none flex flex-col gap-5 pr-8 justify-start items-end rounded-md dark:text-white text-black"
+      className="z-20 fixed top-0 right-0 p-3 w-[70vw] h-screen shadow-2xl list-none flex flex-col gap-5 pr-8 justify-start items-end rounded-md dark:text-white text-black"
       variants={menuVariants}
       initial="hidden"
       animate="visible"
@@ -25,11 +25,11 @@ export const MobileNavBar = ({ setTogleMenu }: MobileNavBarProps) => {
           title={item.title}
           key={index}
           url={item.url}
-          classProps="my-2 text-lg"
+          classProps="my-2 text-lg cursor-pointer"
         />
       ))}
       <LightDarkSwitcherButton styles="pb-5 pt-20"/>
-      <ConnectWalletButton styles=""/>
+      <ConnectWalletButton />
     </motion.div>
   );
 };

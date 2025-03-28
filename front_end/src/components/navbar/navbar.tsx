@@ -2,7 +2,7 @@
 
 import { TiThMenu } from "react-icons/ti";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NavBarItemType } from "@/types/navBar";
 import Link from "next/link";
 import { LightDarkSwitcherButton } from "./LightDarkSwitcherButton";
@@ -13,18 +13,9 @@ import { ConnectWalletButton } from "./ConnectWalletButton";
 
 const Navbar = () => {
   const [togleMenu, setTogleMenu] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
+  
   return (
-    <nav className="w-full flex lg:justify-center justify-between items-center p-4 sticky top-0 z-10 glassmorphism">
+    <nav className="w-full flex lg:justify-center justify-between items-center p-4 sticky top-0 z-10">
       <div className="flex-1 justify-center items-center">
         <Link href="/">
           <Image
@@ -48,7 +39,7 @@ const Navbar = () => {
           ))}
         </div>
         <LightDarkSwitcherButton styles="pr-11" />
-        <ConnectWalletButton styles=" h-[60px] w-[216px]"/>
+        <ConnectWalletButton styles=" h-[60px] w-[216px]" />
       </div>
       <div className="flex relative">
         {!togleMenu && (

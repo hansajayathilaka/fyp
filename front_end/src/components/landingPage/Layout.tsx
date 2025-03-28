@@ -15,7 +15,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       ></div>
 
       {/* Content */}
-      <div className="px-8 md:px-16 pt-2 min-h-screen relative z-10">{children}</div>
+      <div className="px-8 md:px-16 pt-2 min-h-screen relative">{children}</div>
     </div>
   );
 };
