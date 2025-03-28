@@ -1,6 +1,6 @@
 export const WhyChooseSection = () => {
   return (
-    <div>
+    <div id="features">
       <h1 className="dark:text-white text-black">Why Choose Section</h1>
     </div>
   );

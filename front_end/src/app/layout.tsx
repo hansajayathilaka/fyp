@@ -1,11 +1,11 @@
-import type React from "react";
+import React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/footer";
 import { SkeletonTheme } from "react-loading-skeleton";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,8 +23,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+          enableSystem={true}
+          disableTransitionOnChange={true}
         >
           <SkeletonTheme baseColor="#202020" highlightColor="#444">
             <div className="px-8">
