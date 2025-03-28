@@ -1,6 +1,6 @@
 export const HeroSection = () => {
   return (
-    <div className="flex-1 h-screen ">
+    <div>
       <h1 className="dark:text-white text-black">Hero Section</h1>
     </div>
   );
