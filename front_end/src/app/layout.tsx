@@ -30,7 +30,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="px-8">
               <div className="absolute inset-0 -z-10 w-full bg-white dark:bg-darkBackGround dark:bg-[radial-gradient(#374151_0.0001px,transparent_1px)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
                 <Navbar />
-                <div className="px-8 pt-2 min-h-screen">{children}</div>
+                <div className="md:px-8 pt-2 min-h-screen">{children}</div>
                 <Footer />
               </div>
             </div>
