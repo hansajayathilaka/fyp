@@ -15,7 +15,7 @@ const Navbar = () => {
   const [togleMenu, setTogleMenu] = useState(false);
   
   return (
-    <nav className="w-full flex lg:justify-center justify-between items-center p-4 sticky top-0 z-10">
+    <nav className="bg-white dark:bg-darkBackGround w-full flex lg:justify-center justify-between items-center p-4 sticky top-0 z-10 dark:bg-[radial-gradient(#374151_0.0001px,transparent_1px)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       <div className="flex-1 justify-center items-center">
         <Link href="/">
           <Image
