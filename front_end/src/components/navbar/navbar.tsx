@@ -39,7 +39,7 @@ const Navbar = () => {
           ))}
         </div>
         <LightDarkSwitcherButton styles="pr-11" />
-        <ConnectWalletButton styles=" h-[60px] w-[216px]" />
+        <ConnectWalletButton styles="h-[60px] w-[216px]" />
       </div>
       <div className="flex relative">
         {!togleMenu && (
