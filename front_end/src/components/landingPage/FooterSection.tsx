@@ -3,7 +3,7 @@ import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 
 export const FooterSection = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-15 items-center mt-3 mb-5">
+    <div id='contact' className="grid grid-cols-1 md:grid-cols-4 gap-15 items-center mt-3 mb-5">
       <div>
         <Image src={"/icons/logo.png"} alt={"logo"} width={60} height={70} />
         <p className="text-sm text-gray-700 dark:text-gray-300 max-w-md">
