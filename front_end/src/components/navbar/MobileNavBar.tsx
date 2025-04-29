@@ -9,7 +9,7 @@ import { ConnectWalletButton } from "./ConnectWalletButton";
 export const MobileNavBar = ({ setTogleMenu }: MobileNavBarProps) => {
   return (
     <motion.div
-      className="z-20 fixed top-0 right-0 p-3 w-[70vw] h-screen shadow-2xl list-none flex flex-col gap-5 pr-8 justify-start items-end rounded-md dark:text-white text-black"
+      className="bg-white dark:bg-darkBackGround z-20 fixed top-0 right-0 p-3 w-[70vw] h-screen shadow-2xl list-none flex flex-col gap-5 pr-8 justify-start items-end rounded-md dark:text-white text-black dark:bg-[radial-gradient(#374151_0.0001px,transparent_1px)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"
       variants={menuVariants}
       initial="hidden"
       animate="visible"
