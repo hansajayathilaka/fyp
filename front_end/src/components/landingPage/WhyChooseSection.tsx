@@ -3,7 +3,7 @@ import { Card } from "../Card";
 
 export const WhyChooseSection = () => {
   return (
-    <div id="features">
+    <div id="features" className="md:pt-20 pt-0">
       <section className="py-3 px-3 mt-20 bg-transparent text-black dark:text-white">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-4xl font-bold">
