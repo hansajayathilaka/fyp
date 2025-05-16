@@ -15,10 +15,20 @@ export default {
   			foreground: 'var(--foreground)',
   			lightBackGround: '#ffffff',
   			darkBackGround: '#010D36',
-			darkSecondary: '#3ABDE0',
-			buttonHover: '#0891b2',
+  			darkSecondary: '#3ABDE0',
+  			buttonHover: '#0891b2',
   			darkGray: '#374151',
-  			secondary: '#25aef3'
+  			secondary: '#25aef3',
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
+  			}
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
