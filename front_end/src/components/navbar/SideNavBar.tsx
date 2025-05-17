@@ -1,23 +1,147 @@
-export const SideNavBar = () => {
+"use client";
+import {
+  LayoutGrid,
+  Coins,
+  ListOrdered,
+  FileBarChart,
+  Settings,
+  ChevronDown,
+  Zap,
+  Home,
+} from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { usePathname } from "next/navigation";
+import { ActiveLink } from "./ActiveLink";
+
+export function SideNavBar() {
   return (
-    <div className="flex flex-col h-full w-64 bg-gray-800 text-white">
-      <div className="flex items-center justify-center h-16 bg-gray-900">
-        <h1 className="text-xl font-bold">Company Name</h1>
-      </div>
-      <nav className="flex flex-col p-4 space-y-2">
-        <a href="/company/dashboard" className="hover:bg-gray-700 p-2 rounded">
-          Dashboard
-        </a>
-        <a
-          href="/company/mint-new-token"
-          className="hover:bg-gray-700 p-2 rounded"
-        >
-          Mint New Token
-        </a>
-        <a href="/company/settings" className="hover:bg-gray-700 p-2 rounded">
-          Settings
-        </a>
-      </nav>
-    </div>
+    <Sidebar>
+      <SidebarHeader className="pb-0">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white">
+                  <Zap className="h-4 w-4" />
+                </div>
+                <span className="font-semibold">Company Name</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent className="pt-4">
+        <SidebarMenu>
+          {CompanySideNavBarItemList.map((item, index) => (
+            <SideNavBarItemComponent
+              key={index}
+              icon={item.icon}
+              label={item.label}
+              href={item.href}
+            />
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter className="mt-auto">
+        <SidebarMenu>
+          <SideNavBarItemComponent icon={Settings} label="Settings" href="#" />
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Avatar className="mr-2 h-6 w-6">
+                      <AvatarImage
+                        src="/placeholder.svg?height=32&width=32"
+                        alt="User"
+                      />
+                      <AvatarFallback>AG</AvatarFallback>
+                    </Avatar>
+                    <span>Aurobindo Gill</span>
+                  </div>
+                  <ChevronDown className="h-4 w-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px]">
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Account Settings</DropdownMenuItem>
+                <DropdownMenuItem>Sign Out</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  );
+}
+
+interface SideNavBarItemComponentProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  href?: string;
+  isActive?: boolean;
+}
+
+const CompanySideNavBarItemList = [
+  {
+    icon: Home,
+    label: "Home",
+    href: "/",
+  },
+  {
+    icon: LayoutGrid,
+    label: "Dashboard",
+    href: "/company/dashboard",
+  },
+  {
+    icon: Coins,
+    label: "Mint New Token",
+    href: "/company/mint-new-token",
+  },
+  {
+    icon: ListOrdered,
+    label: "List Tokens for Sale",
+    href: "/company/list-tokens-for-sale",
+  },
+  {
+    icon: FileBarChart,
+    label: "Reports & Compliance",
+    href: "/company/reports-and-compliance",
+  },
+];
+
+const SideNavBarItemComponent = ({
+  icon: Icon,
+  label,
+  href = "#",
+}: SideNavBarItemComponentProps) => {
+  const pathname = usePathname();
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={pathname === href}>
+        <ActiveLink href={href} className="flex items-center" activeClassName="text-sky-500">
+          <Icon className="mr-2 h-4 w-4" />
+          <span>{label}</span>
+        </ActiveLink>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 };
