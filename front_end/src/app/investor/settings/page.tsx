@@ -7,11 +7,11 @@ const Companypage = () => {
     <div className="max-w-2xl mx-auto mt-10">
       <Card>
         <CardHeader>
-          <CardTitle>Company Settings</CardTitle>
+          <CardTitle>Investor Settings</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <span className="font-semibold">Company Name:</span>{" "}
+            <span className="font-semibold">Investor Name:</span>{" "}
             <Badge variant="outline">Acme Corp</Badge>
           </div>
           <Table>
