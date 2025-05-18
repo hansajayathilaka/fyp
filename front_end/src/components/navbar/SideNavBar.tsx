@@ -51,7 +51,7 @@ export function SideNavBar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="pt-4">
-        <SidebarMenu className="p-4">
+        <SidebarMenu className="p-4 gap-4">
           {itemList.map((item, index) => (
             <SideNavBarItemComponent
               key={index}

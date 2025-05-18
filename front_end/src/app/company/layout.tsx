@@ -23,7 +23,7 @@ const RootCompanyLayout = ({ children }: { children: React.ReactNode }) => {
       <Suspense fallback={null}>
         <SideNavBar itemList={CompanySideNavBarItemList} colorVarient="text-sky-500" titleName="Upeksha's company"/>
         <SidebarInset className="bg-[#E2F5FF]">
-          <header className="flex h-16 items-center justify-between border-b bg-white dark:bg-black px-4">
+          <header className="flex h-16 items-center justify-between border-b bg-white dark:bg-black px-4 sticky top-0 z-10 right-0">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               {path === "/company/dashboard" ? (
