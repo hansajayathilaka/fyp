@@ -8,6 +8,9 @@ export const HeroSection = () => {
   const handleRegisterAsCompany = () => {
     router.push("/company/dashboard");
   };
+  const handleRegisterAsInvestor = () => {
+    router.push("/investor/dashboard");
+  };
   return (
     <div
       id="home"
@@ -21,14 +24,15 @@ export const HeroSection = () => {
       </h2>
       <div className="flex flex-col md:flex-row gap-4 mt-8">
         <RegistrationButton
-          buttonText="Register As A Company"
+          buttonText="Register as a Company"
           styles="md:h-[60px] md:w-[288px]"
           onClick={() => handleRegisterAsCompany()}
         />
         <RegistrationButton
-          buttonText="Register As A Investor"
+          buttonText="Register as an Investor"
           styles="md:h-[60px] md:w-[276x] bg-white dark:bg-darkBackGround border-[2px] border-black dark:border-white hover:bg-darkSecondary"
           variant="outline"
+          onClick={() => handleRegisterAsInvestor()}
         />
       </div>
     </div>
