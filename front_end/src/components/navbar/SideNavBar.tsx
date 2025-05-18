@@ -1,14 +1,5 @@
 "use client";
-import {
-  LayoutGrid,
-  Coins,
-  ListOrdered,
-  FileBarChart,
-  Settings,
-  ChevronDown,
-  Zap,
-  Home,
-} from "lucide-react";
+import { Settings, ChevronDown, Zap } from "lucide-react";
 
 import {
   Sidebar,
@@ -28,8 +19,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ActiveLink } from "./ActiveLink";
+import { CompanySideNavBarItemList } from "@/data/SideNavBar";
+import {
+  SideNavBarItemComponentProps,
+  SideNavBarProps,
+} from "@/types/SideNavBarTypes";
+import { usePathname } from "next/navigation";
 
-export function SideNavBar() {
+export function SideNavBar({
+  titleName = "Company Name",
+  itemList = CompanySideNavBarItemList,
+  colorVarient = "text-sky-500",
+}: SideNavBarProps) {
+  const path = usePathname();
+  const match = path.match(/^\/([^\/]+)\//);
+
   return (
     <Sidebar variant="floating" className="rounded-lg shadow-sm">
       <SidebarHeader className="pb-0">
@@ -40,7 +44,7 @@ export function SideNavBar() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white">
                   <Zap className="h-4 w-4" />
                 </div>
-                <span className="font-semibold">Company Name</span>
+                <span className="font-semibold">{titleName}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -48,19 +52,25 @@ export function SideNavBar() {
       </SidebarHeader>
       <SidebarContent className="pt-4">
         <SidebarMenu className="p-4">
-          {CompanySideNavBarItemList.map((item, index) => (
+          {itemList.map((item, index) => (
             <SideNavBarItemComponent
               key={index}
               icon={item.icon}
               label={item.label}
               href={item.href}
+              colorVarient={colorVarient}
             />
           ))}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="mt-auto">
         <SidebarMenu>
-          <SideNavBarItemComponent icon={Settings} label="Settings" href="#" />
+          <SideNavBarItemComponent
+            icon={Settings}
+            label="Settings"
+            href={`/${match ? match[1] : null}/settings`}
+            colorVarient={colorVarient}
+          />
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -92,53 +102,22 @@ export function SideNavBar() {
   );
 }
 
-interface SideNavBarItemComponentProps {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  href?: string;
-  isActive?: boolean;
-}
-
-const CompanySideNavBarItemList = [
-  {
-    icon: Home,
-    label: "Home",
-    href: "/",
-  },
-  {
-    icon: LayoutGrid,
-    label: "Dashboard",
-    href: "/company/dashboard",
-  },
-  {
-    icon: Coins,
-    label: "Mint New Token",
-    href: "/company/mint-new-token",
-  },
-  {
-    icon: ListOrdered,
-    label: "List Tokens for Sale",
-    href: "/company/list-tokens-for-sale",
-  },
-  {
-    icon: FileBarChart,
-    label: "Reports & Compliance",
-    href: "/company/reports-and-compliance",
-  },
-];
-
 const SideNavBarItemComponent = ({
   icon: Icon,
   label,
   href = "#",
+  colorVarient,
 }: SideNavBarItemComponentProps) => {
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild className="hover:text-sky-500 data-[active=true]:text-sky-500 active:text-sky-500">
+      <SidebarMenuButton
+        asChild
+        className={`hover:${colorVarient} data-[active=true]:${colorVarient} active:${colorVarient}`}
+      >
         <ActiveLink
           href={href}
           className="flex items-center"
-          activeClassName="text-sky-500"
+          activeClassName={colorVarient}
         >
           <Icon className="mr-2 h-4 w-4" />
           <span className="font-semibold">{label}</span>

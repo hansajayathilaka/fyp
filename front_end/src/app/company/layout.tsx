@@ -14,13 +14,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Suspense } from "react";
 import { SideNavBar } from "@/components/navbar/SideNavBar";
 import { usePathname } from "next/navigation";
+import { CompanySideNavBarItemList } from "@/data/SideNavBar";
 
 const RootCompanyLayout = ({ children }: { children: React.ReactNode }) => {
   const path = usePathname();
   return (
     <SidebarProvider>
       <Suspense fallback={null}>
-        <SideNavBar />
+        <SideNavBar itemList={CompanySideNavBarItemList} colorVarient="text-sky-500" titleName="Upeksha's company"/>
         <SidebarInset className="bg-[#E2F5FF]">
           <header className="flex h-16 items-center justify-between border-b bg-white dark:bg-black px-4">
             <div className="flex items-center gap-2">
