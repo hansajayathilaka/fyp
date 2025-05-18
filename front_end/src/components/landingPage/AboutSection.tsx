@@ -51,7 +51,7 @@ export const AboutSection = () => {
             </p>
           </div>
 
-          <div className="mx-10">
+          <div className="mx-16">
             <Rating rating={4.5} />
           </div>
         </div>
