@@ -10,12 +10,14 @@ import { NavBarItem } from "./NavBarItem";
 import { MobileNavBar } from "./MobileNavBar";
 import { NavbarItems } from "@/data/Navbar";
 import { ConnectWalletButton } from "./ConnectWalletButton";
+import { useScrollDetection } from "@/hooks/useScrollDetection";
 
 const Navbar = () => {
   const [togleMenu, setTogleMenu] = useState(false);
+  const isScrolled = useScrollDetection(10);
   
   return (
-    <nav className="bg-white dark:bg-darkBackGround w-full flex lg:justify-center justify-between items-center p-4 sticky top-0 z-10 dark:bg-[radial-gradient(#374151_0.0001px,transparent_1px)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+    <nav className={`bg-white dark:bg-darkBackGround w-full flex lg:justify-center justify-between items-center p-4 fixed top-0 z-10 dark:bg-[radial-gradient(#374151_0.0001px,transparent_1px)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] ${isScrolled ? "shadow-lg" : ""}`}>
       <div className="flex-1 justify-center items-center">
         <Link href="/">
           <Image
