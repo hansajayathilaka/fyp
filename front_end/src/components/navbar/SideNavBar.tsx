@@ -27,12 +27,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePathname } from "next/navigation";
 import { ActiveLink } from "./ActiveLink";
 
 export function SideNavBar() {
   return (
-    <Sidebar>
+    <Sidebar variant="floating" className="rounded-lg shadow-sm">
       <SidebarHeader className="pb-0">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -48,7 +47,7 @@ export function SideNavBar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="pt-4">
-        <SidebarMenu>
+        <SidebarMenu className="p-4">
           {CompanySideNavBarItemList.map((item, index) => (
             <SideNavBarItemComponent
               key={index}
@@ -133,13 +132,16 @@ const SideNavBarItemComponent = ({
   label,
   href = "#",
 }: SideNavBarItemComponentProps) => {
-  const pathname = usePathname();
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={pathname === href}>
-        <ActiveLink href={href} className="flex items-center" activeClassName="text-sky-500">
+      <SidebarMenuButton asChild className="hover:text-sky-500 data-[active=true]:text-sky-500 active:text-sky-500">
+        <ActiveLink
+          href={href}
+          className="flex items-center"
+          activeClassName="text-sky-500"
+        >
           <Icon className="mr-2 h-4 w-4" />
-          <span>{label}</span>
+          <span className="font-semibold">{label}</span>
         </ActiveLink>
       </SidebarMenuButton>
     </SidebarMenuItem>

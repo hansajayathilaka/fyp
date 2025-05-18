@@ -13,24 +13,28 @@ import { Search, Bell } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Suspense } from "react";
 import { SideNavBar } from "@/components/navbar/SideNavBar";
+import { usePathname } from "next/navigation";
 
 const RootCompanyLayout = ({ children }: { children: React.ReactNode }) => {
+  const path = usePathname();
   return (
     <SidebarProvider>
       <Suspense fallback={null}>
         <SideNavBar />
-        <SidebarInset className="bg-slate-50">
-          <header className="flex h-16 items-center justify-between border-b bg-white px-4">
+        <SidebarInset className="bg-[#E2F5FF]">
+          <header className="flex h-16 items-center justify-between border-b bg-white dark:bg-black px-4">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
-              <div className="relative w-[400px]">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search for stocks & more"
-                  className="w-full pl-8"
-                />
-              </div>
+              {path === "/company/dashboard" ? (
+                <div className="relative w-[400px]">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search for stocks & more"
+                    className="w-full pl-8"
+                  />
+                </div>
+              ) : null}
             </div>
             <div className="flex items-center gap-2">
               <Button size="icon" variant="ghost" className="rounded-full">
