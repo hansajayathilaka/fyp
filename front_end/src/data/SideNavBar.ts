@@ -27,3 +27,31 @@ export const CompanySideNavBarItemList = [
     href: "/company/reports-and-compliance",
   },
 ];
+
+export const InvestorSideNavBarItemList = [
+    {
+        icon: Home,
+        label: "Home",
+        href: "/",
+    },
+    {
+        icon: LayoutGrid,
+        label: "Dashboard",
+        href: "/investor/dashboard",
+    },
+    {
+        icon: Coins,
+        label: "Trading",
+        href: "/investor/trading",
+    },
+    {
+        icon: ListOrdered,
+        label: "My Wallet",
+        href: "/investor/my-wallet",
+    },
+    {
+        icon: FileBarChart,
+        label: "Peer Transactions",
+        href: "/investor/peer-transactions",
+    }
+]

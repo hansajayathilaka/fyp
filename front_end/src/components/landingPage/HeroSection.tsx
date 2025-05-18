@@ -8,6 +8,9 @@ export const HeroSection = () => {
   const handleRegisterAsCompany = () => {
     router.push("/company/dashboard");
   };
+  const handleRegisterAsInvestor = () => {
+    router.push("/investor/dashboard");
+  };
   return (
     <div
       id="home"
@@ -29,6 +32,7 @@ export const HeroSection = () => {
           buttonText="Register As A Investor"
           styles="md:h-[60px] md:w-[276x] bg-white dark:bg-darkBackGround border-[2px] border-black dark:border-white hover:bg-darkSecondary"
           variant="outline"
+          onClick={() => handleRegisterAsInvestor()}
         />
       </div>
     </div>
