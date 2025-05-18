@@ -3,9 +3,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Footer from "@/components/footer";
 import { SkeletonTheme } from "react-loading-skeleton";
-import Navbar from "@/components/navbar/navbar";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -30,13 +28,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           disableTransitionOnChange={true}
         >
           <SkeletonTheme baseColor="#202020" highlightColor="#444">
-            <div className="px-8">
-              <div className="absolute inset-0 w-full bg-white dark:bg-darkBackGround dark:bg-[radial-gradient(#374151_0.0001px,transparent_1px)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-                <Navbar />
-                <div className="md:px-8 pt-2 min-h-screen">{children}</div>
-                <Footer />
-              </div>
-            </div>
+            <div className="md:px-8 pt-2 min-h-screen">{children}</div>
           </SkeletonTheme>
         </ThemeProvider>
       </body>

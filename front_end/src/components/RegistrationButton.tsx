@@ -5,9 +5,11 @@ export const RegistrationButton = ({
   styles,
   buttonText,
   variant = "default",
+  onClick = () => {},
 }: RegistrationButtonType) => {
   return (
     <Button
+      onClick={onClick}
       variant={variant}
       className={`bg-darkSecondary dark:bg-darkSecondary dark:text-lightBackGround dark:hover:bg-buttonHover hover:bg-buttonHover
 font-bold text-lg ${styles} rounded-lg`}
