@@ -1,5 +1,5 @@
-const RootCompanyLayout = ({ children }: { children: React.ReactNode }) => {
+const MintNewTokenLayout = ({ children }: { children: React.ReactNode }) => {
   return <div>{children}</div>;
 };
 
-export default RootCompanyLayout;
+export default MintNewTokenLayout;

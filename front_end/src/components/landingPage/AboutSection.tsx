@@ -31,7 +31,7 @@ const Rating = ({ rating }: { rating: number }) => {
 
 export const AboutSection = () => {
   return (
-    <div className="text-black dark:text-white py-4 rounded-xl max-w-8xl mx-auto flex felx-col md:mt-24 mt-0">
+    <div id="about" className="text-black dark:text-white py-4 rounded-xl max-w-8xl mx-auto flex felx-col md:mt-24 mt-0">
       <div>
         <h3 className="text-sky-400 text-lg font-semibold">- About</h3>
         <h2 className="text-black text-2xl font-bold mt-2 dark:text-white">
