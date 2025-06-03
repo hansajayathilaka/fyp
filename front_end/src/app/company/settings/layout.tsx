@@ -1,5 +1,5 @@
-const RootCompanyLayout = ({ children }: { children: React.ReactNode }) => {
+const CompanySettingsLayout = ({ children }: { children: React.ReactNode }) => {
   return <div>{children}</div>;
 };
 
-export default RootCompanyLayout;
+export default CompanySettingsLayout;
