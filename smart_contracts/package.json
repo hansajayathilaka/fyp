@@ -1,14 +1,39 @@
 {
-  "name": "smart_contracts",
+  "name": "fyp_smart_contract",
   "version": "1.0.0",
+  "description": "Final Year Project - Blockchain Share Market Smart Contracts",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "deploy:localhost": "hardhat run scripts/deploy.ts --network localhost",
+    "demo": "hardhat run scripts/demo.ts --network localhost",
+    "demo:comprehensive": "hardhat run scripts/comprehensive-demo.ts --network localhost",
+    "demo:workflows": "hardhat run scripts/workflows-demo.ts --network localhost",
+    "node": "hardhat node",
+    "clean": "hardhat clean",
+    "coverage": "hardhat coverage",
+    "lint": "solhint 'contracts/**/*.sol'",
+    "lint:fix": "solhint 'contracts/**/*.sol' --fix"
   },
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "blockchain",
+    "smart-contracts",
+    "erc1155",
+    "marketplace",
+    "regulatory",
+    "hardhat",
+    "solidity"
+  ],
+  "author": "FYP Student",
+  "license": "MIT",
   "devDependencies": {
-    "hardhat": "^2.22.18"
+    "@nomicfoundation/hardhat-toolbox": "^6.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.14",
+    "hardhat": "^2.25.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.3.0"
   }
 }
