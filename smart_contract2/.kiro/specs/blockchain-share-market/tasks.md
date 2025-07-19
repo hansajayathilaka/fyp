@@ -133,25 +133,25 @@
     - Verify event emissions and state consistency using TypeScript
     - _Requirements: Cross-contract functionality_
 
-- [ ] 9. Build deployment and demo system
+- [x] 9. Build deployment and demo system
 
-  - [ ] 9.1 Create deployment scripts
+  - [x] 9.1 Create deployment scripts
     - Write TypeScript deployment script for RegulatoryManagement, RegulatedERC1155Token, and RegulatedMarketplace contracts
     - Implement contract initialization and linking
     - Add configuration for Hedera testnet deployment
     - Create basic verification of deployed contracts
     - _Requirements: 10.1, 10.2_
 
-  - [ ] 9.2 Create demo and testing utilities
+  - [x] 9.2 Create demo and testing utilities
     - Build TypeScript demo script showcasing main features
     - Create utility functions for testing and development
     - Add sample data creation for demonstration
     - Write basic usage documentation
     - _Requirements: 10.3, 10.4_
 
-- [ ] 10. Finalize frontend integration support
+- [-] 10. Finalize frontend integration support
 
-  - [ ] 10.1 Ensure proper event emission
+  - [x] 10.1 Ensure proper event emission
     - Add events for all major state changes
     - Implement comprehensive view functions for queries
     - Create functions to get user balances and order books
