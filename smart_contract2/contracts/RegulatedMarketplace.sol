@@ -138,6 +138,13 @@ contract RegulatedMarketplace is Ownable, ReentrancyGuard, Pausable, IERC1155Rec
     event SuspiciousActivityDetected(address indexed user, string reason);
     event ComplianceViolation(address indexed user, string violation);
     
+    // Additional events for frontend integration
+    event ContractPaused(uint256 timestamp);
+    event ContractUnpaused(uint256 timestamp);
+    event TradingPaused(uint256 timestamp);
+    event UserStatsUpdated(address indexed user, uint256 totalTrades, uint256 totalVolume);
+    event MarketplaceInitialized(address regulatoryManagement, address tokenContract, uint256 tradingFeePercentage);
+    
     /**
      * @dev Constructor
      * @param _regulatoryManagement Address of the regulatory management contract
@@ -155,6 +162,8 @@ contract RegulatedMarketplace is Ownable, ReentrancyGuard, Pausable, IERC1155Rec
         
         // Initialize with 0.5% trading fee (50 basis points)
         tradingFeePercentage = 50;
+        
+        emit MarketplaceInitialized(_regulatoryManagement, _tokenContract, tradingFeePercentage);
     }
     
     /**
@@ -190,6 +199,7 @@ contract RegulatedMarketplace is Ownable, ReentrancyGuard, Pausable, IERC1155Rec
      */
     function pause() external onlyOwner {
         _pause();
+        emit ContractPaused(block.timestamp);
     }
     
     /**
@@ -197,6 +207,7 @@ contract RegulatedMarketplace is Ownable, ReentrancyGuard, Pausable, IERC1155Rec
      */
     function unpause() external onlyOwner {
         _unpause();
+        emit ContractUnpaused(block.timestamp);
     }
     
     /**
@@ -204,6 +215,7 @@ contract RegulatedMarketplace is Ownable, ReentrancyGuard, Pausable, IERC1155Rec
      */
     function pauseTrading() external onlyOwner {
         _pause();
+        emit TradingPaused(block.timestamp);
     }
     
     /**
@@ -1056,6 +1068,8 @@ contract RegulatedMarketplace is Ownable, ReentrancyGuard, Pausable, IERC1155Rec
         userTotalTrades[user]++;
         // tradeVolume is already in wei, add it directly
         userTotalVolume[user] += tradeVolume;
+        
+        emit UserStatsUpdated(user, userTotalTrades[user], userTotalVolume[user]);
     }
     
     /**
@@ -1242,6 +1256,199 @@ contract RegulatedMarketplace is Ownable, ReentrancyGuard, Pausable, IERC1155Rec
             highestBuyPrice,
             lowestSellPrice
         );
+    }
+    
+    /**
+     * @dev Get marketplace statistics
+     * @return totalOrders Total number of orders placed
+     * @return activeOrders Number of active orders
+     * @return totalTrades Total number of completed trades
+     * @return totalVolume Total trading volume in ETH
+     * @return totalFeesCollected Total fees collected
+     */
+    function getMarketplaceStats() external view returns (
+        uint256 totalOrders,
+        uint256 activeOrders,
+        uint256 totalTrades,
+        uint256 totalVolume,
+        uint256 totalFeesCollected
+    ) {
+        totalOrders = _orderIdCounter;
+        totalFeesCollected = collectedFees;
+        
+        // Count active orders and calculate total volume
+        for (uint256 i = 1; i <= _orderIdCounter; i++) {
+            if (orders[i].status == OrderStatus.ACTIVE) {
+                activeOrders++;
+            }
+            if (orders[i].status == OrderStatus.FILLED) {
+                totalTrades++;
+                totalVolume += orders[i].filledAmount * orders[i].price;
+            }
+        }
+    }
+    
+    /**
+     * @dev Get all orders for a specific token
+     * @param tokenId Token ID to query
+     * @return Order[] Array of all orders (active, filled, cancelled) for the token
+     */
+    function getAllOrdersForToken(uint256 tokenId) external view returns (Order[] memory) {
+        // Count total orders for this token
+        uint256 count = 0;
+        for (uint256 i = 1; i <= _orderIdCounter; i++) {
+            if (orders[i].tokenId == tokenId) {
+                count++;
+            }
+        }
+        
+        // Create array and populate
+        Order[] memory tokenOrders = new Order[](count);
+        uint256 index = 0;
+        for (uint256 i = 1; i <= _orderIdCounter; i++) {
+            if (orders[i].tokenId == tokenId) {
+                tokenOrders[index] = orders[i];
+                index++;
+            }
+        }
+        
+        return tokenOrders;
+    }
+    
+    /**
+     * @dev Get recent orders (last N orders)
+     * @param count Number of recent orders to return
+     * @return Order[] Array of recent orders
+     */
+    function getRecentOrders(uint256 count) external view returns (Order[] memory) {
+        if (_orderIdCounter == 0) {
+            return new Order[](0);
+        }
+        
+        uint256 returnCount = count > _orderIdCounter ? _orderIdCounter : count;
+        Order[] memory recentOrders = new Order[](returnCount);
+        
+        for (uint256 i = 0; i < returnCount; i++) {
+            recentOrders[i] = orders[_orderIdCounter - i];
+        }
+        
+        return recentOrders;
+    }
+    
+    /**
+     * @dev Get orders by status
+     * @param status Order status to filter by
+     * @return Order[] Array of orders with the specified status
+     */
+    function getOrdersByStatus(OrderStatus status) external view returns (Order[] memory) {
+        // Count orders with specified status
+        uint256 count = 0;
+        for (uint256 i = 1; i <= _orderIdCounter; i++) {
+            if (orders[i].status == status) {
+                count++;
+            }
+        }
+        
+        // Create array and populate
+        Order[] memory statusOrders = new Order[](count);
+        uint256 index = 0;
+        for (uint256 i = 1; i <= _orderIdCounter; i++) {
+            if (orders[i].status == status) {
+                statusOrders[index] = orders[i];
+                index++;
+            }
+        }
+        
+        return statusOrders;
+    }
+    
+    /**
+     * @dev Get comprehensive user trading data
+     * @param user Address of the user
+     * @return ethBalance User's ETH balance in marketplace
+     * @return tokenIds Array of token IDs user has balances for
+     * @return tokenBalanceAmounts Array of token balances
+     * @return activeOrdersCount Number of active orders
+     * @return totalTradesCount Total completed trades
+     * @return totalVolumeTraded Total volume traded in ETH
+     */
+    function getComprehensiveUserData(address user) external view returns (
+        uint256 ethBalance,
+        uint256[] memory tokenIds,
+        uint256[] memory tokenBalanceAmounts,
+        uint256 activeOrdersCount,
+        uint256 totalTradesCount,
+        uint256 totalVolumeTraded
+    ) {
+        // Get balance data
+        (ethBalance, tokenIds, tokenBalanceAmounts) = this.getUserBalance(user);
+        
+        // Get trading stats
+        totalTradesCount = userTotalTrades[user];
+        totalVolumeTraded = userTotalVolume[user];
+        
+        // Count active orders
+        uint256[] memory userOrderIds = userOrders[user];
+        for (uint256 i = 0; i < userOrderIds.length; i++) {
+            if (orders[userOrderIds[i]].status == OrderStatus.ACTIVE) {
+                activeOrdersCount++;
+            }
+        }
+    }
+    
+    /**
+     * @dev Get market depth for a token (aggregated order book data)
+     * @param tokenId Token ID to query
+     * @param levels Number of price levels to return
+     * @return buyPrices Array of buy price levels
+     * @return buyVolumes Array of buy volumes at each price level
+     * @return sellPrices Array of sell price levels
+     * @return sellVolumes Array of sell volumes at each price level
+     */
+    function getMarketDepth(uint256 tokenId, uint256 levels) external view returns (
+        uint256[] memory buyPrices,
+        uint256[] memory buyVolumes,
+        uint256[] memory sellPrices,
+        uint256[] memory sellVolumes
+    ) {
+        // Get sorted orders
+        (Order[] memory buyOrders, Order[] memory sellOrders) = this.getOrderBook(tokenId);
+        
+        // Initialize arrays
+        buyPrices = new uint256[](levels);
+        buyVolumes = new uint256[](levels);
+        sellPrices = new uint256[](levels);
+        sellVolumes = new uint256[](levels);
+        
+        // Aggregate buy orders by price level
+        uint256 buyLevel = 0;
+        for (uint256 i = 0; i < buyOrders.length && buyLevel < levels; i++) {
+            uint256 price = buyOrders[i].price;
+            uint256 volume = buyOrders[i].amount - buyOrders[i].filledAmount;
+            
+            if (buyLevel == 0 || buyPrices[buyLevel - 1] != price) {
+                buyPrices[buyLevel] = price;
+                buyVolumes[buyLevel] = volume;
+                buyLevel++;
+            } else {
+                buyVolumes[buyLevel - 1] += volume;
+            }
+        }
+        
+        // Aggregate sell orders by price level
+        uint256 sellLevel = 0;
+        for (uint256 i = 0; i < sellOrders.length && sellLevel < levels; i++) {
+            uint256 price = sellOrders[i].price;
+            uint256 volume = sellOrders[i].amount - sellOrders[i].filledAmount;
+            
+            if (sellLevel == 0 || sellPrices[sellLevel - 1] != price) {
+                sellPrices[sellLevel] = price;
+                sellVolumes[sellLevel] = volume;
+                sellLevel++;
+            } else {
+                sellVolumes[sellLevel - 1] += volume;
+            }
+        }
     }
     
     /**

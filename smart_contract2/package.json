@@ -9,10 +9,20 @@
     "test:coverage": "hardhat coverage",
     "deploy:local": "hardhat run scripts/deploy.ts --network hardhat",
     "deploy:hedera": "hardhat run scripts/deploy.ts --network hederaTestnet",
+    "demo:local": "hardhat run scripts/demo.ts --network hardhat",
+    "demo:hedera": "hardhat run scripts/demo.ts --network hederaTestnet",
+    "utilities": "hardhat run scripts/utilities.ts --network hardhat",
     "node": "hardhat node",
     "clean": "hardhat clean"
   },
-  "keywords": ["blockchain", "smart-contracts", "trading", "ssi", "erc1155", "hardhat"],
+  "keywords": [
+    "blockchain",
+    "smart-contracts",
+    "trading",
+    "ssi",
+    "erc1155",
+    "hardhat"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {

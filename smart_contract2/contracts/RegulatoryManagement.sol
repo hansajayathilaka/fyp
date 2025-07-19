@@ -49,6 +49,9 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
     event UserVerified(address indexed userAddress, uint256 verificationDate);
     event UserSuspended(address indexed userAddress, uint256 suspensionDate);
     event UserUnsuspended(address indexed userAddress, uint256 unsuspensionDate);
+    event PermissionsUpdated(address indexed userAddress, bool canTrade, bool canCreateTokens);
+    event ContractPaused(uint256 timestamp);
+    event ContractUnpaused(uint256 timestamp);
     
     constructor() Ownable(msg.sender) {}
     
@@ -70,6 +73,7 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
         }
         
         emit UserVerified(userAddress, block.timestamp);
+        emit PermissionsUpdated(userAddress, true, userProfiles[userAddress].canCreateTokens);
     }
     
     /**
@@ -85,6 +89,7 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
         userProfiles[userAddress].canCreateTokens = false;
         
         emit UserSuspended(userAddress, block.timestamp);
+        emit PermissionsUpdated(userAddress, false, false);
     }
     
     /**
@@ -106,6 +111,7 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
         }
         
         emit UserUnsuspended(userAddress, block.timestamp);
+        emit PermissionsUpdated(userAddress, userProfiles[userAddress].canTrade, userProfiles[userAddress].canCreateTokens);
     }
     
     /**
@@ -113,6 +119,7 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
      */
     function pause() external onlyOwner {
         _pause();
+        emit ContractPaused(block.timestamp);
     }
     
     /**
@@ -120,6 +127,7 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
      */
     function unpause() external onlyOwner {
         _unpause();
+        emit ContractUnpaused(block.timestamp);
     }
     
     /**
@@ -148,6 +156,7 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
         userProfiles[msg.sender] = newProfile;
         isUserRegistered[msg.sender] = true;
         ssiIdentifierUsed[ssiIdentifier] = true;
+        allUsers.push(msg.sender);
         
         emit UserRegistered(msg.sender, ssiIdentifier, userType, block.timestamp);
     }
@@ -227,5 +236,113 @@ contract RegulatoryManagement is Ownable, ReentrancyGuard, Pausable {
     function getUserType(address userAddress) external view returns (UserType) {
         require(isUserRegistered[userAddress], "User not registered");
         return userProfiles[userAddress].userType;
+    }
+    
+    // Array to track all registered users for frontend queries
+    address[] public allUsers;
+    
+    /**
+     * @dev Get all registered users
+     * @return address[] Array of all registered user addresses
+     */
+    function getAllUsers() external view returns (address[] memory) {
+        return allUsers;
+    }
+    
+    /**
+     * @dev Get total number of registered users
+     * @return uint256 Total number of users
+     */
+    function getTotalUsers() external view returns (uint256) {
+        return allUsers.length;
+    }
+    
+    /**
+     * @dev Get platform statistics
+     * @return totalUsers Total number of registered users
+     * @return verifiedUsers Number of verified users
+     * @return companyUsers Number of company users
+     * @return individualUsers Number of individual users
+     * @return suspendedUsers Number of suspended users
+     */
+    function getPlatformStats() external view returns (
+        uint256 totalUsers,
+        uint256 verifiedUsers,
+        uint256 companyUsers,
+        uint256 individualUsers,
+        uint256 suspendedUsers
+    ) {
+        totalUsers = allUsers.length;
+        
+        for (uint256 i = 0; i < allUsers.length; i++) {
+            UserProfile memory profile = userProfiles[allUsers[i]];
+            
+            if (profile.isVerified) {
+                verifiedUsers++;
+            }
+            
+            if (profile.userType == UserType.Company) {
+                companyUsers++;
+            } else {
+                individualUsers++;
+            }
+            
+            if (profile.isSuspended) {
+                suspendedUsers++;
+            }
+        }
+    }
+    
+    /**
+     * @dev Get users by type
+     * @param userType The type of users to retrieve
+     * @return address[] Array of user addresses of the specified type
+     */
+    function getUsersByType(UserType userType) external view returns (address[] memory) {
+        // Count users of the specified type
+        uint256 count = 0;
+        for (uint256 i = 0; i < allUsers.length; i++) {
+            if (userProfiles[allUsers[i]].userType == userType) {
+                count++;
+            }
+        }
+        
+        // Create array and populate
+        address[] memory usersOfType = new address[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < allUsers.length; i++) {
+            if (userProfiles[allUsers[i]].userType == userType) {
+                usersOfType[index] = allUsers[i];
+                index++;
+            }
+        }
+        
+        return usersOfType;
+    }
+    
+    /**
+     * @dev Get verified users only
+     * @return address[] Array of verified user addresses
+     */
+    function getVerifiedUsers() external view returns (address[] memory) {
+        // Count verified users
+        uint256 count = 0;
+        for (uint256 i = 0; i < allUsers.length; i++) {
+            if (userProfiles[allUsers[i]].isVerified && !userProfiles[allUsers[i]].isSuspended) {
+                count++;
+            }
+        }
+        
+        // Create array and populate
+        address[] memory verifiedUsers = new address[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < allUsers.length; i++) {
+            if (userProfiles[allUsers[i]].isVerified && !userProfiles[allUsers[i]].isSuspended) {
+                verifiedUsers[index] = allUsers[i];
+                index++;
+            }
+        }
+        
+        return verifiedUsers;
     }
 }

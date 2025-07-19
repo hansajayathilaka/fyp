@@ -64,6 +64,16 @@ contract RegulatedERC1155Token is ERC1155, Ownable, ReentrancyGuard, Pausable {
         bool isActive
     );
     
+    event ContractPaused(uint256 timestamp);
+    event ContractUnpaused(uint256 timestamp);
+    event MarketplaceTransfer(
+        address indexed from,
+        address indexed to,
+        uint256 indexed tokenId,
+        uint256 amount,
+        address marketplace
+    );
+    
     /**
      * @dev Constructor
      * @param _regulatoryManagement Address of the regulatory management contract
@@ -102,6 +112,7 @@ contract RegulatedERC1155Token is ERC1155, Ownable, ReentrancyGuard, Pausable {
      */
     function pause() external onlyOwner {
         _pause();
+        emit ContractPaused(block.timestamp);
     }
     
     /**
@@ -109,6 +120,7 @@ contract RegulatedERC1155Token is ERC1155, Ownable, ReentrancyGuard, Pausable {
      */
     function unpause() external onlyOwner {
         _unpause();
+        emit ContractUnpaused(block.timestamp);
     }
     
     /**
@@ -330,6 +342,9 @@ contract RegulatedERC1155Token is ERC1155, Ownable, ReentrancyGuard, Pausable {
         
         // Perform the transfer
         _safeTransferFrom(from, to, id, amount, "");
+        
+        // Emit marketplace transfer event
+        emit MarketplaceTransfer(from, to, id, amount, msg.sender);
     }
     
     /**
@@ -405,6 +420,118 @@ contract RegulatedERC1155Token is ERC1155, Ownable, ReentrancyGuard, Pausable {
         }
         
         super.safeBatchTransferFrom(from, to, ids, amounts, data);
+    }
+    
+    /**
+     * @dev Get tokens created by a specific user
+     * @param creator Address of the token creator
+     * @return uint256[] Array of token IDs created by the user
+     */
+    function getTokensByCreator(address creator) external view returns (uint256[] memory) {
+        // Count tokens created by this user
+        uint256 count = 0;
+        for (uint256 i = 0; i < allTokenIds.length; i++) {
+            if (tokenMetadata[allTokenIds[i]].creator == creator) {
+                count++;
+            }
+        }
+        
+        // Create array and populate
+        uint256[] memory creatorTokens = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < allTokenIds.length; i++) {
+            if (tokenMetadata[allTokenIds[i]].creator == creator) {
+                creatorTokens[index] = allTokenIds[i];
+                index++;
+            }
+        }
+        
+        return creatorTokens;
+    }
+    
+    /**
+     * @dev Get active tokens only
+     * @return uint256[] Array of active token IDs
+     */
+    function getActiveTokens() external view returns (uint256[] memory) {
+        // Count active tokens
+        uint256 count = 0;
+        for (uint256 i = 0; i < allTokenIds.length; i++) {
+            if (tokenMetadata[allTokenIds[i]].isActive) {
+                count++;
+            }
+        }
+        
+        // Create array and populate
+        uint256[] memory activeTokens = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < allTokenIds.length; i++) {
+            if (tokenMetadata[allTokenIds[i]].isActive) {
+                activeTokens[index] = allTokenIds[i];
+                index++;
+            }
+        }
+        
+        return activeTokens;
+    }
+    
+    /**
+     * @dev Get token statistics
+     * @return totalTokens Total number of token types created
+     * @return activeTokens Number of active token types
+     * @return totalSupplyAll Total supply across all tokens
+     * @return totalMaxSupplyAll Total max supply across all tokens
+     */
+    function getTokenStats() external view returns (
+        uint256 totalTokens,
+        uint256 activeTokens,
+        uint256 totalSupplyAll,
+        uint256 totalMaxSupplyAll
+    ) {
+        totalTokens = allTokenIds.length;
+        
+        for (uint256 i = 0; i < allTokenIds.length; i++) {
+            TokenMetadata memory metadata = tokenMetadata[allTokenIds[i]];
+            
+            if (metadata.isActive) {
+                activeTokens++;
+            }
+            
+            totalSupplyAll += metadata.currentSupply;
+            totalMaxSupplyAll += metadata.maxSupply;
+        }
+    }
+    
+    /**
+     * @dev Get multiple token info at once
+     * @param tokenIds Array of token IDs to query
+     * @return TokenMetadata[] Array of token metadata
+     */
+    function getMultipleTokenInfo(uint256[] memory tokenIds) external view returns (TokenMetadata[] memory) {
+        TokenMetadata[] memory tokensInfo = new TokenMetadata[](tokenIds.length);
+        
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            require(_tokenExists(tokenIds[i]), "Token does not exist");
+            tokensInfo[i] = tokenMetadata[tokenIds[i]];
+        }
+        
+        return tokensInfo;
+    }
+    
+    /**
+     * @dev Get user's token balances for multiple tokens
+     * @param user Address of the user
+     * @param tokenIds Array of token IDs to check
+     * @return uint256[] Array of balances corresponding to token IDs
+     */
+    function getUserTokenBalances(address user, uint256[] memory tokenIds) external view returns (uint256[] memory) {
+        uint256[] memory balances = new uint256[](tokenIds.length);
+        
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            balances[i] = balanceOf(user, tokenIds[i]);
+        }
+        
+        return balances;
     }
     
     /**
