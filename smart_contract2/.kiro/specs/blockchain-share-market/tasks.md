@@ -88,7 +88,6 @@
 
 - [x] 6. Add trading fees and basic compliance
 
-
   - [x] 6.1 Implement simple fee system
     - Create basic percentage-based fee calculation
     - Add fee collection during trade execution
@@ -105,12 +104,6 @@
 
 - [x] 7. Implement security and emergency controls
 
-
-
-
-
-
-
   - [x] 7.1 Add basic security measures
     - Implement ReentrancyGuard on state-changing functions
     - Add basic access control modifiers
@@ -118,33 +111,22 @@
     - Write tests for security measures
     - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-
-
   - [x] 7.2 Add order cancellation functionality
     - Implement cancelOrder function with fund return
     - Add proper validation for order ownership
     - Update order status and return escrowed funds/tokens
     - Write tests for order cancellation scenarios
     - _Requirements: 4.5_
-- [ ] 8. Create basic test suite
-
-
-
-
-
+- [x] 8. Create basic test suite
 
   - [x] 8.1 Write integration tests for main workflows
-
     - Test complete user registration and verification flow
     - Test token creation and minting workflow
     - Test basic trading workflow (deposit, order, match, withdraw)
     - Write tests for error conditions and edge cases
     - _Requirements: All requirements integration_
 
-
-
   - [x] 8.2 Test contract interactions
-
     - Test RegulatoryManagement and RegulatedERC1155Token integration
     - Test RegulatedERC1155Token and RegulatedMarketplace integration
     - Test permission enforcement across contracts
