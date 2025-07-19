@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Web3Provider } from "@/hooks/useWeb3";
+import { Toaster } from "@/components/ui/sonner";
 import { SkeletonTheme } from "react-loading-skeleton";
 
 const poppins = Poppins({
@@ -27,9 +29,12 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           enableSystem={true}
           disableTransitionOnChange={true}
         >
-          <SkeletonTheme baseColor="#202020" highlightColor="#444">
-            <div className="md:px-8 pt-2 min-h-screen">{children}</div>
-          </SkeletonTheme>
+          <Web3Provider>
+            <SkeletonTheme baseColor="#202020" highlightColor="#444">
+              <div className="md:px-8 pt-2 min-h-screen">{children}</div>
+              <Toaster />
+            </SkeletonTheme>
+          </Web3Provider>
         </ThemeProvider>
       </body>
     </html>

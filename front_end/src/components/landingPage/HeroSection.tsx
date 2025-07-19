@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { RegistrationButton } from "../RegistrationButton";
+import { WalletConnect } from "../WalletConnect";
 
 export const HeroSection = () => {
   const router = useRouter();
@@ -14,7 +15,7 @@ export const HeroSection = () => {
   return (
     <div
       id="home"
-      className="flex flex-1 h-[calc(100vh-120px)] flex-col items-center justify-center md:gap-5"
+      className="flex flex-1 h-[calc(100vh-120px)] flex-col items-center justify-center md:gap-5 pt-[200px]"
     >
       <h1 className="md:text-[55px] text-[30px] font-bold text-center md:max-w-[1000px] sm:max-w-[600px]">
         Revolutionizing Equity Investment through Blockchain

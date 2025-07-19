@@ -29,7 +29,7 @@ export const MobileNavBar = ({ setTogleMenu }: MobileNavBarProps) => {
         />
       ))}
       <LightDarkSwitcherButton styles="pb-5 pt-20"/>
-      <ConnectWalletButton />
+      <ConnectWalletButton styles="w-full h-12" />
     </motion.div>
   );
 };
