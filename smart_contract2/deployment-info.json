@@ -1,0 +1,14 @@
+{
+  "regulatoryManagement": "0x08db47BeFB28439fEF37702a59616BA02C868a8D",
+  "regulatedERC1155Token": "0xF76d17C50f967da99427586339996645c135190F",
+  "regulatedMarketplace": "0x3F446f27FFAC6d4eB7f6C86267916BB8119D40Bd",
+  "deployer": "0x3D4ED8288A1264ce3Ba01E0F2dc8C8541bFbB5Ff",
+  "network": "hederaTestnet",
+  "chainId": 296,
+  "deploymentTime": "2025-07-20T01:44:14.359Z",
+  "contractABIs": {
+    "regulatoryManagement": "RegulatoryManagement",
+    "regulatedERC1155Token": "RegulatedERC1155Token",
+    "regulatedMarketplace": "RegulatedMarketplace"
+  }
+}

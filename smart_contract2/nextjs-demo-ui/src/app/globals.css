@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* Force light mode for better visibility */
+body {
+  color: #171717;
+  background: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ensure form elements are always visible */
+input, textarea, select {
+  color: #171717 !important;
+  background-color: #ffffff !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Ensure headers are visible */
+h1, h2, h3, h4, h5, h6 {
+  color: #111827 !important;
+}
+
+/* Ensure labels are visible */
+label {
+  color: #374151 !important;
+}
+
+/* Ensure buttons are visible */
+button {
+  color: inherit !important;
+}
+
+/* Fix any potential z-index issues */
+.relative {
+  z-index: auto;
+}
+
+/* Ensure proper contrast for all text elements */
+p, span, div {
+  color: inherit;
+}
+
+/* Fix form focus states */
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Ensure all form elements have proper styling */
+.form-input {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.form-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Ensure dropdown options are visible */
+select option {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+/* Fix any potential webkit appearance issues */
+input[type="text"], input[type="number"], select, textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

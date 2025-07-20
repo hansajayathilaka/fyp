@@ -1,5 +1,15 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import * as dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Ensure private key is available
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+if (!PRIVATE_KEY) {
+  throw new Error("Please set your PRIVATE_KEY in a .env file");
+}
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -21,9 +31,10 @@ const config: HardhatUserConfig = {
     hederaTestnet: {
       url: "https://testnet.hashio.io/api",
       chainId: 296,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: [PRIVATE_KEY],
       gas: 300000,
-      gasPrice: 10000000000, // 10 gwei
+      gasPrice: 330000000000, // 330 gwei
+      timeout: 120000, // 2 minutes
     },
   },
   paths: {
@@ -35,6 +46,7 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 40000,
   },
+
 };
 
 export default config;

@@ -1,6 +1,7 @@
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import * as fs from 'fs';
+import { parseAmount, formatAmount } from '../src/utils/decimal-utils';
 
 /**
  * Utility functions for testing and development of the Blockchain Share Market system
@@ -90,7 +91,7 @@ export async function createSampleData() {
         symbol: "TECH",
         companyName: "TechCorp Inc.",
         maxSupply: ethers.parseUnits("1000000", 0),
-        initialPrice: ethers.parseEther("0.01"),
+        initialPrice: parseAmount("0.01"),
         mintAmount: ethers.parseUnits("10000", 0)
       },
       {
@@ -98,7 +99,7 @@ export async function createSampleData() {
         symbol: "GREEN",
         companyName: "GreenEnergy Ltd.",
         maxSupply: ethers.parseUnits("500000", 0),
-        initialPrice: ethers.parseEther("0.02"),
+        initialPrice: parseAmount("0.02"),
         mintAmount: ethers.parseUnits("5000", 0)
       }
     ],
@@ -106,17 +107,17 @@ export async function createSampleData() {
       buyOrder: {
         tokenId: 1,
         amount: ethers.parseUnits("100", 0),
-        price: ethers.parseEther("0.015")
+        price: parseAmount("0.015")
       },
       sellOrder: {
         tokenId: 1,
         amount: ethers.parseUnits("50", 0),
-        price: ethers.parseEther("0.015")
+        price: parseAmount("0.015")
       }
     },
     depositAmounts: {
-      individual1ETH: ethers.parseEther("2.0"),
-      individual2ETH: ethers.parseEther("3.0"),
+      individual1ETH: parseAmount("2.0"),
+      individual2ETH: parseAmount("3.0"),
       company1Tokens: ethers.parseUnits("1000", 0)
     }
   };
@@ -207,14 +208,14 @@ export async function setupMarketplaceBalances(
     await contracts.regulatedMarketplace.connect(users.individual1).depositETH({
       value: amounts.individual1ETH
     });
-    console.log(`✅ Individual 1 deposited ${ethers.formatEther(amounts.individual1ETH)} ETH`);
+    console.log(`✅ Individual 1 deposited ${formatAmount(amounts.individual1ETH)} ETH`);
   }
   
   if (amounts.individual2ETH) {
     await contracts.regulatedMarketplace.connect(users.individual2).depositETH({
       value: amounts.individual2ETH
     });
-    console.log(`✅ Individual 2 deposited ${ethers.formatEther(amounts.individual2ETH)} ETH`);
+    console.log(`✅ Individual 2 deposited ${formatAmount(amounts.individual2ETH)} ETH`);
   }
   
   // Deposit tokens for companies
@@ -245,17 +246,17 @@ export async function getSystemStatus(contracts: ContractInstances) {
     console.log(`Token ${tokenId}: ${tokenInfo.name} (${tokenInfo.symbol})`);
     console.log(`  Company: ${tokenInfo.companyName}`);
     console.log(`  Supply: ${tokenInfo.currentSupply}/${tokenInfo.maxSupply}`);
-    console.log(`  Price: ${ethers.formatEther(tokenInfo.initialPrice)} ETH`);
+    console.log(`  Price: ${formatAmount(tokenInfo.initialPrice)} ETH`);
     
     // Get order book stats
     try {
       const stats = await contracts.regulatedMarketplace.getOrderBookStats(tokenId);
       console.log(`  Order Book: ${stats.totalBuyOrders} buy orders, ${stats.totalSellOrders} sell orders`);
       if (stats.highestBuyPrice > 0) {
-        console.log(`  Highest Buy: ${ethers.formatEther(stats.highestBuyPrice)} ETH`);
+        console.log(`  Highest Buy: ${formatAmount(stats.highestBuyPrice)} ETH`);
       }
       if (stats.lowestSellPrice > 0) {
-        console.log(`  Lowest Sell: ${ethers.formatEther(stats.lowestSellPrice)} ETH`);
+        console.log(`  Lowest Sell: ${formatAmount(stats.lowestSellPrice)} ETH`);
       }
     } catch (error) {
       console.log(`  Order Book: Unable to fetch stats`);
@@ -296,7 +297,7 @@ export async function getUserStatus(contracts: ContractInstances, userAddress: s
     
     // Get marketplace balances
     const balance = await contracts.regulatedMarketplace.getUserBalance(userAddress);
-    console.log(`ETH Balance: ${ethers.formatEther(balance.ethBalance)} ETH`);
+    console.log(`ETH Balance: ${formatAmount(balance.ethBalance)} ETH`);
     
     if (balance.tokenIds.length > 0) {
       console.log("Token Balances:");
