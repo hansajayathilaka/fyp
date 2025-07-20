@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers as originalEthers } from "hardhat";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { 
@@ -7,6 +7,7 @@ import {
   RegulatedERC1155Token, 
   RegulatedMarketplace 
 } from "../typechain-types";
+import { networkAwareEthers as ethers } from "./utils/test-decimal-utils";
 
 describe("RegulatedMarketplace - Balance Management", function () {
   let regulatoryManagement: RegulatoryManagement;

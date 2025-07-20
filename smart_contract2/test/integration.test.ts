@@ -1,11 +1,12 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers as originalEthers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { 
   RegulatoryManagement, 
   RegulatedERC1155Token, 
   RegulatedMarketplace 
 } from "../typechain-types";
+import { networkAwareEthers as ethers } from "./utils/test-decimal-utils";
 
 describe("Integration Tests - Main Workflows", function () {
   let regulatoryManagement: RegulatoryManagement;
