@@ -12,6 +12,7 @@
     "demo:local": "hardhat run scripts/demo.ts --network hardhat",
     "demo:hedera": "hardhat run scripts/demo.ts --network hederaTestnet",
     "utilities": "hardhat run scripts/utilities.ts --network hardhat",
+    "verify": "hardhat run scripts/verify.ts --network hederaTestnet",
     "node": "hardhat node",
     "clean": "hardhat clean"
   },
@@ -37,6 +38,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.4.0"
+    "@openzeppelin/contracts": "^5.4.0",
+    "dotenv": "^17.2.0"
   }
 }

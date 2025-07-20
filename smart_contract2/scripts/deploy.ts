@@ -1,5 +1,6 @@
 import { ethers } from "hardhat";
 import { BaseContract } from "ethers";
+import { parseAmount, formatAmount } from '../src/utils/decimal-utils';
 
 interface DeployedContracts {
   regulatoryManagement: BaseContract;
@@ -29,12 +30,12 @@ async function main() {
   console.log("👤 Deploying contracts with account:", deployer.address);
   
   const balance = await ethers.provider.getBalance(deployer.address);
-  console.log("💰 Account balance:", ethers.formatEther(balance), "ETH\n");
+  console.log("💰 Account balance:", formatAmount(balance), "ETH\n");
   
   // Check minimum balance for deployment
-  const minBalance = ethers.parseEther("0.1");
+  const minBalance = parseAmount("0.1");
   if (balance < minBalance) {
-    throw new Error(`Insufficient balance. Need at least 0.1 ETH for deployment, but have ${ethers.formatEther(balance)} ETH`);
+    throw new Error(`Insufficient balance. Need at least 0.1 ETH for deployment, but have ${formatAmount(balance)} ETH`);
   }
   
   try {
