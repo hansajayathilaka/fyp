@@ -3,7 +3,7 @@
 ## Project Overview
 This is a Hardhat-based smart contract project for a **blockchain share market** using **ERC-1155 tokens**. The system implements a regulated trading platform where only authorized and verified users can participate in token trading activities.
 
-**Current Status**: ✅ **PRODUCTION-READY** - All core functionality implemented, debugged, and tested successfully. Complete workflow verified with perfect balance reconciliation.
+**Current Status**: Needs development of smart contracts with a focus on regulatory compliance, user verification, and secure trading mechanisms.
 
 ## Core Concepts & Architecture
 
@@ -25,7 +25,6 @@ This is a Hardhat-based smart contract project for a **blockchain share market**
   - Real-time trading limit enforcement (daily/monthly)
   - Authorized verifier management
   - Marketplace authorization system
-  - Jurisdiction tracking for compliance
 
 #### **RegulatedERC1155Token Contract** (`contracts/ERC1155Token.sol`)
 - **Primary Purpose**: Multi-token standard for share certificates
@@ -38,15 +37,17 @@ This is a Hardhat-based smart contract project for a **blockchain share market**
   - **Token Unit Handling**: Uses simple whole numbers (like traditional shares)
 
 #### **RegulatedMarketplace Contract** (`contracts/Marketplace.sol`)
-- **Primary Purpose**: Trading platform for token exchange
+- **Primary Purpose**: Exchange-style trading platform for token trading
 - **Key Features**:
-  - Fixed-price and trading-style listings
-  - **Professional Escrow System**: Tokens held safely during listings
-  - **ERC1155Receiver Implementation**: Properly handles token transfers
-  - ETH-only fee structure (preserves all tokens)
+  - **Order Book Design**: Separate buy and sell order books like Binance
+  - **Automatic Matching**: Buy and sell orders automatically match when conditions align
+  - **Decoupled Orders**: Users can place buy orders without existing sell orders
+  - **Escrow System**: Tokens held in escrow only during active sell orders
+  - **Partial Fulfillment**: Orders can be partially filled based on available matches
+  - **Ownership Transfer**: Seller's token ownership transfers only when buy/sell orders match
+  - ERC1155Receiver implementation for token handling
+  - ETH-only fee structure (2.5% default)
   - Regulatory compliance integration
-  - Trading fee management (2.5% default)
-  - buying and selling tokens
   - Emergency controls and pause functionality
   - **Complete Balance Tracking**: Full transparency of all funds
 
@@ -54,8 +55,8 @@ This is a Hardhat-based smart contract project for a **blockchain share market**
 ```
 1. User Authentication via SSI → User Registration with SSI Identifier → External KYC Verification
 2. Admin Verification in Smart Contract → Trading Permission Assignment
-3. Company Registration → Token Creation → Token Minting → Marketplace Listing
-4. Trader Registration → Browse Marketplace → Purchase/Sell Tokens → Settlement
+3. Company Registration → Token Creation → Token Minting → Marketplace Orders
+4. Trader Registration → Browse Order Books → Place Buy/Sell Orders → Automatic Matching → Settlement
 5. Admin Oversight → User Management → Compliance Monitoring → System Controls
 ```
 
@@ -76,8 +77,17 @@ This is a Hardhat-based smart contract project for a **blockchain share market**
 3. **Multi-Signature Controls**: Critical admin functions require proper authorization
 4. **Emergency Stops**: Pausable contracts for emergency situations
 5. **Input Validation**: Comprehensive parameter validation and error handling
-6. **Escrow Safety**: Tokens held securely in marketplace during listings
+6. **Escrow Safety**: Tokens held securely in marketplace during sell listings only
 7. **ERC1155Receiver**: Proper interface implementation for token transfers
+
+### Order Book Implementation
+- **Dual Order Books**: Separate structures for buy and sell orders
+- **Order Matching Engine**: Automated system to match compatible buy/sell orders
+- **Price-Time Priority**: Orders matched based on price and timestamp
+- **Partial Fulfillment Logic**: Support for partial order execution
+- **Order Management**: Create, cancel, and update order functionality
+- **Balance Management**: Track ETH balances for buyers and token balances for sellers
+- **Event Emission**: Comprehensive events for UI updates on order status
 
 ### Regulatory Compliance Features
 - **External KYC Process**: KYC handled by separate SSI platform (no personal data stored on-chain)

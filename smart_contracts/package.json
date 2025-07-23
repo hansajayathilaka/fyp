@@ -1,39 +1,44 @@
 {
-  "name": "fyp_smart_contract",
+  "name": "blockchain-share-market",
   "version": "1.0.0",
-  "description": "Final Year Project - Blockchain Share Market Smart Contracts",
+  "description": "A blockchain-based share market system with SSI integration for university final year project",
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.ts",
-    "deploy:localhost": "hardhat run scripts/deploy.ts --network localhost",
-    "demo": "hardhat run scripts/demo.ts --network localhost",
-    "demo:comprehensive": "hardhat run scripts/comprehensive-demo.ts --network localhost",
-    "demo:workflows": "hardhat run scripts/workflows-demo.ts --network localhost",
+    "test:coverage": "hardhat coverage",
+    "deploy:local": "hardhat run scripts/deploy.ts --network hardhat",
+    "deploy:hedera": "hardhat run scripts/deploy.ts --network hederaTestnet",
+    "demo:local": "hardhat run scripts/demo.ts --network hardhat",
+    "demo:hedera": "hardhat run scripts/demo.ts --network hederaTestnet",
+    "utilities": "hardhat run scripts/utilities.ts --network hardhat",
+    "verify": "hardhat run scripts/verify.ts --network hederaTestnet",
     "node": "hardhat node",
-    "clean": "hardhat clean",
-    "coverage": "hardhat coverage",
-    "lint": "solhint 'contracts/**/*.sol'",
-    "lint:fix": "solhint 'contracts/**/*.sol' --fix"
+    "clean": "hardhat clean"
   },
   "keywords": [
     "blockchain",
     "smart-contracts",
+    "trading",
+    "ssi",
     "erc1155",
-    "marketplace",
-    "regulatory",
-    "hardhat",
-    "solidity"
+    "hardhat"
   ],
-  "author": "FYP Student",
+  "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^6.0.0",
-    "@nomicfoundation/hardhat-verify": "^2.0.14",
-    "hardhat": "^2.25.0"
+    "@nomicfoundation/hardhat-ethers": "^3.1.0",
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@types/chai": "^4.3.20",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.0.15",
+    "ethers": "^6.15.0",
+    "hardhat": "^2.26.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.3.0"
+    "@openzeppelin/contracts": "^5.4.0",
+    "dotenv": "^17.2.0"
   }
 }
