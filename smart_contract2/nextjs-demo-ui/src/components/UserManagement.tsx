@@ -7,6 +7,7 @@ import { useContractOwner } from '../hooks/useContractOwner'
 import { clsx } from 'clsx'
 import { type UserProfile, getUserTypeDisplayName } from '../types/regulatory'
 import { UserQuickActions, UserDetailsModal } from './UserQuickActions'
+import { useEnhancedTransactionState, TransactionFeedback } from './TransactionFeedback'
 
 interface UserManagementProps {
   onUserSelect?: (address: string) => void
@@ -24,6 +25,9 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
   const [sortBy, setSortBy] = useState<'address' | 'registration' | 'type' | 'status'>('registration')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [selectedUserForModal, setSelectedUserForModal] = useState<string | null>(null)
+
+  // Transaction state for user management actions
+  const userManagementTransaction = useEnhancedTransactionState()
 
   // Data fetching
   const { data: allUsers, isLoading: isLoadingUsers } = regulatory.useGetAllUsers()
@@ -58,7 +62,7 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
     // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase()
-      filtered = filtered.filter(userAddress => 
+      filtered = filtered.filter(userAddress =>
         userAddress.toLowerCase().includes(searchLower)
       )
     }
@@ -231,11 +235,22 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
                 isAdmin={isOwner}
                 onClick={() => handleUserClick(userAddress)}
                 onViewDetails={() => setSelectedUserForModal(userAddress)}
+                transactionState={userManagementTransaction}
               />
             ))}
           </>
         )}
       </div>
+
+      {/* Transaction Feedback for User Management Actions */}
+      {userManagementTransaction.transaction.status !== 'idle' && (
+        <div className="mt-6">
+          <TransactionFeedback
+            transaction={userManagementTransaction.transaction}
+            showImmediate={true}
+          />
+        </div>
+      )}
 
       {/* User Details Modal */}
       {selectedUserForModal && (
@@ -256,12 +271,13 @@ interface UserCardProps {
   isAdmin: boolean
   onClick: () => void
   onViewDetails: () => void
+  transactionState: ReturnType<typeof useEnhancedTransactionState>
 }
 
-function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, onViewDetails }: UserCardProps) {
+function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, onViewDetails, transactionState }: UserCardProps) {
   const regulatory = useRegulatoryManagement()
   const { data: userProfile, isLoading } = regulatory.useGetUserProfile(userAddress as `0x${string}`)
-  
+
   const profile = userProfile as UserProfile | undefined
 
   const formatAddress = (addr: string) => {
@@ -467,13 +483,14 @@ function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, on
           <div className="flex items-center space-x-2">
             {/* Quick Actions for Admin */}
             {isAdmin && profile && (
-              <UserQuickActions 
+              <UserQuickActions
                 userAddress={userAddress}
                 userProfile={profile}
                 className="hidden lg:flex"
+                transactionState={transactionState}
               />
             )}
-            
+
             {/* View Details Button */}
             <button
               onClick={(e) => {
