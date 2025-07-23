@@ -1,5 +1,15 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import * as dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Ensure private key is available
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+if (!PRIVATE_KEY) {
+  throw new Error("Please set your PRIVATE_KEY in a .env file");
+}
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -7,36 +17,36 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200
+        runs: 200,
       },
-      viaIR: true
-    }
+      viaIR: true,
+    },
   },
   networks: {
-    localhost: {
-      url: "http://127.0.0.1:8545"
-    },
+    // Local development network
     hardhat: {
-      chainId: 31337
-    }
+      chainId: 31337,
+    },
+    // Hedera testnet configuration
+    hederaTestnet: {
+      url: "https://testnet.hashio.io/api",
+      chainId: 296,
+      accounts: [PRIVATE_KEY],
+      gas: 300000,
+      gasPrice: 330000000000, // 330 gwei
+      timeout: 120000, // 2 minutes
+    },
   },
   paths: {
     sources: "./contracts",
     tests: "./test",
     cache: "./cache",
-    artifacts: "./artifacts"
+    artifacts: "./artifacts",
   },
-  typechain: {
-    outDir: "typechain-types",
-    target: "ethers-v6"
+  mocha: {
+    timeout: 40000,
   },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD"
-  },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
-  }
+
 };
 
 export default config;
