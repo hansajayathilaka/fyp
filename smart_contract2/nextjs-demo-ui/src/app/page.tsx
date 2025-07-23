@@ -21,11 +21,11 @@ function HomeLoadingFallback() {
       <div className="bg-gradient-to-br from-blue-50 to-indigo-100 px-8 py-16">
         <div className="text-center space-y-6">
           <h1 className="text-5xl font-bold text-gray-900">
-            Blockchain Share Market
+            Decentralized Equity Investment Platform
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            A regulated, transparent, and secure platform for trading company shares using blockchain technology. 
-            Experience the future of financial markets with built-in compliance and real-time verification.
+            A decentralized, transparent, and secure platform for equity investment using blockchain technology. 
+            Experience the future of investment markets with built-in compliance and real-time verification.
           </p>
           <div className="flex justify-center space-x-4 pt-4">
             <div className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium animate-pulse">
@@ -78,11 +78,11 @@ function StaticContent() {
       <div id="how-it-works" className="px-8 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            How the Share Market Works
+            How DEIP Works
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Our platform combines traditional share trading with blockchain technology to create 
-            a transparent, secure, and regulated marketplace.
+            Our platform combines traditional equity investment with blockchain technology to create 
+            a transparent, secure, and regulated investment marketplace.
           </p>
         </div>
 
@@ -106,10 +106,10 @@ function StaticContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900">Token Creation</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Equity Token Creation</h3>
             <p className="text-gray-600">
-              Verified companies can create share tokens representing ownership stakes. 
-              Each token includes metadata about the company and share details.
+              Verified companies can create equity tokens representing ownership stakes. 
+              Each token includes metadata about the company and equity details.
             </p>
           </div>
 
@@ -119,9 +119,9 @@ function StaticContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900">Secure Trading</h3>
+            <h3 className="text-xl font-semibold text-gray-900">Secure Investment</h3>
             <p className="text-gray-600">
-              Trade shares in a regulated marketplace with transparent order books, 
+              Invest in equity tokens through a regulated marketplace with transparent order books, 
               automatic compliance checks, and blockchain-verified transactions.
             </p>
           </div>
@@ -135,7 +135,7 @@ function StaticContent() {
             Explore the Platform
           </h2>
           <p className="text-lg text-gray-600">
-            Navigate through different sections to see the complete share market ecosystem in action.
+            Navigate through different sections to see the complete equity investment ecosystem in action.
           </p>
         </div>
 
@@ -168,10 +168,10 @@ function StaticContent() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              Token Management
+              Equity Token Management
             </h3>
             <p className="text-gray-600 mb-6">
-              Create and manage share tokens for companies. Mint tokens, set metadata, 
+              Create and manage equity tokens for companies. Mint tokens, set metadata, 
               and control token distribution with built-in compliance.
             </p>
             <Link 
@@ -189,10 +189,10 @@ function StaticContent() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              Marketplace Trading
+              Investment Marketplace
             </h3>
             <p className="text-gray-600 mb-6">
-              Trade shares in a secure marketplace. Place buy and sell orders, 
+              Invest in equity tokens through a secure marketplace. Place buy and sell orders, 
               view order books, and execute trades with real-time verification.
             </p>
             <Link 
@@ -240,11 +240,11 @@ function HomeContent() {
       <div className="bg-gradient-to-br from-blue-50 to-indigo-100 px-8 py-16">
         <div className="text-center space-y-6">
           <h1 className="text-5xl font-bold text-gray-900">
-            Blockchain Share Market
+            Decentralized Equity Investment Platform
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            A regulated, transparent, and secure platform for trading company shares using blockchain technology. 
-            Experience the future of financial markets with built-in compliance and real-time verification.
+            A decentralized, transparent, and secure platform for equity investment using blockchain technology. 
+            Experience the future of investment markets with built-in compliance and real-time verification.
           </p>
           <div className="flex justify-center space-x-4 pt-4">
             <Link 
@@ -398,10 +398,10 @@ function HomeContent() {
       {/* Call to Action */}
       <div className="px-8 py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center">
         <h2 className="text-3xl font-bold mb-4">
-          Ready to Experience the Future of Share Trading?
+          Ready to Experience the Future of Equity Investment?
         </h2>
         <p className="text-xl mb-8 text-blue-100">
-          Connect your wallet and explore the complete blockchain share market ecosystem.
+          Connect your wallet and explore the complete decentralized equity investment ecosystem.
         </p>
         <div className="flex justify-center space-x-4">
           <Link 

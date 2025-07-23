@@ -13,7 +13,7 @@ export default function MarketplacePage() {
   return (
     <ClientOnly fallback={
       <PageLoadingFallback 
-        title="Share Marketplace" 
+        title="Equity Investment Marketplace" 
         description="Loading marketplace contracts and trading interface..."
       />
     }>
@@ -50,7 +50,7 @@ function MarketplaceContent() {
 
   // Set default token selection
   useEffect(() => {
-    if (activeTokens && activeTokens.length > 0 && !selectedTokenId) {
+    if (activeTokens && Array.isArray(activeTokens) && activeTokens.length > 0 && !selectedTokenId) {
       setSelectedTokenId(activeTokens[0])
     }
   }, [activeTokens, selectedTokenId])
@@ -179,27 +179,26 @@ function MarketplaceContent() {
         </div>
       </div>
 
-      {/* Marketplace Stats */}
-      {marketplaceStats && (
+      {marketplaceStats && Array.isArray(marketplaceStats) && marketplaceStats.length >= 4 ? (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg border p-4">
-            <div className="text-2xl font-bold text-blue-600">{marketplaceStats[0].toString()}</div>
+            <div className="text-2xl font-bold text-blue-600">{marketplaceStats[0]?.toString() || '0'}</div>
             <div className="text-sm text-gray-600">Total Orders</div>
           </div>
           <div className="bg-white rounded-lg border p-4">
-            <div className="text-2xl font-bold text-green-600">{marketplaceStats[1].toString()}</div>
+            <div className="text-2xl font-bold text-green-600">{marketplaceStats[1]?.toString() || '0'}</div>
             <div className="text-sm text-gray-600">Active Orders</div>
           </div>
           <div className="bg-white rounded-lg border p-4">
-            <div className="text-2xl font-bold text-purple-600">{marketplaceStats[2].toString()}</div>
+            <div className="text-2xl font-bold text-purple-600">{marketplaceStats[2]?.toString() || '0'}</div>
             <div className="text-sm text-gray-600">Total Trades</div>
           </div>
           <div className="bg-white rounded-lg border p-4">
-            <div className="text-2xl font-bold text-orange-600">{fromWei(marketplaceStats[3])}</div>
+            <div className="text-2xl font-bold text-orange-600">{marketplaceStats[3] ? fromWei(marketplaceStats[3]) : '0'}</div>
             <div className="text-sm text-gray-600">Total Volume</div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Enhanced Transaction Feedback - Shows immediate feedback and real-time updates */}
       {marketplaceTransaction.transaction.status !== 'idle' && (
@@ -274,11 +273,11 @@ function MarketplaceContent() {
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                 >
                   <option value="">Select a token</option>
-                  {activeTokens?.map((tokenId) => (
+                  {activeTokens && Array.isArray(activeTokens) ? activeTokens.map((tokenId) => (
                     <option key={tokenId.toString()} value={tokenId.toString()}>
                       Token #{tokenId.toString()}
                     </option>
-                  ))}
+                  )) : null}
                 </select>
               </div>
 
@@ -328,11 +327,11 @@ function MarketplaceContent() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Tokens Available for Trading</h2>
             
             <div className="space-y-3">
-              {activeTokens?.map((tokenId) => (
+              {activeTokens && Array.isArray(activeTokens) ? activeTokens.map((tokenId) => (
                 <TokenCard key={tokenId.toString()} tokenId={tokenId} />
-              ))}
+              )) : null}
               
-              {(!activeTokens || activeTokens.length === 0) && (
+              {(!activeTokens || !Array.isArray(activeTokens) || activeTokens.length === 0) && (
                 <div className="text-center py-8">
                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -360,11 +359,11 @@ function MarketplaceContent() {
               className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
             >
               <option value="">Select a token</option>
-              {activeTokens?.map((tokenId) => (
+              {activeTokens && Array.isArray(activeTokens) ? activeTokens.map((tokenId) => (
                 <option key={tokenId.toString()} value={tokenId.toString()}>
                   Token #{tokenId.toString()}
                 </option>
-              ))}
+              )) : null}
             </select>
           </div>
 

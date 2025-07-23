@@ -10,8 +10,8 @@ import { ClientOnly } from './ClientOnly'
 const navigationItems = [
   { href: '/', label: 'Home', description: 'Project Overview' },
   { href: '/regulatory', label: 'Regulatory', description: 'User Management' },
-  { href: '/tokens', label: 'Tokens', description: 'Share Token Management' },
-  { href: '/marketplace', label: 'Marketplace', description: 'Trading Interface' },
+  { href: '/tokens', label: 'Tokens', description: 'Equity Token Management' },
+  { href: '/marketplace', label: 'Marketplace', description: 'Investment Interface' },
   { href: '/portfolio', label: 'Portfolio', description: 'Asset Overview' },
 ]
 
@@ -25,11 +25,11 @@ export function Navigation() {
           {/* Logo and Title */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SM</span>
+              <div className="w-12 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">DEIP</span>
               </div>
               <span className="text-xl font-semibold text-gray-900">
-                Share Market Demo
+                Decentralized Equity Investment Platform
               </span>
             </Link>
           </div>
