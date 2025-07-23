@@ -4,6 +4,7 @@ import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain } fro
 import { useState, useEffect } from 'react'
 import { clsx } from 'clsx'
 import { getCurrentNetworkInfo } from '../lib/wagmi'
+import { AdminBadge } from './AdminBadge'
 
 export function WalletConnect() {
   const { address, isConnected } = useAccount()
@@ -82,27 +83,33 @@ export function WalletConnect() {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className={clsx(
-          'px-4 py-2 rounded-md text-sm font-medium transition-colors',
-          'bg-green-600 text-white hover:bg-green-700',
-          'flex items-center space-x-2'
-        )}
-      >
-        <div className="w-2 h-2 bg-green-300 rounded-full" />
-        <span>{formatAddress(address!)}</span>
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      </button>
+      <div className="flex items-center space-x-2">
+        <AdminBadge />
+        <button
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className={clsx(
+            'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+            'bg-green-600 text-white hover:bg-green-700',
+            'flex items-center space-x-2'
+          )}
+        >
+          <div className="w-2 h-2 bg-green-300 rounded-full" />
+          <span>{formatAddress(address!)}</span>
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
+      </div>
 
       {isDropdownOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg border z-50">
           <div className="p-4 space-y-3">
             {/* Address Info */}
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Connected Address</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Connected Address</p>
+                <AdminBadge />
+              </div>
               <p className="text-sm font-mono text-gray-900 break-all">{address}</p>
             </div>
 

@@ -20,8 +20,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Share Market Demo - Blockchain Trading Platform",
-  description: "University demonstration of blockchain-based share market with regulatory compliance",
+  title: "DEIP - Decentralized Equity Investment Platform",
+  description: "A decentralized platform for equity investment with blockchain technology and regulatory compliance",
 };
 
 export default function RootLayout({
