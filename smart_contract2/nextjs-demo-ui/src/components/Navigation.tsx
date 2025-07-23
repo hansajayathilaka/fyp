@@ -96,7 +96,7 @@ export function Navigation() {
 
 function NetworkIndicator() {
   const networkInfo = getCurrentNetworkInfo()
-  
+
   return (
     <div className="hidden sm:flex items-center space-x-2 text-sm">
       <div className={clsx(

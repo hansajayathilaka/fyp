@@ -1,0 +1,38 @@
+{
+  "network": "Hedera Testnet",
+  "chainId": 296,
+  "deploymentTime": "2025-07-20T01:44:14.359Z",
+  "deployer": "0x3D4ED8288A1264ce3Ba01E0F2dc8C8541bFbB5Ff",
+  "contracts": {
+    "RegulatoryManagement": {
+      "address": "0x08db47BeFB28439fEF37702a59616BA02C868a8D",
+      "hashscanUrl": "https://hashscan.io/testnet/contract/0x08db47BeFB28439fEF37702a59616BA02C868a8D",
+      "constructorArgs": []
+    },
+    "RegulatedERC1155Token": {
+      "address": "0xF76d17C50f967da99427586339996645c135190F",
+      "hashscanUrl": "https://hashscan.io/testnet/contract/0xF76d17C50f967da99427586339996645c135190F",
+      "constructorArgs": [
+        "0x08db47BeFB28439fEF37702a59616BA02C868a8D",
+        "https://api.sharemarket.example.com/token/{id}.json"
+      ]
+    },
+    "RegulatedMarketplace": {
+      "address": "0x3F446f27FFAC6d4eB7f6C86267916BB8119D40Bd",
+      "hashscanUrl": "https://hashscan.io/testnet/contract/0x3F446f27FFAC6d4eB7f6C86267916BB8119D40Bd",
+      "constructorArgs": [
+        "0x08db47BeFB28439fEF37702a59616BA02C868a8D",
+        "0xF76d17C50f967da99427586339996645c135190F"
+      ]
+    }
+  },
+  "verificationInstructions": [
+    "1. Visit HashScan.io",
+    "2. Navigate to each contract address",
+    "3. Click 'Verify Contract' if available",
+    "4. Upload the source code from the contracts/ directory",
+    "5. Set compiler version to 0.8.28",
+    "6. Enable optimization with 200 runs",
+    "7. Add constructor arguments as specified above"
+  ]
+}

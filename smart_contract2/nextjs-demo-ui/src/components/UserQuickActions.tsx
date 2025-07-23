@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { useRegulatoryManagement } from '../contracts/hooks'
 import { useContractOwner } from '../hooks/useContractOwner'
+import { useEnhancedTransactionState, TransactionFeedback } from './TransactionFeedback'
 import { type UserProfile, getUserTypeDisplayName } from '../types/regulatory'
 import { clsx } from 'clsx'
 
@@ -11,75 +12,155 @@ interface UserQuickActionsProps {
   userProfile?: UserProfile
   onActionComplete?: () => void
   className?: string
+  transactionState?: ReturnType<typeof useEnhancedTransactionState>
 }
 
 export function UserQuickActions({ 
   userAddress, 
   userProfile, 
   onActionComplete,
-  className 
+  className,
+  transactionState
 }: UserQuickActionsProps) {
   const { isOwner } = useContractOwner()
   const regulatory = useRegulatoryManagement()
-  const [isProcessing, setIsProcessing] = useState(false)
+  const localTransactionState = useEnhancedTransactionState()
+  
+  // Use provided transaction state or create local one
+  const transaction = transactionState || localTransactionState
+
+  // Watch for transaction hash from contract writes
+  useEffect(() => {
+    if (regulatory.data) {
+      transaction.setTransactionHash(regulatory.data)
+    }
+  }, [regulatory.data, transaction])
+
+  // Watch for contract errors
+  useEffect(() => {
+    if (regulatory.error) {
+      transaction.setTransactionError(regulatory.error.message, 'Transaction Error')
+    }
+  }, [regulatory.error, transaction])
+
+  // Watch for successful transactions to trigger callback and reset state
+  useEffect(() => {
+    if (transaction.transaction.status === 'success') {
+      console.log('Transaction successful, resetting state in 3 seconds...')
+      // Add a small delay to allow the transaction to be processed
+      const timer = setTimeout(() => {
+        if (onActionComplete) {
+          onActionComplete()
+        }
+        // Reset transaction state after success
+        transaction.resetTransaction()
+        console.log('Transaction state reset')
+      }, 3000) // Increased delay to show success state
+      
+      return () => clearTimeout(timer)
+    }
+  }, [transaction.transaction.status, onActionComplete, transaction])
+
+  // Watch for error transactions to reset state after some time
+  useEffect(() => {
+    if (transaction.transaction.status === 'error') {
+      console.log('Transaction error, resetting state in 5 seconds...')
+      const timer = setTimeout(() => {
+        transaction.resetTransaction()
+        console.log('Transaction state reset after error')
+      }, 5000) // Reset after 5 seconds on error
+      
+      return () => clearTimeout(timer)
+    }
+  }, [transaction.transaction.status, transaction])
+
+  // Debug log for transaction status changes
+  useEffect(() => {
+    console.log('Transaction status changed:', transaction.transaction.status)
+  }, [transaction.transaction.status])
 
   if (!isOwner || !userProfile) {
     return null
   }
 
   const handleVerifyUser = async () => {
-    if (isProcessing) return
+    if (regulatory.isPending || transaction.transaction.status === 'pending') return
     
     try {
-      setIsProcessing(true)
+      transaction.setTransactionSubmitting(
+        'User Verification',
+        `Verifying user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
+      )
       await regulatory.verifyUser(userAddress as `0x${string}`)
-      onActionComplete?.()
     } catch (error) {
-      console.error('Failed to verify user:', error)
-    } finally {
-      setIsProcessing(false)
+      transaction.setTransactionError(
+        error instanceof Error ? error.message : 'Verification failed',
+        'User Verification Failed'
+      )
     }
   }
 
   const handleSuspendUser = async () => {
-    if (isProcessing) return
+    if (regulatory.isPending || transaction.transaction.status === 'pending') return
     
     try {
-      setIsProcessing(true)
+      transaction.setTransactionSubmitting(
+        'User Suspension',
+        `Suspending user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
+      )
       await regulatory.suspendUser(userAddress as `0x${string}`)
-      onActionComplete?.()
     } catch (error) {
-      console.error('Failed to suspend user:', error)
-    } finally {
-      setIsProcessing(false)
+      transaction.setTransactionError(
+        error instanceof Error ? error.message : 'Suspension failed',
+        'User Suspension Failed'
+      )
     }
   }
 
   const handleUnsuspendUser = async () => {
-    if (isProcessing) return
+    if (regulatory.isPending || transaction.transaction.status === 'pending') return
     
     try {
-      setIsProcessing(true)
+      transaction.setTransactionSubmitting(
+        'User Unsuspension',
+        `Unsuspending user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
+      )
       await regulatory.unsuspendUser(userAddress as `0x${string}`)
-      onActionComplete?.()
     } catch (error) {
-      console.error('Failed to unsuspend user:', error)
-    } finally {
-      setIsProcessing(false)
+      transaction.setTransactionError(
+        error instanceof Error ? error.message : 'Unsuspension failed',
+        'User Unsuspension Failed'
+      )
     }
   }
 
+  const isLoading = regulatory.isPending || transaction.transaction.status === 'pending' || transaction.transaction.status === 'submitting'
+
   return (
     <div className={clsx("flex items-center space-x-2", className)}>
+      {/* Debug: Manual Reset Button (remove in production) */}
+      {process.env.NODE_ENV === 'development' && transaction.transaction.status !== 'idle' && (
+        <button
+          onClick={() => transaction.resetTransaction()}
+          className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+          title="Reset Transaction State (Debug)"
+        >
+          Reset
+        </button>
+      )}
+      
       {/* Verify User */}
       {!userProfile.isVerified && !userProfile.isSuspended && (
         <button
           onClick={handleVerifyUser}
-          disabled={isProcessing}
-          className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          disabled={isLoading}
+          className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-1"
           title="Verify User"
         >
-          {isProcessing ? 'Verifying...' : 'Verify'}
+          {isLoading && (
+            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+          )}
+          <span>{isLoading ? 'Verifying...' : 'Verify'}</span>
         </button>
       )}
 
@@ -87,20 +168,26 @@ export function UserQuickActions({
       {userProfile.isSuspended ? (
         <button
           onClick={handleUnsuspendUser}
-          disabled={isProcessing}
-          className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          disabled={isLoading}
+          className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-1"
           title="Unsuspend User"
         >
-          {isProcessing ? 'Processing...' : 'Unsuspend'}
+          {isLoading && (
+            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+          )}
+          <span>{isLoading ? 'Processing...' : 'Unsuspend'}</span>
         </button>
       ) : (
         <button
           onClick={handleSuspendUser}
-          disabled={isProcessing}
-          className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          disabled={isLoading}
+          className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-1"
           title="Suspend User"
         >
-          {isProcessing ? 'Processing...' : 'Suspend'}
+          {isLoading && (
+            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+          )}
+          <span>{isLoading ? 'Processing...' : 'Suspend'}</span>
         </button>
       )}
     </div>
@@ -116,6 +203,7 @@ interface UserDetailsModalProps {
 export function UserDetailsModal({ userAddress, isOpen, onClose }: UserDetailsModalProps) {
   const regulatory = useRegulatoryManagement()
   const { data: userProfile, isLoading } = regulatory.useGetUserProfile(userAddress as `0x${string}`)
+  const modalTransactionState = useEnhancedTransactionState()
   
   const profile = userProfile as UserProfile | undefined
 
@@ -254,8 +342,19 @@ export function UserDetailsModal({ userAddress, isOpen, onClose }: UserDetailsMo
                   userAddress={userAddress}
                   userProfile={profile}
                   onActionComplete={onClose}
+                  transactionState={modalTransactionState}
                 />
               </div>
+
+              {/* Transaction Feedback */}
+              {modalTransactionState.transaction.status !== 'idle' && (
+                <div className="pt-4 border-t border-gray-200">
+                  <TransactionFeedback 
+                    transaction={modalTransactionState.transaction}
+                    showImmediate={true}
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-8">
