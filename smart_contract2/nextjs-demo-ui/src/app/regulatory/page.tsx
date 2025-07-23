@@ -16,6 +16,8 @@ import {
   convertPlatformStats,
   getUserTypeDisplayName
 } from '../../types/regulatory'
+import { UserManagement } from '../../components/UserManagement'
+import { UserSearch, UserProfileCard } from '../../components/UserSearch'
 import { clsx } from 'clsx'
 
 export default function RegulatoryPage() {
@@ -224,6 +226,7 @@ function RegulatoryContent() {
         <nav className="-mb-px flex space-x-8">
           {[
             { id: 'register', label: 'User Registration' },
+            { id: 'users', label: 'All Users' },
             { id: 'verify', label: 'User Verification' },
             { id: 'manage', label: 'User Management' },
             { id: 'stats', label: 'Platform Statistics' }
@@ -306,6 +309,14 @@ function RegulatoryContent() {
           </div>
         )}
 
+        {/* All Users Tab */}
+        {activeTab === 'users' && (
+          <UserManagement 
+            onUserSelect={setUserManagementAddress}
+            selectedAddress={userManagementAddress}
+          />
+        )}
+
         {/* User Verification Tab */}
         {activeTab === 'verify' && (
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -314,49 +325,22 @@ function RegulatoryContent() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="verifyAddress" className="block text-sm font-medium text-gray-700 mb-1">
-                  User Address to Verify
+                  Search User to Verify
                 </label>
-                <input
-                  type="text"
-                  id="verifyAddress"
-                  value={userManagementAddress}
-                  onChange={(e) => setUserManagementAddress(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-                  placeholder="0x..."
+                <UserSearch
+                  onUserSelect={(address) => setUserManagementAddress(address)}
+                  placeholder="Search by address or SSI identifier..."
+                  showFullProfile={true}
                 />
               </div>
 
-              {selectedUser && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">User Information</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">SSI ID:</span>
-                      <span className="ml-2 text-gray-900">{selectedUser.ssiIdentifier}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Type:</span>
-                      <span className="ml-2 text-gray-900">{getUserTypeDisplayName(Number(selectedUser.userType))}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Verified:</span>
-                      <span className={clsx("ml-2", selectedUser.isVerified ? "text-green-600" : "text-red-600")}>
-                        {selectedUser.isVerified ? "Yes" : "No"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Status:</span>
-                      <span className={clsx("ml-2", selectedUser.isSuspended ? "text-red-600" : "text-green-600")}>
-                        {selectedUser.isSuspended ? "Suspended" : "Active"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              {userManagementAddress && (
+                <UserProfileCard userAddress={userManagementAddress} />
               )}
 
               <button
                 onClick={() => handleVerifyUser(userManagementAddress)}
-                disabled={regulatory.isPending || !userManagementAddress || !selectedUser || selectedUser.isVerified}
+                disabled={regulatory.isPending || !userManagementAddress || !selectedUserData || selectedUserData.isVerified}
                 className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {regulatory.isPending ? 'Verifying...' : 'Verify User'}

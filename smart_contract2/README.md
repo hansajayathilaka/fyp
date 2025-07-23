@@ -1,11 +1,11 @@
-# Blockchain Share Market
+# Decentralized Equity Investment Platform (DEIP)
 
-A blockchain-based share market system with Self-Sovereign Identity (SSI) integration for university final year project.
+A decentralized equity investment platform with blockchain technology and regulatory compliance integration.
 
 ## Features
 
 - SSI-based user registration and verification
-- ERC-1155 token creation for company shares
+- ERC-1155 token creation for company equity
 - Order book trading system with automatic matching
 - Basic compliance monitoring
 - Hedera testnet deployment support

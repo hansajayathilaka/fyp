@@ -51,6 +51,36 @@ export function useRegulatoryManagement() {
       query: { enabled: !!userAddress }
     })
 
+  const useGetAllUsers = () =>
+    useReadContract({
+      address,
+      abi,
+      functionName: 'getAllUsers'
+    })
+
+  const useGetUsersByType = (userType?: 0 | 1) =>
+    useReadContract({
+      address,
+      abi,
+      functionName: 'getUsersByType',
+      args: userType !== undefined ? [userType] : undefined,
+      query: { enabled: userType !== undefined }
+    })
+
+  const useGetVerifiedUsers = () =>
+    useReadContract({
+      address,
+      abi,
+      functionName: 'getVerifiedUsers'
+    })
+
+  const useGetTotalUsers = () =>
+    useReadContract({
+      address,
+      abi,
+      functionName: 'getTotalUsers'
+    })
+
   // Write hooks
   const { writeContract: writeRegulatoryContract, ...writeRegulatoryRest } = useWriteContract()
 
@@ -106,6 +136,10 @@ export function useRegulatoryManagement() {
     useIsUserRegistered,
     useCanUserTrade,
     useCanUserCreateTokens,
+    useGetAllUsers,
+    useGetUsersByType,
+    useGetVerifiedUsers,
+    useGetTotalUsers,
     // Write functions
     registerUser,
     verifyUser,
