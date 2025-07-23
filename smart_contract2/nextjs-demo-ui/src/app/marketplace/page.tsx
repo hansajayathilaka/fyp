@@ -215,7 +215,7 @@ function MarketplaceContent() {
             { id: 'trade', label: 'Trading' },
             { id: 'orders', label: 'Order Book' },
             { id: 'balances', label: 'Balances' },
-            { id: 'completed', label: 'Completed Orders' }
+            { id: 'completed', label: 'My Orders' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -474,12 +474,12 @@ function MarketplaceContent() {
         </div>
       )}
       
-      {/* Completed Orders Tab */}
+      {/* Order Management Tab */}
       {activeTab === 'completed' && (
         <div className="space-y-6">
           <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Completed Orders</h2>
-            <CompletedOrdersDisplay 
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Management</h2>
+            <OrderManagementDisplay 
               address={address}
               marketplaceTransaction={marketplaceTransaction}
             />
@@ -719,77 +719,342 @@ function OrderRowDirect({
   )
 }
 
-// Completed Orders Display Component
-function CompletedOrdersDisplay({
+// Order Management Display Component
+function OrderManagementDisplay({
   address,
   marketplaceTransaction
 }: {
   address?: `0x${string}`;
   marketplaceTransaction: ReturnType<typeof useEnhancedTransactionState>;
 }) {
-  const { marketplace, token } = useContracts()
+  const { marketplace } = useContracts()
+  const [activeOrders, setActiveOrders] = useState<any[]>([])
   const [completedOrders, setCompletedOrders] = useState<any[]>([])
+  const [cancelledOrders, setCancelledOrders] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [activeOrderTab, setActiveOrderTab] = useState<'active' | 'completed' | 'cancelled'>('active')
 
   // Get user's orders
   const { data: userOrders } = marketplace.useGetUserOrders(address)
   
-  // Filter for completed orders
+  // Filter orders by status
   useEffect(() => {
     if (userOrders) {
-      const filled = userOrders.filter(order => order.status === 2) // Status 2 is FILLED
+      console.log('All user orders:', userOrders)
+      
+      const active = userOrders.filter(order => order.status === 0) // Status 0 is ACTIVE
+      const filled = userOrders.filter(order => order.status === 1) // Status 1 is FILLED
+      const cancelled = userOrders.filter(order => order.status === 2) // Status 2 is CANCELLED
+      
+      console.log('Active orders:', active)
+      console.log('Completed orders:', filled)
+      console.log('Cancelled orders:', cancelled)
+      
+      setActiveOrders(active)
       setCompletedOrders(filled)
+      setCancelledOrders(cancelled)
       setIsLoading(false)
     }
   }, [userOrders])
+
+  const handleCancelOrder = async (orderId: bigint) => {
+    try {
+      marketplaceTransaction.setTransactionSubmitting(
+        'Cancel Order',
+        `Cancelling order #${orderId.toString()}...`
+      )
+      await marketplace.cancelOrder(orderId)
+    } catch (error) {
+      marketplaceTransaction.setTransactionError(
+        error instanceof Error ? error.message : 'Order cancellation failed',
+        'Cancel Order Failed'
+      )
+    }
+  }
 
   if (isLoading) {
     return (
       <div className="text-center py-8">
         <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
-        <p className="text-gray-600">Loading completed orders...</p>
+        <p className="text-gray-600">Loading your orders...</p>
       </div>
     )
   }
 
-  if (!completedOrders || completedOrders.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+  const totalOrders = activeOrders.length + completedOrders.length + cancelledOrders.length
+
+  return (
+    <div className="space-y-6">
+      {/* Order Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-blue-50 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-2xl font-bold text-blue-600">{totalOrders}</div>
+              <div className="text-sm text-blue-700">Total Orders</div>
+            </div>
+            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
         </div>
-        <p className="text-gray-500 text-sm">No completed orders found</p>
-        <p className="text-gray-400 text-xs mt-1">Your completed orders will appear here</p>
+        <div className="bg-yellow-50 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-2xl font-bold text-yellow-600">{activeOrders.length}</div>
+              <div className="text-sm text-yellow-700">Active Orders</div>
+            </div>
+            <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+        <div className="bg-green-50 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-2xl font-bold text-green-600">{completedOrders.length}</div>
+              <div className="text-sm text-green-700">Completed</div>
+            </div>
+            <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+        <div className="bg-red-50 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-2xl font-bold text-red-600">{cancelledOrders.length}</div>
+              <div className="text-sm text-red-700">Cancelled</div>
+            </div>
+            <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Order Tabs */}
+      <div className="flex items-center justify-between border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          {[
+            { id: 'active', label: 'Active Orders', count: activeOrders.length, color: 'yellow' },
+            { id: 'completed', label: 'Completed', count: completedOrders.length, color: 'green' },
+            { id: 'cancelled', label: 'Cancelled', count: cancelledOrders.length, color: 'red' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveOrderTab(tab.id as typeof activeOrderTab)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                activeOrderTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className={`px-2 py-1 rounded-full text-xs ${
+                tab.color === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
+                tab.color === 'green' ? 'bg-green-100 text-green-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </nav>
+        
+        {/* Refresh Button */}
+        <button
+          onClick={() => window.location.reload()}
+          className="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1 pb-2"
+          title="Refresh orders"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      {/* Debug Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-yellow-800 mb-2">Debug Info:</h3>
+          <div className="grid grid-cols-3 gap-4 text-xs text-yellow-700">
+            <div>Active (status=0): {activeOrders.length}</div>
+            <div>Completed (status=1): {completedOrders.length}</div>
+            <div>Cancelled (status=2): {cancelledOrders.length}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Content */}
+      <div className="bg-white border rounded-lg overflow-hidden">
+        {/* Active Orders */}
+        {activeOrderTab === 'active' && (
+          <OrderTable 
+            orders={activeOrders}
+            type="active"
+            onCancelOrder={handleCancelOrder}
+            marketplaceTransaction={marketplaceTransaction}
+          />
+        )}
+
+        {/* Completed Orders */}
+        {activeOrderTab === 'completed' && (
+          <OrderTable 
+            orders={completedOrders}
+            type="completed"
+          />
+        )}
+
+        {/* Cancelled Orders */}
+        {activeOrderTab === 'cancelled' && (
+          <OrderTable 
+            orders={cancelledOrders}
+            type="cancelled"
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Order Table Component
+function OrderTable({ 
+  orders, 
+  type, 
+  onCancelOrder,
+  marketplaceTransaction
+}: { 
+  orders: any[]
+  type: 'active' | 'completed' | 'cancelled'
+  onCancelOrder?: (orderId: bigint) => void
+  marketplaceTransaction?: ReturnType<typeof useEnhancedTransactionState>
+}) {
+  const getStatusColor = (type: string) => {
+    switch (type) {
+      case 'active': return 'bg-yellow-50'
+      case 'completed': return 'bg-green-50'
+      case 'cancelled': return 'bg-red-50'
+      default: return 'bg-gray-50'
+    }
+  }
+
+  const getStatusText = (type: string) => {
+    switch (type) {
+      case 'active': return 'Pending Execution'
+      case 'completed': return 'Filled & Executed'
+      case 'cancelled': return 'Cancelled by User'
+      default: return 'Unknown'
+    }
+  }
+
+  const formatDate = (timestamp: bigint) => {
+    return new Date(Number(timestamp) * 1000).toLocaleString()
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          {type === 'active' && (
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+          {type === 'completed' && (
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+          {type === 'cancelled' && (
+            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+        </div>
+        <p className="text-gray-500 text-lg font-medium">No {type} orders</p>
+        <p className="text-gray-400 text-sm mt-1">{getStatusText(type)} orders will appear here</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-700 border-b pb-2">
+    <div>
+      {/* Table Header */}
+      <div className={`grid ${type === 'active' ? 'grid-cols-10' : 'grid-cols-9'} gap-4 text-sm font-medium text-gray-700 bg-gray-50 px-4 py-3 border-b`}>
         <div>Order ID</div>
         <div>Type</div>
         <div>Token ID</div>
         <div>Amount</div>
+        <div>Filled</div>
         <div>Price (ETH)</div>
         <div>Total (ETH)</div>
+        <div>Status</div>
+        <div>Created</div>
+        {type === 'active' && <div>Actions</div>}
       </div>
       
-      {completedOrders.map((order) => (
+      {/* Table Rows */}
+      {orders.map((order) => (
         <div 
           key={order.orderId.toString()} 
-          className={`grid grid-cols-6 gap-4 text-sm py-2 px-2 rounded ${
+          className={`grid ${type === 'active' ? 'grid-cols-10' : 'grid-cols-9'} gap-4 text-sm py-3 px-4 border-b last:border-b-0 ${
             order.orderType === 0 ? 'bg-green-50' : 'bg-red-50'
           }`}
         >
-          <div>#{order.orderId.toString()}</div>
-          <div>{order.orderType === 0 ? 'BUY' : 'SELL'}</div>
-          <div>#{order.tokenId.toString()}</div>
+          <div className="font-mono">#{order.orderId.toString()}</div>
+          <div className={`font-medium ${order.orderType === 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {order.orderType === 0 ? 'BUY' : 'SELL'}
+          </div>
+          <div className="font-mono">#{order.tokenId.toString()}</div>
           <div>{order.amount.toString()}</div>
-          <div>{fromWei(order.price, { includeUnits: false })}</div>
-          <div>{fromWei(order.price * order.amount, { includeUnits: false })}</div>
+          <div className="space-y-1">
+            <div className={type === 'completed' ? 'text-green-600 font-medium' : ''}>
+              {order.filledAmount?.toString() || '0'}
+              {type === 'active' && order.amount > 0 && (
+                <span className="text-gray-500 text-xs ml-1">
+                  ({Math.round((Number(order.filledAmount || 0) / Number(order.amount)) * 100)}%)
+                </span>
+              )}
+            </div>
+            {type === 'active' && order.amount > 0 && (
+              <div className="w-full bg-gray-200 rounded-full h-1">
+                <div 
+                  className="bg-blue-600 h-1 rounded-full transition-all duration-300"
+                  style={{ 
+                    width: `${Math.round((Number(order.filledAmount || 0) / Number(order.amount)) * 100)}%` 
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <div className="font-mono">{fromWei(order.price, { includeUnits: false })}</div>
+          <div className="font-mono font-medium">{fromWei(order.price * order.amount, { includeUnits: false })}</div>
+          <div>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+              type === 'active' ? 'bg-yellow-100 text-yellow-700' :
+              type === 'completed' ? 'bg-green-100 text-green-700' :
+              'bg-red-100 text-red-700'
+            }`}>
+              {type === 'active' ? 'Pending' : type === 'completed' ? 'Filled' : 'Cancelled'}
+            </span>
+          </div>
+          <div className="text-xs text-gray-500" title={formatDate(order.createdAt)}>
+            {new Date(Number(order.createdAt) * 1000).toLocaleDateString()}
+          </div>
+          {type === 'active' && (
+            <div>
+              <button
+                onClick={() => onCancelOrder?.(order.orderId)}
+                disabled={marketplaceTransaction?.transaction.status === 'pending'}
+                className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Cancel this order"
+              >
+                {marketplaceTransaction?.transaction.status === 'pending' ? 'Cancelling...' : 'Cancel'}
+              </button>
+            </div>
+          )}
         </div>
       ))}
     </div>
