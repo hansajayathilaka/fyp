@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { BaseContract } from "ethers";
-import { parseAmount, formatAmount } from '../src/utils/decimal-utils';
+import { parseAmount, formatAmount } from './decimal-utils';
 
 interface DeployedContracts {
   regulatoryManagement: BaseContract;

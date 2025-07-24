@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import * as fs from 'fs';
-import { parseAmount, formatAmount } from '../src/utils/decimal-utils';
+import { parseAmount, formatAmount } from './decimal-utils';
 
 /**
  * Utility functions for testing and development of the Blockchain Share Market system

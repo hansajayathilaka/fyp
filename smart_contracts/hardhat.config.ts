@@ -33,7 +33,7 @@ const config: HardhatUserConfig = {
       chainId: 296,
       accounts: [PRIVATE_KEY],
       gas: 300000,
-      gasPrice: 330000000000, // 330 gwei
+      gasPrice: 360000000000, // 360 gwei
       timeout: 120000, // 2 minutes
     },
   },
