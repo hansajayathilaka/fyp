@@ -1,0 +1,293 @@
+name: ssi-issuer-dev
+
+networks:
+  ssi-dev-network:
+    driver: bridge
+    internal: false
+
+volumes:
+  keria-dev-data:
+    driver: local
+  witness-dev-data:
+    driver: local
+  mongodb-dev-data:
+    driver: local
+
+services:
+  # Traefik for Development (optional - for testing routing)
+  traefik-dev:
+    profiles: [traefik-dev]
+    image: traefik:v3.0
+    container_name: ssi-traefik-dev
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infrastructure/traefik/traefik.dev.yml:/etc/traefik/traefik.yml:ro
+    networks:
+      - ssi-dev-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-dev.rule=Host(`localhost`) && PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.traefik-dev.service=api@internal"
+
+  # KERIA for Development (with exposed ports)
+  keria-dev:
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+    container_name: ssi-keria-dev
+    ports:
+      - "3901:3901"
+      - "3903:3903"
+    networks:
+      - ssi-dev-network
+    volumes:
+      - keria-dev-data:/usr/local/var/keri
+    environment:
+      - KERI_AGENT_CORS=true
+    command: >
+      keria start
+      --name keria-dev
+      --admin-http-port 3901
+      --boot-url http://keria-dev:3903
+      --witness-receipts
+    depends_on:
+      - witness-0-dev
+      - witness-1-dev
+      - witness-2-dev
+      - witness-3-dev
+      - witness-4-dev
+      - witness-5-dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3901/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Development Witnesses (with exposed ports)
+  witness-0-dev:
+    hostname: witness-0-dev
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+    container_name: ssi-witness-0-dev
+    ports:
+      - "5621:5621"
+    networks:
+      - ssi-dev-network
+    volumes:
+      - witness-dev-data:/usr/local/var/keri
+    environment:
+      - KERI_AGENT_CORS=true
+    command: >
+      keria witness start
+      --name witness0-dev
+      --tcp 5621
+      --http 5621
+
+  witness-1-dev:
+    hostname: witness-1-dev
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+    container_name: ssi-witness-1-dev
+    ports:
+      - "5622:5622"
+    networks:
+      - ssi-dev-network
+    volumes:
+      - witness-dev-data:/usr/local/var/keri
+    environment:
+      - KERI_AGENT_CORS=true
+    command: >
+      keria witness start
+      --name witness1-dev
+      --tcp 5622
+      --http 5622
+
+  witness-2-dev:
+    hostname: witness-2-dev
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+    container_name: ssi-witness-2-dev
+    ports:
+      - "5623:5623"
+    networks:
+      - ssi-dev-network
+    volumes:
+      - witness-dev-data:/usr/local/var/keri
+    environment:
+      - KERI_AGENT_CORS=true
+    command: >
+      keria witness start
+      --name witness2-dev
+      --tcp 5623
+      --http 5623
+
+  witness-3-dev:
+    hostname: witness-3-dev
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+    container_name: ssi-witness-3-dev
+    ports:
+      - "5624:5624"
+    networks:
+      - ssi-dev-network
+    volumes:
+      - witness-dev-data:/usr/local/var/keri
+    environment:
+      - KERI_AGENT_CORS=true
+    command: >
+      keria witness start
+      --name witness3-dev
+      --tcp 5624
+      --http 5624
+
+  witness-4-dev:
+    hostname: witness-4-dev
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+    container_name: ssi-witness-4-dev
+    ports:
+      - "5625:5625"
+    networks:
+      - ssi-dev-network
+    volumes:
+      - witness-dev-data:/usr/local/var/keri
+    environment:
+      - KERI_AGENT_CORS=true
+    command: >
+      keria witness start
+      --name witness4-dev
+      --tcp 5625
+      --http 5625
+
+  witness-5-dev:
+    hostname: witness-5-dev
+    restart: unless-stopped
+    image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+    container_name: ssi-witness-5-dev
+    ports:
+      - "5626:5626"
+    networks:
+      - ssi-dev-network
+    volumes:
+      - witness-dev-data:/usr/local/var/keri
+    environment:
+      - KERI_AGENT_CORS=true
+    command: >
+      keria witness start
+      --name witness5-dev
+      --tcp 5626
+      --http 5626
+
+  # MongoDB for Development
+  mongodb-dev:
+    image: mongo:7.0
+    container_name: ssi-mongodb-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"  # MongoDB available at localhost:27017
+    volumes:
+      - mongodb-dev-data:/data/db
+    networks:
+      - ssi-dev-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=dev-password
+      - MONGO_INITDB_DATABASE=ssi_issuer_dev
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend API for Development
+  ssi-api-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: ssi-api-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"  # API available at http://localhost:3000
+    volumes:
+      - ./backend/src:/app/src  # Hot reload
+    networks:
+      - ssi-dev-network
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGODB_URI=mongodb://admin:dev-password@mongodb-dev:27017/ssi_issuer_dev?authSource=admin
+      - KERIA_URL=http://keria-dev:3901
+      - KERIA_BOOT_URL=http://keria-dev:3903
+      - JWT_SECRET=dev-jwt-secret-change-in-production
+      - CORS_ORIGINS=http://localhost:3001,http://localhost:3002,http://ssi-issuer-api.localhost,http://ssi-issuer.localhost,http://ssi-issuer-admin.localhost
+    depends_on:
+      - mongodb-dev
+      - keria-dev
+    command: npm run dev
+    labels:
+      # Traefik labels for local development routing (when traefik-dev profile is used)
+      - "traefik.enable=true"
+      - "traefik.http.routers.ssi-api-dev.rule=Host(`ssi-issuer-api.localhost`)"
+      - "traefik.http.routers.ssi-api-dev.entrypoints=web"
+      - "traefik.http.services.ssi-api-dev.loadbalancer.server.port=3000"
+
+  # Admin Dashboard for Development
+  ssi-admin-dev:
+    build:
+      context: ./admin-ui
+      dockerfile: Dockerfile.dev
+    container_name: ssi-admin-dev
+    restart: unless-stopped
+    ports:
+      - "3001:3000"  # Admin UI available at http://localhost:3001
+    volumes:
+      - ./admin-ui/src:/app/src  # Hot reload
+      - ./admin-ui/public:/app/public
+    networks:
+      - ssi-dev-network
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://ssi-issuer-api.localhost
+      - PORT=3000
+    depends_on:
+      - ssi-api-dev
+    command: npm run dev
+    labels:
+      # Traefik labels for local development routing (when traefik-dev profile is used)
+      - "traefik.enable=true"
+      - "traefik.http.routers.ssi-admin-dev.rule=Host(`ssi-issuer-admin.localhost`)"
+      - "traefik.http.routers.ssi-admin-dev.entrypoints=web"
+      - "traefik.http.services.ssi-admin-dev.loadbalancer.server.port=3000"
+
+  # Public Registration Interface for Development
+  ssi-public-dev:
+    build:
+      context: ./public-ui
+      dockerfile: Dockerfile.dev
+    container_name: ssi-public-dev
+    restart: unless-stopped
+    ports:
+      - "3002:3000"  # Public UI available at http://localhost:3002
+    volumes:
+      - ./public-ui/src:/app/src  # Hot reload
+      - ./public-ui/public:/app/public
+    networks:
+      - ssi-dev-network
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://ssi-issuer-api.localhost
+      - PORT=3000
+    depends_on:
+      - ssi-api-dev
+    command: npm run dev
+    labels:
+      # Traefik labels for local development routing (when traefik-dev profile is used)
+      - "traefik.enable=true"
+      - "traefik.http.routers.ssi-public-dev.rule=Host(`ssi-issuer.localhost`)"
+      - "traefik.http.routers.ssi-public-dev.entrypoints=web"
+      - "traefik.http.services.ssi-public-dev.loadbalancer.server.port=3000"

@@ -1,0 +1,90 @@
+name: ssi-issuer-prod
+
+x-witness-common: &witness-common
+  profiles: [witness, production, local]
+  restart: unless-stopped
+  image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+  environment:
+    - KERI_AGENT_CORS=true
+    - INITIAL_HTTP_PORT=5621
+  networks:
+    - ssi-network
+  volumes:
+    - witness-data:/usr/local/var/keri
+  labels:
+    - "traefik.enable=false"
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "3"
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:5621/health"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 40s
+
+services:
+  witness-0:
+    hostname: witness-0
+    <<: *witness-common
+    container_name: ssi-witness-0
+    command: >
+      keria witness start
+      --name witness0
+      --tcp 5621
+      --http 5621
+
+  witness-1:
+    hostname: witness-1
+    <<: *witness-common
+    container_name: ssi-witness-1
+    command: >
+      keria witness start
+      --name witness1
+      --tcp 5622
+      --http 5622
+
+  witness-2:
+    hostname: witness-2
+    <<: *witness-common
+    container_name: ssi-witness-2
+    command: >
+      keria witness start
+      --name witness2
+      --tcp 5623
+      --http 5623
+
+  witness-3:
+    hostname: witness-3
+    <<: *witness-common
+    container_name: ssi-witness-3
+    command: >
+      keria witness start
+      --name witness3
+      --tcp 5624
+      --http 5624
+
+  witness-4:
+    hostname: witness-4
+    <<: *witness-common
+    container_name: ssi-witness-4
+    command: >
+      keria witness start
+      --name witness4
+      --tcp 5625
+      --http 5625
+
+  witness-5:
+    hostname: witness-5
+    <<: *witness-common
+    container_name: ssi-witness-5
+    command: >
+      keria witness start
+      --name witness5
+      --tcp 5626
+      --http 5626
+
+volumes:
+  witness-data:
