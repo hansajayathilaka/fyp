@@ -1,0 +1,68 @@
+name: ssi-issuer-prod
+
+x-keria-common: &keria-common
+  restart: unless-stopped
+  image: ${KERIA_IMAGE:-weboftrust/keria:1.2.0-dev4}
+  environment:
+    - KERI_AGENT_CORS=true
+  networks:
+    - ssi-network
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "1024k"
+      max-file: "200"
+
+services:
+  keria:
+    profiles: [keria, production]
+    <<: *keria-common
+    container_name: ssi-keria
+    volumes:
+      - keria-data:/usr/local/var/keri
+    command: >
+      keria start
+      --name keria
+      --admin-http-port 3901
+      --boot-url http://keria:3903
+      --witness-receipts
+    depends_on:
+      - witness-0
+      - witness-1
+      - witness-2
+      - witness-3
+      - witness-4
+      - witness-5
+    labels:
+      - "traefik.enable=false"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3901/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  keria-local:
+    profiles: [keria-local, local]
+    <<: *keria-common
+    container_name: ssi-keria-local
+    ports:
+      - "3901:3901"
+      - "3903:3903"
+    volumes:
+      - keria-data:/usr/local/var/keri
+    command: >
+      keria start
+      --name keria-local
+      --admin-http-port 3901
+      --boot-url http://keria-local:3903
+      --witness-receipts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3901/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  keria-data:

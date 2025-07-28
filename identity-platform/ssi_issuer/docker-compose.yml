@@ -1,0 +1,130 @@
+name: ssi-issuer-prod
+
+networks:
+  ssi-network:
+    driver: bridge
+    internal: false
+  traefik:
+    external: true
+
+volumes:
+  keria-data:
+    driver: local
+  witness-data:
+    driver: local
+  mongodb-data:
+    driver: local
+  traefik-certs:
+    driver: local
+
+services:
+  # Traefik Reverse Proxy
+  traefik:
+    profiles: [traefik, production]
+    image: traefik:v3.0
+    container_name: ssi-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certs:/certificates
+      - ./infrastructure/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./infrastructure/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    networks:
+      - traefik
+      - ssi-network
+    environment:
+      - TRAEFIK_EMAIL=${TRAEFIK_EMAIL}
+      - DOMAIN=${DOMAIN}
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+    labels:
+      - "traefik.enable=true"
+      # Dashboard routing
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`ssi-issuer-traefik.${DOMAIN}`)"
+      - "traefik.http.routers.traefik-dashboard.tls=true"
+      - "traefik.http.routers.traefik-dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.middlewares=security-headers@file"
+      # HTTP redirect for dashboard
+      - "traefik.http.routers.traefik-dashboard-http.rule=Host(`ssi-issuer-traefik.${DOMAIN}`)"
+      - "traefik.http.routers.traefik-dashboard-http.entrypoints=web"
+      - "traefik.http.routers.traefik-dashboard-http.middlewares=redirect-to-https"
+
+  # MongoDB Database
+  mongodb:
+    profiles: [database, production]
+    image: mongo:7.0
+    container_name: ssi-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - ssi-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=ssi_issuer
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # KERIA Services
+  keria:
+    extends:
+      file: docker-compose.keria.yml
+      service: keria
+
+  # Witness Services
+  witness-0:
+    extends:
+      file: docker-compose.witnesses.yml
+      service: witness-0
+
+  witness-1:
+    extends:
+      file: docker-compose.witnesses.yml
+      service: witness-1
+
+  witness-2:
+    extends:
+      file: docker-compose.witnesses.yml
+      service: witness-2
+
+  witness-3:
+    extends:
+      file: docker-compose.witnesses.yml
+      service: witness-3
+
+  witness-4:
+    extends:
+      file: docker-compose.witnesses.yml
+      service: witness-4
+
+  witness-5:
+    extends:
+      file: docker-compose.witnesses.yml
+      service: witness-5
+
+  # Application Services
+  ssi-api:
+    extends:
+      file: docker-compose.services.yml
+      service: ssi-api
+
+  ssi-admin:
+    extends:
+      file: docker-compose.services.yml
+      service: ssi-admin
+
+  ssi-public:
+    extends:
+      file: docker-compose.services.yml
+      service: ssi-public

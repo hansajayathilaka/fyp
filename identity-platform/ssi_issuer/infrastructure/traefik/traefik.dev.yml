@@ -1,0 +1,41 @@
+# Traefik Configuration for Development
+# Local development configuration without SSL
+
+# Global configuration
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# Entry points configuration for development
+entryPoints:
+  # HTTP entry point (port 80) - no HTTPS redirect in dev
+  web:
+    address: ":80"
+
+  # Traefik dashboard (port 8080)
+  traefik:
+    address: ":8080"
+
+# Providers configuration
+providers:
+  # Docker provider for service discovery
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: "ssi-dev-network"
+    watch: true
+
+# API and dashboard configuration
+api:
+  dashboard: true
+  debug: true
+  insecure: true  # Allow insecure dashboard access in dev
+
+# Logging configuration
+log:
+  level: DEBUG
+  format: common
+
+# Access logs
+accessLog:
+  format: common

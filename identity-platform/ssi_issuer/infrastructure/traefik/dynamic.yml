@@ -1,0 +1,98 @@
+# Dynamic Traefik Configuration for SSI Issuing Platform
+# Additional middlewares and TLS configuration
+
+# HTTP middlewares
+http:
+  middlewares:
+    # Security headers middleware
+    security-headers:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+          - POST
+          - DELETE
+        accessControlAllowOriginList:
+          - "https://ssi-issuer.${DOMAIN}"
+          - "https://ssi-issuer-admin.${DOMAIN}"
+          - "http://ssi-issuer.localhost"
+          - "http://ssi-issuer-admin.localhost"
+        accessControlMaxAge: 100
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        referrerPolicy: "same-origin"
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+        customResponseHeaders:
+          X-Robots-Tag: "noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+          server: ""
+        sslRedirect: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        customFrameOptionsValue: "SAMEORIGIN"
+
+    # Rate limiting middleware
+    rate-limit:
+      rateLimit:
+        average: 100
+        period: 1m
+        burst: 50
+
+    # API rate limiting (more restrictive)
+    api-rate-limit:
+      rateLimit:
+        average: 50
+        period: 1m
+        burst: 20
+
+    # CORS middleware for API
+    cors-api:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+          - POST
+          - DELETE
+        accessControlAllowHeaders:
+          - "Content-Type"
+          - "Authorization"
+          - "X-Requested-With"
+        accessControlAllowOriginList:
+          - "https://ssi-issuer.${DOMAIN}"
+          - "https://ssi-issuer-admin.${DOMAIN}"
+          - "http://ssi-issuer.localhost"
+          - "http://ssi-issuer-admin.localhost"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: 100
+
+    # Compression middleware
+    compression:
+      compress: {}
+
+    # Strip prefix for API versioning
+    strip-api-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api/v1"
+
+# TLS configuration
+tls:
+  certificates:
+    # Wildcard certificate configuration (if using wildcard)
+    - certFile: /certificates/wildcard.crt
+      keyFile: /certificates/wildcard.key
+      stores:
+        - default
+
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certificates/default.crt
+        keyFile: /certificates/default.key

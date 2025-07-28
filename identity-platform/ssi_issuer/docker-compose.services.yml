@@ -1,0 +1,110 @@
+name: ssi-issuer-prod
+
+x-service-common: &service-common
+  restart: unless-stopped
+  networks:
+    - ssi-network
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "1024k"
+      max-file: "200"
+
+
+
+services:
+  # Backend API Service
+  ssi-api:
+    profiles: [api, production, local]
+    <<: *service-common
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ssi-api
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI}
+      - KERIA_URL=http://keria:3901
+      - KERIA_BOOT_URL=http://keria:3903
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGINS=https://ssi-issuer.${DOMAIN},https://ssi-issuer-admin.${DOMAIN}
+    depends_on:
+      - mongodb
+      - keria
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      # HTTPS router
+      - "traefik.http.routers.ssi-api.rule=Host(`ssi-issuer-api.${DOMAIN}`)"
+      - "traefik.http.routers.ssi-api.tls=true"
+      - "traefik.http.routers.ssi-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ssi-api.entrypoints=websecure"
+      - "traefik.http.routers.ssi-api.middlewares=security-headers@file,cors-api@file,api-rate-limit@file,compression@file"
+      - "traefik.http.services.ssi-api.loadbalancer.server.port=3000"
+      # HTTP router (redirects to HTTPS)
+      - "traefik.http.routers.ssi-api-http.rule=Host(`ssi-issuer-api.${DOMAIN}`)"
+      - "traefik.http.routers.ssi-api-http.entrypoints=web"
+      - "traefik.http.routers.ssi-api-http.middlewares=redirect-to-https"
+      # Redirect middleware
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Admin Dashboard
+  ssi-admin:
+    profiles: [admin, production]
+    <<: *service-common
+    build:
+      context: ./admin-ui
+      dockerfile: Dockerfile
+    container_name: ssi-admin
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_API_URL=https://ssi-issuer-api.${DOMAIN}
+    depends_on:
+      - ssi-api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      # HTTPS router
+      - "traefik.http.routers.ssi-admin.rule=Host(`ssi-issuer-admin.${DOMAIN}`)"
+      - "traefik.http.routers.ssi-admin.tls=true"
+      - "traefik.http.routers.ssi-admin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ssi-admin.entrypoints=websecure"
+      - "traefik.http.routers.ssi-admin.middlewares=security-headers@file,rate-limit@file,compression@file"
+      - "traefik.http.services.ssi-admin.loadbalancer.server.port=3000"
+      # HTTP router (redirects to HTTPS)
+      - "traefik.http.routers.ssi-admin-http.rule=Host(`ssi-issuer-admin.${DOMAIN}`)"
+      - "traefik.http.routers.ssi-admin-http.entrypoints=web"
+      - "traefik.http.routers.ssi-admin-http.middlewares=redirect-to-https"
+
+  # Public Registration Interface
+  ssi-public:
+    profiles: [public, production]
+    <<: *service-common
+    build:
+      context: ./public-ui
+      dockerfile: Dockerfile
+    container_name: ssi-public
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_API_URL=https://ssi-issuer-api.${DOMAIN}
+    depends_on:
+      - ssi-api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      # HTTPS router
+      - "traefik.http.routers.ssi-public.rule=Host(`ssi-issuer.${DOMAIN}`)"
+      - "traefik.http.routers.ssi-public.tls=true"
+      - "traefik.http.routers.ssi-public.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ssi-public.entrypoints=websecure"
+      - "traefik.http.routers.ssi-public.middlewares=security-headers@file,rate-limit@file,compression@file"
+      - "traefik.http.services.ssi-public.loadbalancer.server.port=3000"
+      # HTTP router (redirects to HTTPS)
+      - "traefik.http.routers.ssi-public-http.rule=Host(`ssi-issuer.${DOMAIN}`)"
+      - "traefik.http.routers.ssi-public-http.entrypoints=web"
+      - "traefik.http.routers.ssi-public-http.middlewares=redirect-to-https"
+
+volumes:
+  mongodb-data:
