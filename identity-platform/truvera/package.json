@@ -1,0 +1,41 @@
+{
+  "name": "ssi-issuing-platform",
+  "version": "1.0.0",
+  "description": "A Self-Sovereign Identity (SSI) issuing platform using Truvera",
+  "private": true,
+  "workspaces": [
+    "issuer_frontend",
+    "issuer_backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:issuer_backend\" \"npm run dev:issuer_frontend\"",
+    "dev:issuer_frontend": "cd issuer_frontend && npm run dev",
+    "dev:issuer_backend": "cd issuer_backend && npm run dev",
+    "build": "npm run build:issuer_backend && npm run build:issuer_frontend",
+    "build:issuer_frontend": "cd issuer_frontend && npm run build",
+    "build:issuer_backend": "cd issuer_backend && npm run build",
+    "test": "npm run test:issuer_backend && npm run test:issuer_frontend",
+    "test:issuer_frontend": "cd issuer_frontend && npm run test",
+    "test:issuer_backend": "cd issuer_backend && npm run test",
+    "test:credential": "node scripts/test-credential.js",
+    "test:verification": "node scripts/test-verification.js",
+    "lint": "npm run lint:issuer_backend && npm run lint:issuer_frontend",
+    "lint:issuer_frontend": "cd issuer_frontend && npm run lint",
+    "lint:issuer_backend": "cd issuer_backend && npm run lint",
+    "format": "npm run format:issuer_backend && npm run format:issuer_frontend",
+    "format:issuer_frontend": "cd issuer_frontend && npm run format",
+    "format:issuer_backend": "cd issuer_backend && npm run format",
+    "install:all": "npm install && cd issuer_frontend && npm install && cd ../issuer_backend && npm install"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
