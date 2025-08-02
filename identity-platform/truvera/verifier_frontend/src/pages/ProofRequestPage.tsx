@@ -63,37 +63,53 @@ export const ProofRequestPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-8">
-          <div className="flex justify-between items-start mb-4">
-            <div></div>
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                DEIP Credential Verifier
-              </h1>
-              <p className="text-lg text-gray-600">
-                Generate QR codes for users to scan and present their credentials
-              </p>
-            </div>
-            <div>
-              <button
-                onClick={() => navigate('/settings')}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
-              >
-                ⚙️ Settings
-              </button>
-            </div>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <header className="text-center mb-12">
+          <div className="mb-6">
+            <h1 className="text-5xl font-bold text-gray-900 mb-3">
+              DEIP Credential Verifier
+            </h1>
+            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
+              Generate QR codes for users to scan and present their credentials securely
+            </p>
           </div>
         </header>
 
-        <main className="max-w-4xl mx-auto">
+        <main className="max-w-5xl mx-auto">
           {!currentProofRequest ? (
-            <ProofRequestForm
-              onSubmit={handleCreateProofRequest}
-              isLoading={isLoading}
-              error={error}
-              onClearError={clearError}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <ProofRequestForm
+                  onSubmit={handleCreateProofRequest}
+                  isLoading={isLoading}
+                  error={error}
+                  onClearError={clearError}
+                />
+              </div>
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg shadow-md p-6 h-fit">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Guide</h3>
+                  <div className="space-y-4 text-sm text-gray-700">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</div>
+                      <p>Generate a QR code with your verification requirements</p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</div>
+                      <p>Share the QR code with credential holders</p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</div>
+                      <p>Monitor real-time status as users scan and present</p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</div>
+                      <p>Review verification results instantly</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           ) : (
             <ProofRequestDetails
               proofRequest={currentProofRequest}
@@ -104,7 +120,7 @@ export const ProofRequestPage: React.FC = () => {
         </main>
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-sm text-gray-500">
+        <footer className="mt-20 text-center text-base text-gray-600">
           <p>
             Powered by Truvera API • Secure credential verification
           </p>

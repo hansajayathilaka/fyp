@@ -71,15 +71,15 @@ export const VerificationPage: React.FC = () => {
       console.log('VerificationPage: Current status:', proofRequestData.status);
 
       // Check if the proof request has meaningful presentation data
-      const hasMeaningfulPresentation = proofRequestData.presentation && 
-                                       proofRequestData.presentation.holder && 
-                                       proofRequestData.presentation.credentials && 
-                                       proofRequestData.presentation.credentials.length > 0;
+      const hasMeaningfulPresentation = proofRequestData.presentation &&
+        proofRequestData.presentation.holder &&
+        proofRequestData.presentation.credentials &&
+        proofRequestData.presentation.credentials.length > 0;
 
       if (!hasMeaningfulPresentation) {
         console.log('VerificationPage: No meaningful presentation data available yet');
         console.log('VerificationPage: Presentation data:', proofRequestData.presentation);
-        
+
         // If status is completed but no meaningful presentation, there might be an issue
         if (proofRequestData.status === 'completed') {
           setError({
@@ -201,9 +201,9 @@ export const VerificationPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading verification data...</p>
-          <p className="text-sm text-gray-500 mt-2">Proof Request ID: {proofRequestId}</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
+          <p className="text-gray-700 text-xl font-medium">Loading verification data...</p>
+          <p className="text-base text-gray-600 mt-3">Proof Request ID: {proofRequestId}</p>
         </div>
       </div>
     );
@@ -214,30 +214,30 @@ export const VerificationPage: React.FC = () => {
     console.log('VerificationPage: Rendering error state:', error);
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
-          <div className="text-red-600 text-4xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+        <div className="max-w-lg w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="text-red-600 text-6xl mb-6">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             {error.type === 'verification' ? 'Verification Error' : 'Loading Error'}
           </h2>
-          <p className="text-gray-600 mb-6">{error.message}</p>
-          <div className="space-y-3">
+          <p className="text-gray-700 mb-8 text-lg">{error.message}</p>
+          <div className="space-y-4">
             {error.retryAction && (
               <button
                 onClick={error.retryAction}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-colors"
               >
                 {error.type === 'verification' ? 'Retry Verification' : 'Try Again'}
               </button>
             )}
             <button
               onClick={handleBackToQRCode}
-              className="w-full px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 font-medium transition-colors"
             >
               Back to QR Code
             </button>
             <button
               onClick={handleCreateNewRequest}
-              className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="w-full px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium transition-colors"
             >
               Create New Request
             </button>
@@ -253,21 +253,21 @@ export const VerificationPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Verifying Credentials</h2>
-          <p className="text-gray-600">Please wait while we verify the presented credentials...</p>
-          <div className="mt-6 bg-white rounded-lg shadow-md p-4 max-w-md mx-auto">
-            <div className="flex items-center space-x-3 mb-3">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-700">Validating signatures...</span>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto mb-6"></div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Verifying Credentials</h2>
+          <p className="text-gray-700 text-lg">Please wait while we verify the presented credentials...</p>
+          <div className="mt-8 bg-white rounded-lg shadow-lg p-6 max-w-lg mx-auto">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-base text-gray-800 font-medium">Validating signatures...</span>
             </div>
-            <div className="flex items-center space-x-3 mb-3">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-700">Checking issuer trust...</span>
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-4 h-4 bg-yellow-500 rounded-full animate-pulse"></div>
+              <span className="text-base text-gray-800 font-medium">Checking issuer trust...</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-700">Verifying expiration...</span>
+            <div className="flex items-center space-x-4">
+              <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-base text-gray-800 font-medium">Verifying expiration...</span>
             </div>
           </div>
         </div>
@@ -280,165 +280,162 @@ export const VerificationPage: React.FC = () => {
     console.log('VerificationPage: Rendering verification results:', verificationResult);
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-10">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Verification Complete</h1>
-                <p className="mt-2 text-gray-600">
+                <h1 className="text-4xl font-bold text-gray-900">Verification Complete</h1>
+                <p className="mt-3 text-xl text-gray-700">
                   {proofRequest ? `Results for "${proofRequest.config.name}"` : 'Credential verification results'}
                 </p>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex space-x-4">
                 <button
                   onClick={handleBackToQRCode}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium transition-colors"
                 >
-                  Back to QR Code
+                  ← Back to QR Code
                 </button>
                 <button
                   onClick={handleCreateNewRequest}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-colors"
                 >
-                  New Verification
+                  🔍 New Verification
                 </button>
               </div>
             </div>
           </div>
 
           {/* Verification Results - Enhanced Debug Mode */}
-          <div className="bg-white rounded-lg shadow-lg border-2 border-green-500 p-6 mb-8">
-            <h2 className="text-3xl font-bold text-green-600 mb-6">✅ Verification Results (Debug Mode)</h2>
-            
+          <div className="bg-white rounded-lg shadow-lg border-2 border-green-500 p-8 mb-10">
+            <h2 className="text-4xl font-bold text-green-600 mb-8">✅ Verification Results (Debug Mode)</h2>
+
             {/* Status Summary */}
-            <div className="bg-green-50 border border-green-200 p-6 rounded-lg mb-6">
-              <h3 className="text-xl font-bold text-green-800 mb-4">📊 Status Summary</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg">
-                <div className="bg-white p-4 rounded border">
-                  <span className="font-semibold text-gray-700">Verification Status:</span>
-                  <span className={`ml-2 font-bold ${verificationResult.verified ? 'text-green-600' : 'text-red-600'}`}>
+            <div className="bg-green-50 border border-green-200 p-8 rounded-lg mb-8">
+              <h3 className="text-2xl font-bold text-green-800 mb-6">📊 Status Summary</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg">
+                <div className="bg-white p-6 rounded-lg border shadow-sm">
+                  <span className="font-semibold text-gray-800 text-base">Verification Status:</span>
+                  <span className={`ml-3 font-bold text-xl ${verificationResult.verified ? 'text-green-600' : 'text-red-600'}`}>
                     {verificationResult.verified ? '✅ VERIFIED' : '❌ FAILED'}
                   </span>
                 </div>
-                <div className="bg-white p-4 rounded border">
-                  <span className="font-semibold text-gray-700">Results Count:</span>
-                  <span className="ml-2 font-bold text-blue-600">{verificationResult.results?.length || 0}</span>
+                <div className="bg-white p-6 rounded-lg border shadow-sm">
+                  <span className="font-semibold text-gray-800 text-base">Results Count:</span>
+                  <span className="ml-3 font-bold text-xl text-blue-600">{verificationResult.results?.length || 0}</span>
                 </div>
-                <div className="bg-white p-4 rounded border">
-                  <span className="font-semibold text-gray-700">Partially Verified:</span>
-                  <span className={`ml-2 font-bold ${verificationResult.partiallyVerified ? 'text-yellow-600' : 'text-gray-600'}`}>
+                <div className="bg-white p-6 rounded-lg border shadow-sm">
+                  <span className="font-semibold text-gray-800 text-base">Partially Verified:</span>
+                  <span className={`ml-3 font-bold text-xl ${verificationResult.partiallyVerified ? 'text-yellow-600' : 'text-gray-600'}`}>
                     {verificationResult.partiallyVerified ? '⚠️ Yes' : '✅ No'}
                   </span>
                 </div>
-                <div className="bg-white p-4 rounded border">
-                  <span className="font-semibold text-gray-700">Timestamp:</span>
-                  <span className="ml-2 font-bold text-gray-800">{verificationResult.timestamp || 'N/A'}</span>
+                <div className="bg-white p-6 rounded-lg border shadow-sm">
+                  <span className="font-semibold text-gray-800 text-base">Timestamp:</span>
+                  <span className="ml-3 font-bold text-xl text-gray-900">{verificationResult.timestamp || 'N/A'}</span>
                 </div>
               </div>
             </div>
 
             {/* Blockchain Registration Status */}
             {verificationResult.blockchainRegistration && (
-              <div className={`border p-6 rounded-lg mb-6 ${
-                verificationResult.blockchainRegistration.success 
-                  ? 'bg-blue-50 border-blue-200' 
-                  : verificationResult.blockchainRegistration.attempted 
-                    ? 'bg-red-50 border-red-200' 
-                    : 'bg-gray-50 border-gray-200'
-              }`}>
-                <h3 className={`text-xl font-bold mb-4 ${
-                  verificationResult.blockchainRegistration.success 
-                    ? 'text-blue-800' 
-                    : verificationResult.blockchainRegistration.attempted 
-                      ? 'text-red-800' 
-                      : 'text-gray-800'
+              <div className={`border p-8 rounded-lg mb-8 ${verificationResult.blockchainRegistration.success
+                ? 'bg-blue-50 border-blue-200'
+                : verificationResult.blockchainRegistration.attempted
+                  ? 'bg-red-50 border-red-200'
+                  : 'bg-gray-50 border-gray-200'
                 }`}>
+                <h3 className={`text-2xl font-bold mb-6 ${verificationResult.blockchainRegistration.success
+                  ? 'text-blue-800'
+                  : verificationResult.blockchainRegistration.attempted
+                    ? 'text-red-800'
+                    : 'text-gray-800'
+                  }`}>
                   🔗 Blockchain Registration
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white p-4 rounded border">
-                    <span className="font-semibold text-gray-700">Registration Status:</span>
-                    <span className={`ml-2 font-bold ${
-                      verificationResult.blockchainRegistration.success 
-                        ? 'text-green-600' 
-                        : verificationResult.blockchainRegistration.attempted 
-                          ? 'text-red-600' 
-                          : 'text-gray-600'
-                    }`}>
-                      {verificationResult.blockchainRegistration.success 
-                        ? '✅ SUCCESS' 
-                        : verificationResult.blockchainRegistration.attempted 
-                          ? '❌ FAILED' 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-lg border shadow-sm">
+                    <span className="font-semibold text-gray-800 text-base">Registration Status:</span>
+                    <span className={`ml-3 font-bold text-xl ${verificationResult.blockchainRegistration.success
+                      ? 'text-green-600'
+                      : verificationResult.blockchainRegistration.attempted
+                        ? 'text-red-600'
+                        : 'text-gray-600'
+                      }`}>
+                      {verificationResult.blockchainRegistration.success
+                        ? '✅ SUCCESS'
+                        : verificationResult.blockchainRegistration.attempted
+                          ? '❌ FAILED'
                           : '⏸️ NOT ATTEMPTED'}
                     </span>
                   </div>
-                  
+
                   {verificationResult.blockchainRegistration.transactionHash && (
-                    <div className="bg-white p-4 rounded border">
-                      <span className="font-semibold text-gray-700">Transaction Hash:</span>
-                      <div className="mt-1">
-                        <code className="text-xs bg-gray-100 p-1 rounded break-all">
+                    <div className="bg-white p-6 rounded-lg border shadow-sm">
+                      <span className="font-semibold text-gray-800 text-base">Transaction Hash:</span>
+                      <div className="mt-2">
+                        <code className="text-sm bg-gray-100 p-2 rounded break-all text-gray-900">
                           {verificationResult.blockchainRegistration.transactionHash}
                         </code>
                       </div>
                     </div>
                   )}
-                  
+
                   {verificationResult.blockchainRegistration.userType !== undefined && (
-                    <div className="bg-white p-4 rounded border">
-                      <span className="font-semibold text-gray-700">User Type:</span>
-                      <span className="ml-2 font-bold text-blue-600">
+                    <div className="bg-white p-6 rounded-lg border shadow-sm">
+                      <span className="font-semibold text-gray-800 text-base">User Type:</span>
+                      <span className="ml-3 font-bold text-xl text-blue-600">
                         {verificationResult.blockchainRegistration.userType === 0 && '👤 Individual'}
                         {verificationResult.blockchainRegistration.userType === 1 && '🏢 Organization'}
                         {verificationResult.blockchainRegistration.userType === 2 && '🏛️ Government'}
                         {verificationResult.blockchainRegistration.userType === 3 && '🎓 Academic'}
-                        {verificationResult.blockchainRegistration.userType !== undefined && 
-                         ![0,1,2,3].includes(verificationResult.blockchainRegistration.userType) && 
-                         `Unknown (${verificationResult.blockchainRegistration.userType})`}
+                        {verificationResult.blockchainRegistration.userType !== undefined &&
+                          ![0, 1, 2, 3].includes(verificationResult.blockchainRegistration.userType) &&
+                          `Unknown (${verificationResult.blockchainRegistration.userType})`}
                       </span>
                     </div>
                   )}
-                  
+
                   {verificationResult.blockchainRegistration.walletAddress && (
-                    <div className="bg-white p-4 rounded border">
-                      <span className="font-semibold text-gray-700">Wallet Address:</span>
-                      <div className="mt-1">
-                        <code className="text-xs bg-gray-100 p-1 rounded break-all">
+                    <div className="bg-white p-6 rounded-lg border shadow-sm">
+                      <span className="font-semibold text-gray-800 text-base">Wallet Address:</span>
+                      <div className="mt-2">
+                        <code className="text-sm bg-gray-100 p-2 rounded break-all text-gray-900">
                           {verificationResult.blockchainRegistration.walletAddress}
                         </code>
                       </div>
                     </div>
                   )}
-                  
+
                   {verificationResult.blockchainRegistration.ssiIdentifier && (
-                    <div className="bg-white p-4 rounded border">
-                      <span className="font-semibold text-gray-700">SSI Identifier:</span>
-                      <div className="mt-1">
-                        <code className="text-xs bg-gray-100 p-1 rounded break-all">
+                    <div className="bg-white p-6 rounded-lg border shadow-sm">
+                      <span className="font-semibold text-gray-800 text-base">SSI Identifier:</span>
+                      <div className="mt-2">
+                        <code className="text-sm bg-gray-100 p-2 rounded break-all text-gray-900">
                           {verificationResult.blockchainRegistration.ssiIdentifier}
                         </code>
                       </div>
                     </div>
                   )}
-                  
+
                   {verificationResult.blockchainRegistration.error && (
-                    <div className="bg-white p-4 rounded border md:col-span-2">
-                      <span className="font-semibold text-red-700">Error:</span>
-                      <div className="mt-1 text-red-600 text-sm">
+                    <div className="bg-white p-6 rounded-lg border shadow-sm md:col-span-2">
+                      <span className="font-semibold text-red-800 text-base">Error:</span>
+                      <div className="mt-2 text-red-700 text-base">
                         {verificationResult.blockchainRegistration.error}
                       </div>
                     </div>
                   )}
                 </div>
-                
+
                 {/* Blockchain Registration Info */}
-                <div className="mt-4 text-sm text-gray-600">
+                <div className="mt-6 text-base text-gray-700 bg-white p-4 rounded-lg border">
                   <p>
-                    <strong>ℹ️ About Blockchain Registration:</strong> 
-                    {verificationResult.blockchainRegistration.success 
+                    <strong className="text-gray-900">ℹ️ About Blockchain Registration:</strong>
+                    {verificationResult.blockchainRegistration.success
                       ? ' Your identity has been successfully registered on the blockchain with the detected user type.'
-                      : verificationResult.blockchainRegistration.attempted 
+                      : verificationResult.blockchainRegistration.attempted
                         ? ' There was an issue registering your identity on the blockchain, but your credential verification was successful.'
                         : ' Blockchain registration was not attempted (likely because verification failed or blockchain is disabled).'}
                   </p>
@@ -447,14 +444,14 @@ export const VerificationPage: React.FC = () => {
             )}
 
             {/* API Response Debug */}
-            <div className="bg-gray-900 text-white rounded-lg p-6">
-              <h3 className="text-xl font-bold mb-4 text-yellow-300">🔍 Raw API Response</h3>
-              <div className="bg-black p-4 rounded">
-                <pre className="text-green-300 font-mono text-sm whitespace-pre-wrap break-words max-h-96 overflow-y-auto">
+            <div className="bg-gray-900 text-white rounded-lg p-8">
+              <h3 className="text-2xl font-bold mb-6 text-yellow-300">🔍 Raw API Response</h3>
+              <div className="bg-black p-6 rounded-lg">
+                <pre className="text-green-300 font-mono text-base whitespace-pre-wrap break-words max-h-96 overflow-y-auto">
                   {JSON.stringify(verificationResult, null, 2)}
                 </pre>
               </div>
-              <div className="mt-4 text-sm text-gray-300">
+              <div className="mt-6 text-base text-gray-300">
                 <p>💡 <strong>Tip:</strong> Check if the API response has the expected structure</p>
                 <p>📝 <strong>Expected:</strong> Should have 'results' array, 'verified' boolean, 'timestamp' string</p>
               </div>
@@ -463,23 +460,23 @@ export const VerificationPage: React.FC = () => {
 
           {/* Proof Request Details */}
           {proofRequest && (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Original Request Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium text-gray-700">Request Name:</p>
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Original Request Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-base">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-800 mb-2">Request Name:</p>
                   <p className="text-gray-900">{proofRequest.config.name}</p>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-700">Purpose:</p>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-800 mb-2">Purpose:</p>
                   <p className="text-gray-900">{proofRequest.config.purpose}</p>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-700">Requested Types:</p>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-800 mb-2">Requested Types:</p>
                   <p className="text-gray-900">{proofRequest.config.credentialTypes.join(', ')}</p>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-700">Created:</p>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-800 mb-2">Created:</p>
                   <p className="text-gray-900">{new Date(proofRequest.createdAt).toLocaleString()}</p>
                 </div>
               </div>
@@ -503,12 +500,12 @@ export const VerificationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-red-100 flex items-center justify-center">
-      <div className="text-center bg-white p-8 rounded-lg shadow-lg max-w-md">
-        <div className="text-red-600 text-4xl mb-4">🔍</div>
-        <h2 className="text-xl font-bold text-gray-900 mb-4">DEBUG: Fallback State</h2>
-        <p className="text-gray-600 mb-4">The component reached the fallback state</p>
+      <div className="text-center bg-white p-10 rounded-lg shadow-lg max-w-lg">
+        <div className="text-red-600 text-6xl mb-6">🔍</div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">DEBUG: Fallback State</h2>
+        <p className="text-gray-700 mb-6 text-lg">The component reached the fallback state</p>
 
-        <div className="text-left text-sm bg-gray-100 p-4 rounded mb-4">
+        <div className="text-left text-base bg-gray-100 p-6 rounded-lg mb-6">
           <p><strong>Loading:</strong> {loading.toString()}</p>
           <p><strong>Verifying:</strong> {verifying.toString()}</p>
           <p><strong>Error:</strong> {error ? error.message : 'null'}</p>
@@ -517,19 +514,19 @@ export const VerificationPage: React.FC = () => {
           <p><strong>Presentation:</strong> {presentation ? 'exists' : 'null'}</p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-4">
           <button
             onClick={() => {
               console.log('Manual retry triggered');
               loadProofRequestAndVerify();
             }}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
           >
             Retry Loading
           </button>
           <button
             onClick={handleCreateNewRequest}
-            className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+            className="w-full px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 font-medium transition-colors"
           >
             Create New Request
           </button>
