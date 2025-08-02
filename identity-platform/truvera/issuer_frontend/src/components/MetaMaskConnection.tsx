@@ -168,9 +168,9 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
   if (connectionState === 'not_detected') {
     return (
       <div className="text-center">
-        <div className="mb-6">
+        <div className="mb-8">
           <svg
-            className="mx-auto h-16 w-16 text-orange-500"
+            className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-orange-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -184,18 +184,18 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
           </svg>
         </div>
         
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3">
           MetaMask Not Detected
         </h3>
         
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 text-base lg:text-lg mb-8 max-w-2xl mx-auto">
           MetaMask is required to connect your wallet. Please install MetaMask to continue.
         </p>
         
-        <div className="space-y-3">
+        <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-8">
           <button
             onClick={openMetaMaskInstall}
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+            className="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white font-medium py-4 px-8 rounded-md transition-colors flex items-center justify-center text-base"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l3.09 6.26L22 9l-5 4.87L18.18 22 12 18.77 5.82 22 7 13.87 2 9l6.91-.74L12 2z"/>
@@ -206,15 +206,15 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
           {isInstallPromptShown && (
             <button
               onClick={() => window.location.reload()}
-              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              className="w-full md:w-auto bg-gray-600 hover:bg-gray-700 text-white font-medium py-4 px-8 rounded-md transition-colors text-base"
             >
               I've Installed MetaMask - Refresh
             </button>
           )}
         </div>
         
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
+        <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-blue-800">
             <strong>What is MetaMask?</strong><br />
             MetaMask is a secure wallet that allows you to interact with blockchain applications. 
             It's required to connect your wallet and receive credentials.
@@ -227,9 +227,9 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
   if (connectionState === 'connected') {
     return (
       <div className="text-center">
-        <div className="mb-6">
+        <div className="mb-8">
           <svg
-            className="mx-auto h-16 w-16 text-green-600"
+            className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-green-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -243,20 +243,20 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
           </svg>
         </div>
         
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
           Wallet Connected Successfully
         </h3>
         
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-green-800 mb-2">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-green-800 mb-3">
             <strong>Connected Address:</strong>
           </p>
-          <p className="text-xs font-mono text-green-700 break-all">
+          <p className="text-xs md:text-sm font-mono text-green-700 break-all">
             {state.walletAddress}
           </p>
         </div>
         
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-base lg:text-lg">
           Proceeding to the next step...
         </p>
       </div>
@@ -266,9 +266,9 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
   if (connectionState === 'error') {
     return (
       <div className="text-center">
-        <div className="mb-6">
+        <div className="mb-8">
           <svg
-            className="mx-auto h-16 w-16 text-red-500"
+            className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-red-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -282,34 +282,34 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
           </svg>
         </div>
         
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
           Connection Failed
         </h3>
         
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-red-800">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-red-800">
             {errorMessage}
           </p>
         </div>
         
-        <div className="space-y-3">
+        <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-8">
           <button
             onClick={retryConnection}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors text-base"
           >
             Try Again
           </button>
           
           <button
             onClick={openMetaMaskInstall}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full md:w-auto bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-md transition-colors text-base"
           >
             Reinstall MetaMask
           </button>
         </div>
         
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
+        <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-blue-800">
             <strong>Troubleshooting Tips:</strong><br />
             • Make sure MetaMask is unlocked<br />
             • Check that you have at least one account in MetaMask<br />
@@ -323,9 +323,9 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
   // Default state: detected but not connected
   return (
     <div className="text-center">
-      <div className="mb-6">
+      <div className="mb-8">
         <svg
-          className="mx-auto h-16 w-16 text-blue-600"
+          className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-blue-600"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -339,21 +339,20 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
         </svg>
       </div>
       
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-3">
         Connect Your MetaMask Wallet
       </h3>
       
-      <p className="text-gray-600 mb-6">
+      <p className="text-gray-600 text-base lg:text-lg mb-8 max-w-2xl mx-auto">
         Click the button below to connect your MetaMask wallet and begin the credential issuance process.
       </p>
       
-
-      
-      <button
-        onClick={connectWallet}
-        disabled={connectionState === 'connecting'}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md transition-colors flex items-center justify-center"
-      >
+      <div className="flex justify-center mb-8">
+        <button
+          onClick={connectWallet}
+          disabled={connectionState === 'connecting'}
+          className="w-full md:w-auto md:min-w-[200px] bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-4 px-8 rounded-md transition-colors flex items-center justify-center text-base"
+        >
         {connectionState === 'connecting' ? (
           <>
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
@@ -367,10 +366,11 @@ export default function MetaMaskConnection({ onConnectionSuccess }: MetaMaskConn
             Connect MetaMask
           </>
         )}
-      </button>
+        </button>
+      </div>
       
-      <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <p className="text-sm text-gray-700">
+      <div className="p-6 bg-gray-50 border border-gray-200 rounded-lg max-w-2xl mx-auto">
+        <p className="text-sm md:text-base text-gray-700">
           <strong>Why do we need your wallet?</strong><br />
           Your wallet address will be included in the credential to verify your identity 
           and ensure the credential is issued to the correct person.

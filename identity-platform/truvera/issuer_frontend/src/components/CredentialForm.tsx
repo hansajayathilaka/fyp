@@ -85,16 +85,16 @@ export default function CredentialForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
       {/* Personal Information Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+      <div className="space-y-6">
+        <h3 className="text-lg md:text-xl font-medium text-gray-900 border-b border-gray-200 pb-3">
           Personal Information
         </h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
               First Name *
             </label>
             <input
@@ -102,19 +102,19 @@ export default function CredentialForm({
               id="firstName"
               value={formData.firstName}
               onChange={(e) => handleInputChange('firstName', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-4 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 allErrors.firstName ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your first name"
               disabled={isLoading}
             />
             {allErrors.firstName && (
-              <p className="mt-1 text-sm text-red-600">{allErrors.firstName}</p>
+              <p className="mt-2 text-sm text-red-600">{allErrors.firstName}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
               Last Name *
             </label>
             <input
@@ -122,20 +122,20 @@ export default function CredentialForm({
               id="lastName"
               value={formData.lastName}
               onChange={(e) => handleInputChange('lastName', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-4 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 allErrors.lastName ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your last name"
               disabled={isLoading}
             />
             {allErrors.lastName && (
-              <p className="mt-1 text-sm text-red-600">{allErrors.lastName}</p>
+              <p className="mt-2 text-sm text-red-600">{allErrors.lastName}</p>
             )}
           </div>
         </div>
 
         <div>
-          <label htmlFor="nic" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="nic" className="block text-sm font-medium text-gray-700 mb-2">
             NIC (National Identity Card) *
           </label>
           <input
@@ -143,20 +143,20 @@ export default function CredentialForm({
             id="nic"
             value={formData.nic}
             onChange={(e) => handleInputChange('nic', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               allErrors.nic ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter your National Identity Card number"
             disabled={isLoading}
           />
           {allErrors.nic && (
-            <p className="mt-1 text-sm text-red-600">{allErrors.nic}</p>
+            <p className="mt-2 text-sm text-red-600">{allErrors.nic}</p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Email Address *
             </label>
             <input
@@ -164,19 +164,19 @@ export default function CredentialForm({
               id="email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-4 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 allErrors.email ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your email address"
               disabled={isLoading}
             />
             {allErrors.email && (
-              <p className="mt-1 text-sm text-red-600">{allErrors.email}</p>
+              <p className="mt-2 text-sm text-red-600">{allErrors.email}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
               Country *
             </label>
             <input
@@ -184,91 +184,91 @@ export default function CredentialForm({
               id="country"
               value={formData.country}
               onChange={(e) => handleInputChange('country', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-4 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 allErrors.country ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your country"
               disabled={isLoading}
             />
             {allErrors.country && (
-              <p className="mt-1 text-sm text-red-600">{allErrors.country}</p>
+              <p className="mt-2 text-sm text-red-600">{allErrors.country}</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Investment Information Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+      <div className="space-y-6">
+        <h3 className="text-lg md:text-xl font-medium text-gray-900 border-b border-gray-200 pb-3">
           Investment Information
         </h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="investorType" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="investorType" className="block text-sm font-medium text-gray-700 mb-2">
               Investor Type *
             </label>
             <select
               id="investorType"
               value={formData.investorType}
               onChange={(e) => handleInputChange('investorType', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             >
               <option value="Individual">Individual</option>
               <option value="Company">Company</option>
             </select>
             {allErrors.investorType && (
-              <p className="mt-1 text-sm text-red-600">{allErrors.investorType}</p>
+              <p className="mt-2 text-sm text-red-600">{allErrors.investorType}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="kycLevel" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="kycLevel" className="block text-sm font-medium text-gray-700 mb-2">
               KYC Level *
             </label>
             <select
               id="kycLevel"
               value={formData.kycLevel}
               onChange={(e) => handleInputChange('kycLevel', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             >
               <option value="basic">Basic</option>
               <option value="advanced">Advanced</option>
             </select>
             {allErrors.kycLevel && (
-              <p className="mt-1 text-sm text-red-600">{allErrors.kycLevel}</p>
+              <p className="mt-2 text-sm text-red-600">{allErrors.kycLevel}</p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-start">
           <input
             type="checkbox"
             id="amlStatus"
             checked={formData.amlStatus}
             onChange={(e) => handleInputChange('amlStatus', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
             disabled={isLoading}
           />
-          <label htmlFor="amlStatus" className="ml-2 block text-sm text-gray-700">
+          <label htmlFor="amlStatus" className="ml-3 block text-sm text-gray-700">
             I confirm that I have completed AML verification *
           </label>
         </div>
         {allErrors.amlStatus && (
-          <p className="mt-1 text-sm text-red-600">{allErrors.amlStatus}</p>
+          <p className="mt-2 text-sm text-red-600">{allErrors.amlStatus}</p>
         )}
       </div>
 
       {/* Blockchain Information Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+      <div className="space-y-6">
+        <h3 className="text-lg md:text-xl font-medium text-gray-900 border-b border-gray-200 pb-3">
           Blockchain Information
         </h3>
         
         <div>
-          <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-700 mb-2">
             Wallet Address *
           </label>
           <input
@@ -276,23 +276,23 @@ export default function CredentialForm({
             id="walletAddress"
             value={formData.walletAddress}
             readOnly
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600 font-mono text-sm"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600 font-mono text-sm"
           />
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-500">
             This is your connected MetaMask wallet address
           </p>
           {allErrors.walletAddress && (
-            <p className="mt-1 text-sm text-red-600">{allErrors.walletAddress}</p>
+            <p className="mt-2 text-sm text-red-600">{allErrors.walletAddress}</p>
           )}
         </div>
       </div>
 
       {/* Submit Button */}
-      <div className="pt-4">
+      <div className="pt-6 flex justify-center">
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+          className="w-full md:w-auto md:min-w-[200px] bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-4 px-8 rounded-md transition-colors flex items-center justify-center text-base"
         >
           {isLoading ? (
             <>
@@ -304,7 +304,7 @@ export default function CredentialForm({
           )}
         </button>
         
-        <p className="mt-3 text-sm text-gray-500 text-center">
+        <p className="mt-4 text-sm text-gray-500 text-center max-w-2xl mx-auto">
           Your information will be securely processed and used to generate your DEIP Access Credential.
         </p>
       </div>

@@ -13,9 +13,21 @@ function AppContent() {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Initializing session...</p>
+          <div className="text-center bg-white rounded-lg shadow-md p-8 lg:p-12 max-w-md mx-auto">
+            <div className="mb-6">
+              <div className="animate-spin rounded-full h-16 w-16 lg:h-20 lg:w-20 border-b-2 border-blue-600 mx-auto"></div>
+            </div>
+            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-3">
+              Initializing Session
+            </h3>
+            <p className="text-gray-600 text-base">
+              Setting up your secure credential issuance session...
+            </p>
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                This should only take a moment
+              </p>
+            </div>
           </div>
         </div>
       </Layout>
@@ -27,10 +39,10 @@ function AppContent() {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center max-w-md">
-            <div className="mb-4">
+          <div className="text-center bg-white rounded-lg shadow-md p-8 lg:p-12 max-w-md lg:max-w-lg mx-auto">
+            <div className="mb-6">
               <svg
-                className="mx-auto h-12 w-12 text-red-600"
+                className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-red-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -43,16 +55,25 @@ function AppContent() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-4">
               Session Initialization Failed
             </h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-            >
-              Retry
-            </button>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-sm md:text-base text-red-800">{error}</p>
+            </div>
+            <div className="flex justify-center">
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors text-base"
+              >
+                Retry
+              </button>
+            </div>
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                If this problem persists, please try refreshing your browser or contact support.
+              </p>
+            </div>
           </div>
         </div>
       </Layout>

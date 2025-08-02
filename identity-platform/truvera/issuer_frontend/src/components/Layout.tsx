@@ -81,35 +81,35 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900">
             SSI Issuing Platform
           </h1>
-          <p className="text-center text-gray-600 mt-2 text-sm md:text-base">
+          <p className="text-center text-gray-600 mt-2 text-sm md:text-base lg:text-lg">
             Secure credential issuance with Truvera
           </p>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Progress Stepper at the top */}
-        <div className="max-w-4xl mx-auto mb-8">
+        <div className="max-w-5xl mx-auto mb-8">
           <ProgressStepper steps={getProgressSteps(state.currentStep)} />
         </div>
         
         {/* Error display */}
         <ErrorDisplay />
         
-        {/* Page content */}
-        <div className="max-w-md mx-auto">
+        {/* Page content - Responsive width constraints */}
+        <div className="max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
           {children}
         </div>
       </main>
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
           <p className="text-center text-sm text-gray-500">
             Powered by Truvera • Secure • Decentralized
           </p>

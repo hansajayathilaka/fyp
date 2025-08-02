@@ -78,12 +78,12 @@ export class ErrorBoundary extends Component<Props, State> {
       // Default error UI
       return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-md">
-            <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <div className="sm:mx-auto sm:w-full sm:max-w-md lg:max-w-lg">
+            <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 lg:px-12 lg:py-10">
               <div className="text-center">
-                <div className="mb-6">
+                <div className="mb-8">
                   <svg
-                    className="mx-auto h-16 w-16 text-red-500"
+                    className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-red-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -97,22 +97,22 @@ export class ErrorBoundary extends Component<Props, State> {
                   </svg>
                 </div>
 
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 mb-4">
                   Something went wrong
                 </h2>
 
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 text-base lg:text-lg mb-8">
                   An unexpected error occurred while processing your request. 
                   Our team has been notified and is working to fix the issue.
                 </p>
 
                 {/* Error details (only in development) */}
                 {process.env.NODE_ENV === 'development' && this.state.error && (
-                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
-                    <h3 className="text-sm font-medium text-red-800 mb-2">
+                  <div className="mb-8 p-6 bg-red-50 border border-red-200 rounded-lg text-left">
+                    <h3 className="text-sm md:text-base font-medium text-red-800 mb-3">
                       Error Details (Development Only)
                     </h3>
-                    <div className="text-xs text-red-700 font-mono">
+                    <div className="text-xs md:text-sm text-red-700 font-mono">
                       <div className="mb-2">
                         <strong>Message:</strong> {this.state.error.message}
                       </div>
@@ -137,35 +137,35 @@ export class ErrorBoundary extends Component<Props, State> {
                 )}
 
                 {/* Recovery options */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <button
                     onClick={this.handleRetry}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors text-base"
                   >
                     Try Again
                   </button>
                   
                   <button
                     onClick={this.handleReload}
-                    className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                    className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-md transition-colors text-base"
                   >
                     Reload Page
                   </button>
                   
                   <button
                     onClick={() => window.location.href = '/'}
-                    className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors"
+                    className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-3 px-6 rounded-md transition-colors text-base"
                   >
                     Go to Home
                   </button>
                 </div>
 
                 {/* Support information */}
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="text-sm font-medium text-blue-900 mb-2">
+                <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h4 className="text-sm md:text-base font-medium text-blue-900 mb-3">
                     Need Help?
                   </h4>
-                  <p className="text-xs text-blue-800">
+                  <p className="text-xs md:text-sm text-blue-800">
                     If this problem persists, please contact our support team with the error details above.
                   </p>
                 </div>
