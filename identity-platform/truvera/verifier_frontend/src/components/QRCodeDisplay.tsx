@@ -61,11 +61,11 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
     <div className={`bg-white rounded-lg shadow-lg p-8 ${className}`}>
       {/* Title */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-3xl font-bold text-gray-900 mb-3">
           Scan QR Code
         </h2>
-        <p className="text-gray-600">
-          Use your mobile wallet to scan this code
+        <p className="text-lg text-gray-700">
+          Use your mobile wallet to scan this code and present your credentials
         </p>
       </div>
 
@@ -74,72 +74,80 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
         {loading ? (
           <div className="w-96 h-96 bg-gray-100 rounded-lg flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Generating QR Code...</p>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
+              <p className="text-lg text-gray-700 font-medium">Generating QR Code...</p>
             </div>
           </div>
         ) : error ? (
           <div className="w-96 h-96 bg-red-50 rounded-lg flex items-center justify-center border-2 border-red-200">
             <div className="text-center">
-              <div className="text-red-600 text-4xl mb-4">⚠️</div>
-              <p className="text-red-600 mb-4">{error}</p>
+              <div className="text-red-600 text-6xl mb-6">⚠️</div>
+              <p className="text-red-700 mb-6 text-lg font-medium">{error}</p>
               <button
                 onClick={generateQRCode}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
               >
                 Try Again
               </button>
             </div>
           </div>
         ) : qrCodeImage ? (
-          <div className="bg-white p-4 rounded-lg border-2 border-gray-200 shadow-md">
+          <div className="bg-white p-6 rounded-lg border-2 border-gray-300 shadow-lg">
             <img
               src={qrCodeImage}
-              alt="QR Code"
+              alt="QR Code for credential verification"
               className="w-80 h-80 block"
             />
           </div>
         ) : (
           <div className="w-96 h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-            <p className="text-gray-500">No QR code available</p>
+            <p className="text-gray-600 text-lg">No QR code available</p>
           </div>
         )}
       </div>
 
       {/* URL Display */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-6">
-        <h3 className="font-semibold text-gray-900 mb-2">QR Code URL</h3>
-        <div className="flex items-center space-x-2">
+      <div className="bg-gray-50 rounded-lg p-6 mb-6">
+        <h3 className="font-semibold text-gray-900 mb-3 text-lg">QR Code URL</h3>
+        <div className="flex items-center space-x-3">
           <input
             type="text"
             value={proofRequest.qr}
             readOnly
-            className="flex-1 px-3 py-2 border border-gray-300 rounded bg-white text-sm font-mono"
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-white text-sm font-mono text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={copyUrl}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Copy
+            📋 Copy
           </button>
         </div>
       </div>
 
       {/* Status */}
-      <div className="text-center">
-        <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-          Status: {proofRequest.status}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center px-4 py-2 rounded-full text-base font-medium bg-green-100 text-green-800 border border-green-200">
+          <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+          Status: {proofRequest.status.charAt(0).toUpperCase() + proofRequest.status.slice(1)}
         </div>
       </div>
 
       {/* Regenerate Button */}
-      <div className="text-center mt-6">
+      <div className="text-center">
         <button
           onClick={generateQRCode}
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          {loading ? 'Generating...' : 'Regenerate QR Code'}
+          {loading ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Generating...
+            </div>
+          ) : (
+            '🔄 Regenerate QR Code'
+          )}
         </button>
       </div>
     </div>

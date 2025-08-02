@@ -319,13 +319,13 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
+    <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Status Monitor</h3>
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-gray-900">Status Monitor</h3>
+        <div className="flex items-center space-x-3">
           {isPolling && (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
           )}
           <button
             onClick={() => {
@@ -334,59 +334,61 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
                 pollStatusRef.current();
               }
             }}
-            className="px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200"
+            className="px-4 py-2 text-sm rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 font-medium transition-colors"
           >
-            Poll Now
+            🔄 Poll Now
           </button>
           <button
             onClick={isPolling ? stopPolling : startPolling}
-            className={`px-3 py-1 text-sm rounded-md ${
+            className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
               isPolling
-                ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-green-100 text-green-700 hover:bg-green-200'
+                ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                : 'bg-green-100 text-green-800 hover:bg-green-200'
             }`}
           >
-            {isPolling ? 'Stop' : 'Start'} Monitoring
+            {isPolling ? '⏸️ Stop' : '▶️ Start'} Monitoring
           </button>
         </div>
       </div>
 
       {/* Current Status */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl">{getStatusIcon(currentStatus)}</span>
-            <div>
-              <p className="text-sm font-medium text-gray-700">Current Status</p>
-              <p className={`text-lg font-semibold ${getStatusColor(currentStatus)}`}>
+      <div className="grid grid-cols-1 gap-4 mb-6">
+        <div className="bg-gray-50 rounded-lg p-5">
+          <div className="flex items-center space-x-3">
+            <span className="text-3xl">{getStatusIcon(currentStatus)}</span>
+            <div className="flex-1">
+              <p className="text-base font-medium text-gray-800">Current Status</p>
+              <p className={`text-xl font-bold ${getStatusColor(currentStatus)}`}>
                 {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl">⏱️</span>
-            <div>
-              <p className="text-sm font-medium text-gray-700">Time Remaining</p>
-              <p className={`text-lg font-semibold ${
-                timeRemaining < 300 ? 'text-red-600' : 'text-gray-900'
-              }`}>
-                {formatTimeRemaining(timeRemaining)}
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded-lg p-5">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">⏱️</span>
+              <div>
+                <p className="text-base font-medium text-gray-800">Time Remaining</p>
+                <p className={`text-xl font-bold ${
+                  timeRemaining < 300 ? 'text-red-600' : 'text-gray-900'
+                }`}>
+                  {formatTimeRemaining(timeRemaining)}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl">🔄</span>
-            <div>
-              <p className="text-sm font-medium text-gray-700">Last Update</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Never'}
-              </p>
+          <div className="bg-gray-50 rounded-lg p-5">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🔄</span>
+              <div>
+                <p className="text-base font-medium text-gray-800">Last Update</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Never'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -394,58 +396,53 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
 
       {/* Progress Indicators */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Progress</span>
-          <span className="text-sm text-gray-500">
-            {isPolling ? 'Monitoring...' : 'Stopped'}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-base font-medium text-gray-800">Progress</span>
+          <span className="text-base text-gray-600 font-medium">
+            {isPolling ? '🟢 Monitoring...' : '🔴 Stopped'}
           </span>
         </div>
         
         {/* Progress Steps */}
-        <div className="flex items-center space-x-4">
-          <div className={`flex items-center space-x-2 ${
+        <div className="space-y-4">
+          <div className={`flex items-center space-x-3 p-3 rounded-lg ${
             ['active', 'completed', 'expired', 'failed'].includes(currentStatus) 
-              ? 'text-green-600' : 'text-gray-400'
+              ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'
           }`}>
-            <div className={`w-3 h-3 rounded-full ${
+            <div className={`w-4 h-4 rounded-full ${
               ['active', 'completed', 'expired', 'failed'].includes(currentStatus)
                 ? 'bg-green-600' : 'bg-gray-300'
             }`}></div>
-            <span className="text-sm">Request Created</span>
+            <span className={`text-base font-medium ${
+              ['active', 'completed', 'expired', 'failed'].includes(currentStatus) 
+                ? 'text-green-800' : 'text-gray-600'
+            }`}>Request Created</span>
           </div>
           
-          <div className="flex-1 h-0.5 bg-gray-300">
-            <div className={`h-full transition-all duration-500 ${
-              currentStatus === 'active' ? 'bg-yellow-500 w-1/2' :
-              ['completed', 'expired', 'failed'].includes(currentStatus) ? 'bg-green-600 w-full' :
-              'bg-gray-300 w-0'
-            }`}></div>
-          </div>
-          
-          <div className={`flex items-center space-x-2 ${
-            currentStatus === 'active' ? 'text-yellow-600' :
-            ['completed', 'expired', 'failed'].includes(currentStatus) ? 'text-green-600' : 'text-gray-400'
+          <div className={`flex items-center space-x-3 p-3 rounded-lg ${
+            currentStatus === 'active' ? 'bg-yellow-50 border border-yellow-200' :
+            ['completed', 'expired', 'failed'].includes(currentStatus) ? 'bg-green-50 border border-green-200' :
+            'bg-gray-50 border border-gray-200'
           }`}>
-            <div className={`w-3 h-3 rounded-full ${
+            <div className={`w-4 h-4 rounded-full ${
               currentStatus === 'active' ? 'bg-yellow-500 animate-pulse' :
               ['completed', 'expired', 'failed'].includes(currentStatus) ? 'bg-green-600' : 'bg-gray-300'
             }`}></div>
-            <span className="text-sm">Waiting for Presentation</span>
+            <span className={`text-base font-medium ${
+              currentStatus === 'active' ? 'text-yellow-800' :
+              ['completed', 'expired', 'failed'].includes(currentStatus) ? 'text-green-800' : 'text-gray-600'
+            }`}>Waiting for Presentation</span>
           </div>
           
-          <div className="flex-1 h-0.5 bg-gray-300">
-            <div className={`h-full transition-all duration-500 ${
-              currentStatus === 'completed' ? 'bg-green-600 w-full' : 'bg-gray-300 w-0'
-            }`}></div>
-          </div>
-          
-          <div className={`flex items-center space-x-2 ${
-            currentStatus === 'completed' ? 'text-green-600' : 'text-gray-400'
+          <div className={`flex items-center space-x-3 p-3 rounded-lg ${
+            currentStatus === 'completed' ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'
           }`}>
-            <div className={`w-3 h-3 rounded-full ${
+            <div className={`w-4 h-4 rounded-full ${
               currentStatus === 'completed' ? 'bg-green-600' : 'bg-gray-300'
             }`}></div>
-            <span className="text-sm">Presentation Received</span>
+            <span className={`text-base font-medium ${
+              currentStatus === 'completed' ? 'text-green-800' : 'text-gray-600'
+            }`}>Presentation Received</span>
           </div>
         </div>
       </div>
@@ -475,15 +472,15 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
       )}
 
       {/* Instructions */}
-      <div className="bg-blue-50 rounded-lg p-4">
-        <h4 className="font-medium text-blue-900 mb-2">What's happening?</h4>
-        <div className="text-sm text-blue-800 space-y-1">
+      <div className="bg-blue-50 rounded-lg p-5 border border-blue-200">
+        <h4 className="font-semibold text-blue-900 mb-3 text-lg">What's happening?</h4>
+        <div className="text-base text-blue-800 space-y-2">
           {currentStatus === 'active' && (
             <>
               <p>• Waiting for a credential holder to scan the QR code</p>
               <p>• The system is checking for presentations every {pollInterval / 1000} seconds</p>
-              <p>• Poll count: {pollCount}</p>
-              <p>• This request will expire in {formatTimeRemaining(timeRemaining)}</p>
+              <p>• Poll count: <span className="font-semibold">{pollCount}</span></p>
+              <p>• This request will expire in <span className="font-semibold">{formatTimeRemaining(timeRemaining)}</span></p>
             </>
           )}
           {currentStatus === 'completed' && (

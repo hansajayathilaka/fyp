@@ -2,63 +2,21 @@ import React, { useState, useCallback } from 'react';
 import { 
   VerificationResult, 
   CredentialVerificationResult, 
-  VerifiableCredential,
-  CustomActionPayload 
+  VerifiableCredential
 } from '../types';
-import { apiService } from '../services/api';
 
 interface VerificationResultsProps {
   verificationResult: VerificationResult;
-  onCustomAction?: (result: VerificationResult) => void;
   onRetry?: () => void;
   className?: string;
 }
 
 export const VerificationResults: React.FC<VerificationResultsProps> = ({
   verificationResult,
-  onCustomAction,
   onRetry,
   className = '',
 }) => {
-  const [customActionLoading, setCustomActionLoading] = useState(false);
-  const [customActionError, setCustomActionError] = useState<string | null>(null);
-  const [customActionSuccess, setCustomActionSuccess] = useState(false);
   const [expandedCredentials, setExpandedCredentials] = useState<Set<string>>(new Set());
-
-  // Handle custom action trigger
-  const handleCustomAction = useCallback(async () => {
-    if (!onCustomAction) return;
-
-    setCustomActionLoading(true);
-    setCustomActionError(null);
-    setCustomActionSuccess(false);
-
-    try {
-      // Create payload for custom action
-      const payload: CustomActionPayload = {
-        verificationResult,
-        timestamp: new Date().toISOString(),
-        sessionId: `session-${Date.now()}`,
-        metadata: {
-          userAgent: navigator.userAgent,
-          timestamp: verificationResult.timestamp,
-        },
-      };
-
-      const response = await apiService.triggerCustomAction(payload);
-
-      if (response.success) {
-        setCustomActionSuccess(true);
-        onCustomAction(verificationResult);
-      } else {
-        setCustomActionError(response.error?.message || 'Custom action failed');
-      }
-    } catch (error) {
-      setCustomActionError(error instanceof Error ? error.message : 'Unknown error occurred');
-    } finally {
-      setCustomActionLoading(false);
-    }
-  }, [verificationResult, onCustomAction]);
 
   // Toggle credential expansion
   const toggleCredentialExpansion = useCallback((credentialId: string) => {
@@ -77,28 +35,40 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
   const getOverallStatusDisplay = () => {
     if (verificationResult.verified) {
       return {
-        color: 'text-green-600',
+        color: 'text-green-700',
         bgColor: 'bg-green-50',
-        borderColor: 'border-green-200',
-        icon: '✅',
+        borderColor: 'border-green-300',
+        icon: (
+          <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+        ),
         status: 'Verified',
         description: 'All credentials have been successfully verified',
       };
     } else if (verificationResult.partiallyVerified) {
       return {
-        color: 'text-yellow-600',
-        bgColor: 'bg-yellow-50',
-        borderColor: 'border-yellow-200',
-        icon: '⚠️',
+        color: 'text-amber-700',
+        bgColor: 'bg-amber-50',
+        borderColor: 'border-amber-300',
+        icon: (
+          <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+        ),
         status: 'Partially Verified',
         description: 'Some credentials were verified, but others failed verification',
       };
     } else {
       return {
-        color: 'text-red-600',
+        color: 'text-red-700',
         bgColor: 'bg-red-50',
-        borderColor: 'border-red-200',
-        icon: '❌',
+        borderColor: 'border-red-300',
+        icon: (
+          <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+        ),
         status: 'Verification Failed',
         description: 'Credential verification was unsuccessful',
       };
@@ -109,16 +79,24 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
   const getCredentialStatusDisplay = (result: CredentialVerificationResult) => {
     if (result.verified) {
       return {
-        color: 'text-green-600',
-        bgColor: 'bg-green-50',
-        icon: '✅',
+        color: 'text-green-700',
+        bgColor: 'bg-green-100',
+        icon: (
+          <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        ),
         status: 'Verified',
       };
     } else {
       return {
-        color: 'text-red-600',
-        bgColor: 'bg-red-50',
-        icon: '❌',
+        color: 'text-red-700',
+        bgColor: 'bg-red-100',
+        icon: (
+          <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        ),
         status: 'Failed',
       };
     }
@@ -168,21 +146,61 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
     return (
       <div className="mt-3 p-3 bg-gray-50 rounded-lg">
         <h5 className="text-sm font-medium text-gray-700 mb-2">Verification Details</h5>
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className={`flex items-center space-x-1 ${details.signatureValid ? 'text-green-600' : 'text-red-600'}`}>
-            <span>{details.signatureValid ? '✅' : '❌'}</span>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className={`flex items-center space-x-2 ${details.signatureValid ? 'text-green-700' : 'text-red-700'}`}>
+            <div className="flex-shrink-0">
+              {details.signatureValid ? (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
             <span>Signature Valid</span>
           </div>
-          <div className={`flex items-center space-x-1 ${details.issuerTrusted ? 'text-green-600' : 'text-red-600'}`}>
-            <span>{details.issuerTrusted ? '✅' : '❌'}</span>
+          <div className={`flex items-center space-x-2 ${details.issuerTrusted ? 'text-green-700' : 'text-red-700'}`}>
+            <div className="flex-shrink-0">
+              {details.issuerTrusted ? (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
             <span>Issuer Trusted</span>
           </div>
-          <div className={`flex items-center space-x-1 ${details.notExpired ? 'text-green-600' : 'text-red-600'}`}>
-            <span>{details.notExpired ? '✅' : '❌'}</span>
+          <div className={`flex items-center space-x-2 ${details.notExpired ? 'text-green-700' : 'text-red-700'}`}>
+            <div className="flex-shrink-0">
+              {details.notExpired ? (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
             <span>Not Expired</span>
           </div>
-          <div className={`flex items-center space-x-1 ${details.schemaValid ? 'text-green-600' : 'text-red-600'}`}>
-            <span>{details.schemaValid ? '✅' : '❌'}</span>
+          <div className={`flex items-center space-x-2 ${details.schemaValid ? 'text-green-700' : 'text-red-700'}`}>
+            <div className="flex-shrink-0">
+              {details.schemaValid ? (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
             <span>Schema Valid</span>
           </div>
         </div>
@@ -193,7 +211,7 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
   const overallStatus = getOverallStatusDisplay();
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -205,8 +223,11 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
               >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
                 Verify Again
               </button>
             )}
@@ -217,7 +238,7 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
       {/* Overall Status */}
       <div className={`mx-6 mt-6 p-4 rounded-lg border ${overallStatus.borderColor} ${overallStatus.bgColor}`}>
         <div className="flex items-center space-x-3">
-          <span className="text-2xl">{overallStatus.icon}</span>
+          <div className="flex-shrink-0">{overallStatus.icon}</div>
           <div className="flex-1">
             <h3 className={`text-lg font-semibold ${overallStatus.color}`}>
               {overallStatus.status}
@@ -230,36 +251,48 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
       {/* Summary Statistics */}
       <div className="px-6 py-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">📋</span>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
               <div>
                 <p className="text-sm font-medium text-gray-700">Total Credentials</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-2xl font-bold text-gray-900">
                   {verificationResult.results.length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">✅</span>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
               <div>
                 <p className="text-sm font-medium text-gray-700">Verified</p>
-                <p className="text-lg font-semibold text-green-600">
+                <p className="text-2xl font-bold text-green-600">
                   {verificationResult.results.filter(r => r.verified).length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">❌</span>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
               <div>
                 <p className="text-sm font-medium text-gray-700">Failed</p>
-                <p className="text-lg font-semibold text-red-600">
+                <p className="text-2xl font-bold text-red-600">
                   {verificationResult.results.filter(r => !r.verified).length}
                 </p>
               </div>
@@ -307,7 +340,7 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-xl">{statusDisplay.icon}</span>
+                      <div className="flex-shrink-0">{statusDisplay.icon}</div>
                       <div>
                         <h4 className="font-medium text-gray-900">
                           {result.credential.type.filter(t => t !== 'VerifiableCredential').join(', ') || 'Credential'}
@@ -316,17 +349,22 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
                           Issued by: {formatIssuer(result.credential.issuer)}
                         </p>
                         {isExpired && (
-                          <p className="text-sm text-red-600 font-medium">⚠️ Expired</p>
+                          <div className="flex items-center space-x-1 text-sm text-red-600 font-medium">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            <span>Expired</span>
+                          </div>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusDisplay.bgColor} ${statusDisplay.color}`}>
+                    <div className="flex items-center space-x-3">
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusDisplay.bgColor} ${statusDisplay.color} border`}>
                         {statusDisplay.status}
                       </span>
-                      <span className="text-gray-400">
-                        {isExpanded ? '▼' : '▶'}
-                      </span>
+                      <svg className={`w-5 h-5 text-gray-400 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
                     </div>
                   </div>
 
@@ -404,59 +442,7 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
         </div>
       </div>
 
-      {/* Custom Action Section */}
-      {onCustomAction && verificationResult.verified && (
-        <div className="px-6 py-4 border-t border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Custom Integration</h3>
-          <div className="bg-blue-50 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-900">
-                  Trigger Custom Backend Action
-                </p>
-                <p className="text-sm text-blue-700">
-                  Execute custom integration with verification results
-                </p>
-              </div>
-              <button
-                onClick={handleCustomAction}
-                disabled={customActionLoading}
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  customActionLoading
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : customActionSuccess
-                    ? 'bg-green-600 text-white'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                {customActionLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
-                    <span>Processing...</span>
-                  </div>
-                ) : customActionSuccess ? (
-                  '✅ Completed'
-                ) : (
-                  'Execute Action'
-                )}
-              </button>
-            </div>
 
-            {/* Custom Action Status */}
-            {customActionError && (
-              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-                <strong>Action Failed:</strong> {customActionError}
-              </div>
-            )}
-
-            {customActionSuccess && (
-              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-                <strong>Success:</strong> Custom action executed successfully
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Footer Actions */}
       <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
@@ -464,11 +450,14 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
           <div className="text-sm text-gray-600">
             Verification completed at {formatDate(verificationResult.timestamp)}
           </div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <button
               onClick={() => window.print()}
-              className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+              className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
             >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
               Print Results
             </button>
             <button
@@ -482,8 +471,11 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
                 link.click();
                 URL.revokeObjectURL(url);
               }}
-              className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+              className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
               Export JSON
             </button>
           </div>

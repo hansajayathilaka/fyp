@@ -116,8 +116,8 @@ export const QRCodePage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading proof request...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
+          <p className="text-gray-700 text-xl font-medium">Loading proof request...</p>
         </div>
       </div>
     );
@@ -126,20 +126,20 @@ export const QRCodePage: React.FC = () => {
   if (error && !proofRequest) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
-          <div className="text-red-600 text-4xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Request</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <div className="space-y-3">
+        <div className="max-w-lg w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="text-red-600 text-6xl mb-6">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Request</h2>
+          <p className="text-gray-700 mb-8 text-lg">{error}</p>
+          <div className="space-y-4">
             <button
               onClick={loadProofRequest}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-colors"
             >
               Try Again
             </button>
             <button
               onClick={handleCreateNewRequest}
-              className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="w-full px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium transition-colors"
             >
               Create New Request
             </button>
@@ -167,27 +167,27 @@ export const QRCodePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-10">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Credential Verification</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-4xl font-bold text-gray-900">Credential Verification</h1>
+              <p className="mt-3 text-xl text-gray-700">
                 Present your credential by scanning the QR code below
               </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex space-x-4">
               <button
                 onClick={handleCreateNewRequest}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium transition-colors"
               >
                 New Request
               </button>
               {proofRequest.status === 'completed' && (
                 <button
                   onClick={handleGoToVerification}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium transition-colors"
                 >
                   Go to Verification
                 </button>
@@ -197,9 +197,9 @@ export const QRCodePage: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* QR Code Display */}
-          <div>
+          <div className="xl:col-span-2">
             <QRCodeDisplay
               proofRequest={proofRequest}
               onRefresh={handleRefreshQRCode}
@@ -208,7 +208,7 @@ export const QRCodePage: React.FC = () => {
           </div>
 
           {/* Status Monitor */}
-          <div>
+          <div className="xl:col-span-1">
             <StatusMonitor
               proofRequestId={proofRequest.id}
               onStatusUpdate={handleStatusUpdate}
@@ -223,14 +223,14 @@ export const QRCodePage: React.FC = () => {
 
         {/* Status-based Messages */}
         {proofRequest.status === 'completed' && (
-          <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-6">
-            <div className="flex items-center space-x-3">
-              <div className="text-green-600 text-2xl">✅</div>
+          <div className="mt-10 bg-green-50 border border-green-200 rounded-lg p-8">
+            <div className="flex items-center space-x-4">
+              <div className="text-green-600 text-4xl">✅</div>
               <div>
-                <h3 className="text-lg font-semibold text-green-900">
+                <h3 className="text-2xl font-bold text-green-900">
                   Credential Presentation Received!
                 </h3>
-                <p className="text-green-700 mt-1">
+                <p className="text-green-800 mt-2 text-lg">
                   Your credential has been successfully presented. Redirecting to verification results...
                 </p>
               </div>
@@ -239,19 +239,19 @@ export const QRCodePage: React.FC = () => {
         )}
 
         {proofRequest.status === 'expired' && (
-          <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
-            <div className="flex items-center space-x-3">
-              <div className="text-red-600 text-2xl">⏰</div>
-              <div>
-                <h3 className="text-lg font-semibold text-red-900">
+          <div className="mt-10 bg-red-50 border border-red-200 rounded-lg p-8">
+            <div className="flex items-center space-x-4">
+              <div className="text-red-600 text-4xl">⏰</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-red-900">
                   Request Expired
                 </h3>
-                <p className="text-red-700 mt-1">
+                <p className="text-red-800 mt-2 text-lg">
                   This proof request has expired. Please create a new request to continue.
                 </p>
                 <button
                   onClick={handleCreateNewRequest}
-                  className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="mt-4 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium transition-colors"
                 >
                   Create New Request
                 </button>
@@ -261,19 +261,19 @@ export const QRCodePage: React.FC = () => {
         )}
 
         {proofRequest.status === 'failed' && (
-          <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
-            <div className="flex items-center space-x-3">
-              <div className="text-red-600 text-2xl">❌</div>
-              <div>
-                <h3 className="text-lg font-semibold text-red-900">
+          <div className="mt-10 bg-red-50 border border-red-200 rounded-lg p-8">
+            <div className="flex items-center space-x-4">
+              <div className="text-red-600 text-4xl">❌</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-red-900">
                   Request Failed
                 </h3>
-                <p className="text-red-700 mt-1">
+                <p className="text-red-800 mt-2 text-lg">
                   There was an error processing this proof request. Please try creating a new request.
                 </p>
                 <button
                   onClick={handleCreateNewRequest}
-                  className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="mt-4 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium transition-colors"
                 >
                   Create New Request
                 </button>
