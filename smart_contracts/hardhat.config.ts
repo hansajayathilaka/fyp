@@ -7,8 +7,12 @@ dotenv.config();
 
 // Ensure private key is available
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const HEDERA_TESTNET_URL = process.env.HEDERA_TESTNET_URL;
 if (!PRIVATE_KEY) {
   throw new Error("Please set your PRIVATE_KEY in a .env file");
+}
+if (!HEDERA_TESTNET_URL) {
+  throw new Error("Please set your HEDERA_TESTNET_URL in a .env file");
 }
 
 const config: HardhatUserConfig = {
@@ -29,8 +33,8 @@ const config: HardhatUserConfig = {
     },
     // Hedera testnet configuration
     hederaTestnet: {
-      url: "https://testnet.hashio.io/api",
-      chainId: 296,
+      url: HEDERA_TESTNET_URL,
+      chainId: 57054,
       accounts: [PRIVATE_KEY],
       gas: 300000,
       gasPrice: 360000000000, // 360 gwei
