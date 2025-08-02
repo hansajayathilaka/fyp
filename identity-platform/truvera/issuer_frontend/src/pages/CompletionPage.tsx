@@ -226,13 +226,13 @@ export default function CompletionPage() {
 
   // Show success state with operation summary
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Success Header */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 lg:p-8">
         <div className="text-center">
-          <div className="mb-6">
+          <div className="mb-8">
             <svg
-              className="mx-auto h-16 w-16 text-green-600"
+              className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-green-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -246,19 +246,19 @@ export default function CompletionPage() {
             </svg>
           </div>
           
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 mb-4">
             {operationResult.success ? 'Credential Issued Successfully!' : 'Operation Completed'}
           </h2>
           
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 text-base lg:text-lg mb-8 max-w-2xl mx-auto">
             {operationResult.success 
               ? 'Your DEIP Access Credential has been successfully delivered to your Dock wallet.'
               : 'The credential issuance process has completed. Please review the details below.'}
           </p>
           
           {operationResult.success && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-              <p className="text-green-800 text-sm">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+              <p className="text-green-800 text-sm md:text-base">
                 You can now use this credential to access the DEIP platform and other supported services.
               </p>
             </div>
@@ -274,37 +274,43 @@ export default function CompletionPage() {
       />
 
       {/* Additional Guidance */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="font-medium text-blue-900 mb-3 flex items-center">
-          <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 lg:p-8">
+        <h4 className="font-medium text-blue-900 mb-4 flex items-center text-lg">
+          <svg className="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           What's Next?
         </h4>
-        <div className="text-sm text-blue-800 space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm md:text-base text-blue-800">
           {operationResult.success ? (
             <>
-              <p>
-                <strong>Check your Dock wallet:</strong> Your new DEIP Access Credential should now be available in your wallet.
-              </p>
-              <p>
-                <strong>Verify the credential:</strong> Make sure all the information in the credential is correct.
-              </p>
-              <p>
-                <strong>Use your credential:</strong> You can now use this credential for authentication and access to DEIP services.
-              </p>
+              <div>
+                <p className="font-semibold text-blue-900 mb-2">Check your Dock wallet:</p>
+                <p>Your new DEIP Access Credential should now be available in your wallet.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-900 mb-2">Verify the credential:</p>
+                <p>Make sure all the information in the credential is correct.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-900 mb-2">Use your credential:</p>
+                <p>You can now use this credential for authentication and access to DEIP services.</p>
+              </div>
             </>
           ) : (
             <>
-              <p>
-                <strong>Review the errors:</strong> Check the operation summary above for details about what went wrong.
-              </p>
-              <p>
-                <strong>Try again:</strong> You can start a new credential issuance session if needed.
-              </p>
-              <p>
-                <strong>Contact support:</strong> If problems persist, please contact our support team with your session ID.
-              </p>
+              <div>
+                <p className="font-semibold text-blue-900 mb-2">Review the errors:</p>
+                <p>Check the operation summary above for details about what went wrong.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-900 mb-2">Try again:</p>
+                <p>You can start a new credential issuance session if needed.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-900 mb-2">Contact support:</p>
+                <p>If problems persist, please contact our support team with your session ID.</p>
+              </div>
             </>
           )}
         </div>

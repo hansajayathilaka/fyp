@@ -200,11 +200,11 @@ export default function CredentialFormPage() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="text-center mb-6">
-        <div className="mb-4">
+    <div className="bg-white rounded-lg shadow-md p-6 lg:p-8">
+      <div className="text-center mb-8">
+        <div className="mb-6">
           <svg
-            className="mx-auto h-16 w-16 text-blue-600"
+            className="mx-auto h-16 w-16 lg:h-20 lg:w-20 text-blue-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -218,11 +218,11 @@ export default function CredentialFormPage() {
           </svg>
         </div>
         
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 mb-3">
           Credential Information
         </h2>
         
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 text-base lg:text-lg max-w-2xl mx-auto">
           Please fill out the form below to receive your DEIP Access Credential.
         </p>
       </div>

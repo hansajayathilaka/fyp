@@ -427,164 +427,164 @@ export default function QRCodeDisplay({ onConnectionEstablished: _onConnectionEs
     // Default state: QR code ready for scanning
     return (
         <div className="text-center">
-            <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="mb-8">
+                <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-6">
                     Scan to Receive Your Credential
                 </h3>
 
                 {/* Security PIN Display */}
                 {securityPIN && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                        <div className="flex items-center justify-center space-x-2">
-                            <svg className="w-5 h-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
+                        <div className="flex items-center justify-center space-x-3">
+                            <svg className="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
-                            <span className="text-sm font-medium text-yellow-800">Security PIN:</span>
-                            <span className="text-lg font-bold text-yellow-900 font-mono">{securityPIN}</span>
+                            <span className="text-sm md:text-base font-medium text-yellow-800">Security PIN:</span>
+                            <span className="text-xl md:text-2xl font-bold text-yellow-900 font-mono">{securityPIN}</span>
                         </div>
-                        <p className="text-xs text-yellow-700 mt-1">
+                        <p className="text-sm text-yellow-700 mt-2">
                             You may need this PIN when accepting the credential offer
                         </p>
                     </div>
                 )}
 
                 {/* QR Code Display */}
-                <div className="bg-white border-2 border-gray-200 rounded-lg p-4 inline-block mb-4">
+                <div className="bg-white border-2 border-gray-200 rounded-lg p-6 lg:p-8 inline-block mb-6">
                     <img
                         src={qrCodeDataUrl}
                         alt="Credential Offer QR Code"
-                        className="w-64 h-64 mx-auto"
+                        className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 mx-auto"
                     />
                 </div>
 
                 {/* Timer and Status */}
-                <div className="mb-4">
-                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="mb-8">
+                    <div className="flex items-center justify-center space-x-3 text-sm md:text-base text-gray-600 mb-3">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Expires in: {formatTime(timeRemaining)}</span>
+                        <span className="font-medium">Expires in: {formatTime(timeRemaining)}</span>
                     </div>
 
-                    <div className="mt-2">
-                        <div className="flex items-center justify-center space-x-2">
-                            <div className="animate-pulse w-2 h-2 bg-blue-600 rounded-full"></div>
-                            <span className="text-sm text-gray-600">Waiting for credential acceptance...</span>
-                        </div>
+                    <div className="flex items-center justify-center space-x-3">
+                        <div className="animate-pulse w-3 h-3 bg-blue-600 rounded-full"></div>
+                        <span className="text-sm md:text-base text-gray-600">Waiting for credential acceptance...</span>
                     </div>
                 </div>
             </div>
 
             {/* Comprehensive Scanning Instructions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <h4 className="font-medium text-blue-900 mb-3 flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 lg:p-8 mb-6">
+                <h4 className="font-medium text-blue-900 mb-4 flex items-center text-lg">
+                    <svg className="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Scanning Instructions
                 </h4>
-                <ol className="text-sm text-blue-800 text-left space-y-2">
+                <ol className="text-sm md:text-base text-blue-800 text-left space-y-4 max-w-4xl mx-auto">
                     <li className="flex items-start">
-                        <span className="font-semibold mr-2 text-blue-900">1.</span>
+                        <span className="font-semibold mr-4 text-blue-900 text-lg">1.</span>
                         <div>
-                            <strong>Open your Dock (Truvera) wallet app</strong>
-                            <p className="text-xs text-blue-700 mt-1">Make sure you have the latest version installed</p>
+                            <strong className="text-base md:text-lg">Open your Dock (Truvera) wallet app</strong>
+                            <p className="text-sm text-blue-700 mt-1">Make sure you have the latest version installed</p>
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="font-semibold mr-2 text-blue-900">2.</span>
+                        <span className="font-semibold mr-4 text-blue-900 text-lg">2.</span>
                         <div>
-                            <strong>Tap "Scan QR Code" or "Add Connection"</strong>
-                            <p className="text-xs text-blue-700 mt-1">Usually found on the main screen or in the menu</p>
+                            <strong className="text-base md:text-lg">Tap "Scan QR Code" or "Add Connection"</strong>
+                            <p className="text-sm text-blue-700 mt-1">Usually found on the main screen or in the menu</p>
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="font-semibold mr-2 text-blue-900">3.</span>
+                        <span className="font-semibold mr-4 text-blue-900 text-lg">3.</span>
                         <div>
-                            <strong>Point your camera at the QR code above</strong>
-                            <p className="text-xs text-blue-700 mt-1">Ensure good lighting and hold steady for best results</p>
+                            <strong className="text-base md:text-lg">Point your camera at the QR code above</strong>
+                            <p className="text-sm text-blue-700 mt-1">Ensure good lighting and hold steady for best results</p>
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="font-semibold mr-2 text-blue-900">4.</span>
+                        <span className="font-semibold mr-4 text-blue-900 text-lg">4.</span>
                         <div>
-                            <strong>Accept the connection invitation</strong>
-                            <p className="text-xs text-blue-700 mt-1">Review the connection details before accepting</p>
+                            <strong className="text-base md:text-lg">Accept the connection invitation</strong>
+                            <p className="text-sm text-blue-700 mt-1">Review the connection details before accepting</p>
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="font-semibold mr-2 text-blue-900">5.</span>
+                        <span className="font-semibold mr-4 text-blue-900 text-lg">5.</span>
                         <div>
-                            <strong>Wait for the credential offer</strong>
-                            <p className="text-xs text-blue-700 mt-1">This may take a few seconds to appear</p>
+                            <strong className="text-base md:text-lg">Wait for the credential offer</strong>
+                            <p className="text-sm text-blue-700 mt-1">This may take a few seconds to appear</p>
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="font-semibold mr-2 text-blue-900">6.</span>
+                        <span className="font-semibold mr-4 text-blue-900 text-lg">6.</span>
                         <div>
-                            <strong>Review and accept the credential</strong>
-                            <p className="text-xs text-blue-700 mt-1">Check the credential details before storing in your wallet</p>
+                            <strong className="text-base md:text-lg">Review and accept the credential</strong>
+                            <p className="text-sm text-blue-700 mt-1">Check the credential details before storing in your wallet</p>
                         </div>
                     </li>
                 </ol>
             </div>
 
             {/* Troubleshooting Tips */}
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-                <h4 className="font-medium text-orange-900 mb-3 flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 lg:p-8 mb-6">
+                <h4 className="font-medium text-orange-900 mb-4 flex items-center text-lg">
+                    <svg className="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                     Troubleshooting Tips
                 </h4>
-                <ul className="text-sm text-orange-800 text-left space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ul className="text-sm md:text-base text-orange-800 text-left space-y-4">
                     <li className="flex items-start">
-                        <span className="mr-2">•</span>
+                        <span className="mr-3 text-orange-600">•</span>
                         <div>
                             <strong>QR code won't scan?</strong> Try adjusting your distance from the screen or improving lighting
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="mr-2">•</span>
+                        <span className="mr-3 text-orange-600">•</span>
                         <div>
                             <strong>Connection failed?</strong> Check your internet connection and try generating a new QR code
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="mr-2">•</span>
+                        <span className="mr-3 text-orange-600">•</span>
                         <div>
                             <strong>Wallet app issues?</strong> Make sure you have the latest version of the Dock wallet app
                         </div>
                     </li>
                     <li className="flex items-start">
-                        <span className="mr-2">•</span>
+                        <span className="mr-3 text-orange-600">•</span>
                         <div>
                             <strong>Still having problems?</strong> Use the credential offer URL below as a fallback option
                         </div>
                     </li>
                 </ul>
+                </div>
             </div>
 
             {/* Credential Offer URL Fallback */}
             {credentialOfferUrl && (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                    <h4 className="font-medium text-gray-900 mb-2 flex items-center">
-                        <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 lg:p-8 mb-6">
+                    <h4 className="font-medium text-gray-900 mb-4 flex items-center text-lg">
+                        <svg className="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                         </svg>
                         Alternative: Use Credential Offer URL
                     </h4>
-                    <p className="text-sm text-gray-700 mb-3">
+                    <p className="text-sm md:text-base text-gray-700 mb-4">
                         If scanning doesn't work, you can copy this URL and paste it into your Dock wallet:
                     </p>
-                    <div className="bg-white border border-gray-300 rounded p-2 mb-3">
-                        <code className="text-xs text-gray-800 break-all font-mono">
+                    <div className="bg-white border border-gray-300 rounded p-4 mb-4">
+                        <code className="text-xs md:text-sm text-gray-800 break-all font-mono">
                             {credentialOfferUrl}
                         </code>
                     </div>
                     <button
                         onClick={() => navigator.clipboard.writeText(credentialOfferUrl)}
-                        className="text-sm bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded transition-colors"
+                        className="text-sm md:text-base bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition-colors"
                     >
                         Copy URL
                     </button>
@@ -592,19 +592,19 @@ export default function QRCodeDisplay({ onConnectionEstablished: _onConnectionEs
             )}
 
             {/* Action Buttons */}
-            <div className="space-y-3">
+            <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
                 <button
                     onClick={handleRegenerate}
-                    className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center justify-center"
+                    className="w-full md:w-auto bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-md transition-colors flex items-center justify-center text-base"
                 >
-                    <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     Generate New QR Code
                 </button>
 
                 {retryCount > 0 && (
-                    <div className="text-xs text-gray-500 text-center">
+                    <div className="text-sm text-gray-500 text-center">
                         Retry attempt: {retryCount}
                     </div>
                 )}

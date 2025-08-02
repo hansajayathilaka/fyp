@@ -191,14 +191,14 @@ Exported at: ${new Date().toLocaleString()}
   const statusColor = getStatusColor();
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white rounded-lg shadow-md p-6 lg:p-8">
       {/* Header */}
-      <div className="text-center mb-6">
-        <div className="mb-4">
+      <div className="text-center mb-8">
+        <div className="mb-6">
           {getStatusIcon()}
         </div>
         
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 mb-4">
           Operation Summary
         </h2>
         
@@ -213,32 +213,32 @@ Exported at: ${new Date().toLocaleString()}
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-gray-900">{getDuration()}</div>
-          <div className="text-sm text-gray-600">Duration</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-gray-50 p-6 rounded-lg text-center">
+          <div className="text-2xl lg:text-3xl font-bold text-gray-900">{getDuration()}</div>
+          <div className="text-sm md:text-base text-gray-600 mt-2">Duration</div>
         </div>
-        <div className="bg-gray-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-gray-900">
+        <div className="bg-gray-50 p-6 rounded-lg text-center">
+          <div className="text-2xl lg:text-3xl font-bold text-gray-900">
             {operationResult.steps.filter(step => step.status === 'completed').length}
           </div>
-          <div className="text-sm text-gray-600">Steps Completed</div>
+          <div className="text-sm md:text-base text-gray-600 mt-2">Steps Completed</div>
         </div>
-        <div className="bg-gray-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-gray-900">
+        <div className="bg-gray-50 p-6 rounded-lg text-center">
+          <div className="text-2xl lg:text-3xl font-bold text-gray-900">
             {sessionData.credentialStatus.charAt(0).toUpperCase() + sessionData.credentialStatus.slice(1)}
           </div>
-          <div className="text-sm text-gray-600">Credential Status</div>
+          <div className="text-sm md:text-base text-gray-600 mt-2">Credential Status</div>
         </div>
       </div>
 
       {/* Operation Steps */}
-      <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Operation Steps</h3>
-        <div className="space-y-3">
+      <div className="mb-8">
+        <h3 className="text-lg md:text-xl font-medium text-gray-900 mb-6">Operation Steps</h3>
+        <div className="space-y-4">
           {operationResult.steps.map((step, index) => (
-            <div key={index} className="flex items-center">
-              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
+            <div key={index} className="flex items-center p-4 bg-gray-50 rounded-lg">
+              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-4 ${
                 step.status === 'completed' ? 'bg-green-100 text-green-600' :
                 step.status === 'failed' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
               }`}>
@@ -255,9 +255,9 @@ Exported at: ${new Date().toLocaleString()}
                 )}
               </div>
               <div className="flex-1">
-                <div className="text-sm font-medium text-gray-900">{step.name}</div>
+                <div className="text-sm md:text-base font-medium text-gray-900">{step.name}</div>
                 {step.timestamp && (
-                  <div className="text-xs text-gray-500">{step.timestamp.toLocaleString()}</div>
+                  <div className="text-xs md:text-sm text-gray-500 mt-1">{step.timestamp.toLocaleString()}</div>
                 )}
               </div>
             </div>
@@ -267,13 +267,13 @@ Exported at: ${new Date().toLocaleString()}
 
       {/* Credential Information */}
       {sessionData.formData && (
-        <div className="mb-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Credential Information</h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mb-8">
+          <h3 className="text-lg md:text-xl font-medium text-gray-900 mb-6">Credential Information</h3>
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <div className="text-sm font-medium text-gray-500 mb-1">Name</div>
-                <div className="text-gray-900 font-semibold">{sessionData.formData.firstName} {sessionData.formData.lastName}</div>
+                <div className="text-sm md:text-base font-medium text-gray-500 mb-2">Name</div>
+                <div className="text-gray-900 font-semibold text-base">{sessionData.formData.firstName} {sessionData.formData.lastName}</div>
               </div>
               <div>
                 <div className="text-sm font-medium text-gray-500 mb-1">NIC</div>
@@ -417,10 +417,10 @@ Exported at: ${new Date().toLocaleString()}
       )}
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col md:flex-row gap-4">
         <button
           onClick={onStartNew}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-4 px-6 rounded-md transition-colors flex items-center justify-center text-base"
         >
           <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -428,11 +428,11 @@ Exported at: ${new Date().toLocaleString()}
           Start New Session
         </button>
         
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <select
             value={exportFormat}
             onChange={(e) => setExportFormat(e.target.value as 'json' | 'text')}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="json">JSON</option>
             <option value="text">Text</option>
@@ -440,9 +440,9 @@ Exported at: ${new Date().toLocaleString()}
           
           <button
             onClick={exportData}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center"
+            className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-md transition-colors flex items-center text-base"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Export

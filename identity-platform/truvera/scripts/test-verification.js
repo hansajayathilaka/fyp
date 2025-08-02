@@ -14,7 +14,7 @@ const {
     generateQRCode
 } = require('./credential-utils');
 
-require('dotenv').config({ path: '../backend/.env' });
+require('dotenv').config({ path: '../issuer_backend/.env' });
 
 /**
  * Display verification instructions
