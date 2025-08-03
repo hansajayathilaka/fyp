@@ -118,7 +118,7 @@ export function WalletConnect() {
               <p className="text-xs text-gray-500 uppercase tracking-wide">Network</p>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-900">
-                  {networkInfo.network === 'hardhat' ? 'Local Hardhat' : 'Hedera Testnet'}
+                  {networkInfo.network === 'hardhat' ? 'Local Hardhat' : 'Fantom Sonic Testnet'}
                 </span>
                 {!isCorrectNetwork && (
                   <button
@@ -131,7 +131,7 @@ export function WalletConnect() {
               </div>
               {!isCorrectNetwork && (
                 <p className="text-xs text-red-600 mt-1">
-                  Please switch to {networkInfo.network === 'hardhat' ? 'Local Hardhat' : 'Hedera Testnet'}
+                  Please switch to {networkInfo.network === 'hardhat' ? 'Local Hardhat' : 'Fantom Sonic Testnet'}
                 </p>
               )}
             </div>

@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 # Rebuild the source code only when needed
 FROM node:23-alpine AS builder

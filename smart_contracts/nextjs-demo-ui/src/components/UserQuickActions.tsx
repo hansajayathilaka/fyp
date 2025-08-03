@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRegulatoryManagement } from '../contracts/hooks'
 import { useContractOwner } from '../hooks/useContractOwner'
 import { useEnhancedTransactionState, TransactionFeedback } from './TransactionFeedback'
@@ -15,6 +15,8 @@ interface UserQuickActionsProps {
   transactionState?: ReturnType<typeof useEnhancedTransactionState>
 }
 
+type ActionType = 'verify' | 'suspend' | 'unsuspend' | null
+
 export function UserQuickActions({ 
   userAddress, 
   userProfile, 
@@ -25,6 +27,9 @@ export function UserQuickActions({
   const { isOwner } = useContractOwner()
   const regulatory = useRegulatoryManagement()
   const localTransactionState = useEnhancedTransactionState()
+  
+  // Track which specific action is currently loading
+  const [loadingAction, setLoadingAction] = useState<ActionType>(null)
   
   // Use provided transaction state or create local one
   const transaction = transactionState || localTransactionState
@@ -40,6 +45,7 @@ export function UserQuickActions({
   useEffect(() => {
     if (regulatory.error) {
       transaction.setTransactionError(regulatory.error.message, 'Transaction Error')
+      setLoadingAction(null) // Reset loading state on error
     }
   }, [regulatory.error, transaction])
 
@@ -54,6 +60,7 @@ export function UserQuickActions({
         }
         // Reset transaction state after success
         transaction.resetTransaction()
+        setLoadingAction(null) // Reset loading state
         console.log('Transaction state reset')
       }, 3000) // Increased delay to show success state
       
@@ -67,6 +74,7 @@ export function UserQuickActions({
       console.log('Transaction error, resetting state in 5 seconds...')
       const timer = setTimeout(() => {
         transaction.resetTransaction()
+        setLoadingAction(null) // Reset loading state
         console.log('Transaction state reset after error')
       }, 5000) // Reset after 5 seconds on error
       
@@ -84,9 +92,10 @@ export function UserQuickActions({
   }
 
   const handleVerifyUser = async () => {
-    if (regulatory.isPending || transaction.transaction.status === 'pending') return
+    if (loadingAction || regulatory.isPending) return
     
     try {
+      setLoadingAction('verify')
       transaction.setTransactionSubmitting(
         'User Verification',
         `Verifying user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
@@ -97,13 +106,15 @@ export function UserQuickActions({
         error instanceof Error ? error.message : 'Verification failed',
         'User Verification Failed'
       )
+      setLoadingAction(null)
     }
   }
 
   const handleSuspendUser = async () => {
-    if (regulatory.isPending || transaction.transaction.status === 'pending') return
+    if (loadingAction || regulatory.isPending) return
     
     try {
+      setLoadingAction('suspend')
       transaction.setTransactionSubmitting(
         'User Suspension',
         `Suspending user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
@@ -114,13 +125,15 @@ export function UserQuickActions({
         error instanceof Error ? error.message : 'Suspension failed',
         'User Suspension Failed'
       )
+      setLoadingAction(null)
     }
   }
 
   const handleUnsuspendUser = async () => {
-    if (regulatory.isPending || transaction.transaction.status === 'pending') return
+    if (loadingAction || regulatory.isPending) return
     
     try {
+      setLoadingAction('unsuspend')
       transaction.setTransactionSubmitting(
         'User Unsuspension',
         `Unsuspending user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
@@ -131,17 +144,22 @@ export function UserQuickActions({
         error instanceof Error ? error.message : 'Unsuspension failed',
         'User Unsuspension Failed'
       )
+      setLoadingAction(null)
     }
   }
 
-  const isLoading = regulatory.isPending || transaction.transaction.status === 'pending' || transaction.transaction.status === 'submitting'
+  // Check if any action is currently loading
+  const isAnyActionLoading = loadingAction !== null || regulatory.isPending
 
   return (
     <div className={clsx("flex items-center space-x-2", className)}>
       {/* Debug: Manual Reset Button (remove in production) */}
       {process.env.NODE_ENV === 'development' && transaction.transaction.status !== 'idle' && (
         <button
-          onClick={() => transaction.resetTransaction()}
+          onClick={() => {
+            transaction.resetTransaction()
+            setLoadingAction(null)
+          }}
           className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
           title="Reset Transaction State (Debug)"
         >
@@ -153,14 +171,23 @@ export function UserQuickActions({
       {!userProfile.isVerified && !userProfile.isSuspended && (
         <button
           onClick={handleVerifyUser}
-          disabled={isLoading}
-          className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-1"
+          disabled={isAnyActionLoading}
+          className={clsx(
+            "px-3 py-1 text-white text-xs rounded transition-colors flex items-center space-x-1",
+            loadingAction === 'verify' 
+              ? "bg-green-600" 
+              : isAnyActionLoading 
+                ? "bg-gray-400 cursor-not-allowed" 
+                : "bg-green-600 hover:bg-green-700"
+          )}
           title="Verify User"
         >
-          {isLoading && (
+          {loadingAction === 'verify' && (
             <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
           )}
-          <span>{isLoading ? 'Verifying...' : 'Verify'}</span>
+          <span>
+            {loadingAction === 'verify' ? 'Verifying...' : 'Verify'}
+          </span>
         </button>
       )}
 
@@ -168,26 +195,44 @@ export function UserQuickActions({
       {userProfile.isSuspended ? (
         <button
           onClick={handleUnsuspendUser}
-          disabled={isLoading}
-          className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-1"
+          disabled={isAnyActionLoading}
+          className={clsx(
+            "px-3 py-1 text-white text-xs rounded transition-colors flex items-center space-x-1",
+            loadingAction === 'unsuspend' 
+              ? "bg-blue-600" 
+              : isAnyActionLoading 
+                ? "bg-gray-400 cursor-not-allowed" 
+                : "bg-blue-600 hover:bg-blue-700"
+          )}
           title="Unsuspend User"
         >
-          {isLoading && (
+          {loadingAction === 'unsuspend' && (
             <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
           )}
-          <span>{isLoading ? 'Processing...' : 'Unsuspend'}</span>
+          <span>
+            {loadingAction === 'unsuspend' ? 'Processing...' : 'Unsuspend'}
+          </span>
         </button>
       ) : (
         <button
           onClick={handleSuspendUser}
-          disabled={isLoading}
-          className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-1"
+          disabled={isAnyActionLoading}
+          className={clsx(
+            "px-3 py-1 text-white text-xs rounded transition-colors flex items-center space-x-1",
+            loadingAction === 'suspend' 
+              ? "bg-red-600" 
+              : isAnyActionLoading 
+                ? "bg-gray-400 cursor-not-allowed" 
+                : "bg-red-600 hover:bg-red-700"
+          )}
           title="Suspend User"
         >
-          {isLoading && (
+          {loadingAction === 'suspend' && (
             <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
           )}
-          <span>{isLoading ? 'Processing...' : 'Suspend'}</span>
+          <span>
+            {loadingAction === 'suspend' ? 'Processing...' : 'Suspend'}
+          </span>
         </button>
       )}
     </div>

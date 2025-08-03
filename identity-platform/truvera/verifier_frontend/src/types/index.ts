@@ -57,11 +57,14 @@ export interface VerificationResult {
 export interface BlockchainRegistrationResult {
   attempted: boolean;
   success: boolean;
+  status: 'newly_registered' | 'already_registered' | 'failed';
   transactionHash?: string;
   error?: string;
   userType?: number;
   ssiIdentifier?: string;
   walletAddress?: string;
+  alreadyRegistered?: boolean;
+  userFriendlyMessage?: string;
 }
 
 export interface CredentialVerificationResult {

@@ -55,7 +55,7 @@ npm run node
 npm run deploy:local
 ```
 
-### Hedera Testnet Deployment
+### Fantom Sonic Testnet Deployment
 
 1. **Setup Environment Variables**
 
@@ -65,10 +65,10 @@ Create a `.env` file in the project root:
 PRIVATE_KEY=your_private_key_here
 ```
 
-2. **Deploy to Hedera Testnet**
+2. **Deploy to Fantom Sonic Testnet**
 
 ```bash
-npm run deploy:hedera
+npm run deploy:fantom
 ```
 
 ### Deployment Output
@@ -294,11 +294,11 @@ npx hardhat run scripts/demo.ts --network hardhat
 ### Testnet Testing
 
 ```bash
-# Deploy to Hedera testnet first
-npm run deploy:hedera
+# Deploy to Fantom Sonic testnet first
+npm run deploy:fantom
 
 # Run demo on testnet
-npx hardhat run scripts/demo.ts --network hederaTestnet
+npx hardhat run scripts/demo.ts --network fantomSonic
 ```
 
 ## Troubleshooting
@@ -356,7 +356,7 @@ If you encounter gas-related errors:
 1. **Increase gas limit** in hardhat.config.ts:
 ```javascript
 networks: {
-  hederaTestnet: {
+  fantomSonic: {
     gas: 500000, // Increase from 300000
     gasPrice: 10000000000,
   }

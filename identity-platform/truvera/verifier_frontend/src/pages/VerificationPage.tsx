@@ -327,9 +327,30 @@ export const VerificationPage: React.FC = () => {
                 </div>
                 <div className="bg-white p-6 rounded-lg border shadow-sm">
                   <span className="font-semibold text-gray-800 text-base">Partially Verified:</span>
-                  <span className={`ml-3 font-bold text-xl ${verificationResult.partiallyVerified ? 'text-yellow-600' : 'text-gray-600'}`}>
-                    {verificationResult.partiallyVerified ? '⚠️ Yes' : '✅ No'}
-                  </span>
+                  <div className="mt-2">
+                    {verificationResult.partiallyVerified ? (
+                      <div>
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                          ⚠️ Yes - Mixed Results
+                        </span>
+                        <p className="text-sm text-gray-600 mt-2">
+                          The user presented multiple credentials, but only some of them passed verification. 
+                          Some credentials were valid while others failed due to issues like expiration, 
+                          invalid signatures, or untrusted issuers.
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          ✅ No - All or None
+                        </span>
+                        <p className="text-sm text-gray-600 mt-2">
+                          Either all credentials were verified successfully, or all failed verification. 
+                          No mixed results.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="bg-white p-6 rounded-lg border shadow-sm">
                   <span className="font-semibold text-gray-800 text-base">Timestamp:</span>
@@ -356,19 +377,51 @@ export const VerificationPage: React.FC = () => {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-lg border shadow-sm">
-                    <span className="font-semibold text-gray-800 text-base">Registration Status:</span>
-                    <span className={`ml-3 font-bold text-xl ${verificationResult.blockchainRegistration.success
-                      ? 'text-green-600'
-                      : verificationResult.blockchainRegistration.attempted
-                        ? 'text-red-600'
-                        : 'text-gray-600'
-                      }`}>
-                      {verificationResult.blockchainRegistration.success
-                        ? '✅ SUCCESS'
-                        : verificationResult.blockchainRegistration.attempted
-                          ? '❌ FAILED'
-                          : '⏸️ NOT ATTEMPTED'}
-                    </span>
+                    <span className="font-semibold text-gray-800 text-base">Blockchain Registration:</span>
+                    <div className="mt-2">
+                      {verificationResult.blockchainRegistration.success ? (
+                        <div>
+                          {verificationResult.blockchainRegistration.status === 'newly_registered' ? (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                              🆕 Newly Registered
+                            </span>
+                          ) : verificationResult.blockchainRegistration.status === 'already_registered' ? (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                              ✅ Already Registered
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                              ✅ Success
+                            </span>
+                          )}
+                          <p className="text-sm text-gray-600 mt-2">
+                            {verificationResult.blockchainRegistration.userFriendlyMessage || 
+                             (verificationResult.blockchainRegistration.status === 'newly_registered' 
+                               ? 'User has been successfully registered on the blockchain for the first time.'
+                               : 'User was already registered on the blockchain with the same credentials.')}
+                          </p>
+                        </div>
+                      ) : verificationResult.blockchainRegistration.attempted ? (
+                        <div>
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                            ❌ Registration Failed
+                          </span>
+                          <p className="text-sm text-gray-600 mt-2">
+                            {verificationResult.blockchainRegistration.userFriendlyMessage || 
+                             'There was an issue registering the user on the blockchain.'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                            ⏸️ Not Attempted
+                          </span>
+                          <p className="text-sm text-gray-600 mt-2">
+                            Blockchain registration was not attempted.
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {verificationResult.blockchainRegistration.transactionHash && (
@@ -434,7 +487,11 @@ export const VerificationPage: React.FC = () => {
                   <p>
                     <strong className="text-gray-900">ℹ️ About Blockchain Registration:</strong>
                     {verificationResult.blockchainRegistration.success
-                      ? ' Your identity has been successfully registered on the blockchain with the detected user type.'
+                      ? (verificationResult.blockchainRegistration.status === 'newly_registered'
+                          ? ' This is the first time this user has been registered on the blockchain. A new blockchain record has been created.'
+                          : verificationResult.blockchainRegistration.status === 'already_registered'
+                            ? ' This user was already registered on the blockchain with the same credentials. No new registration was needed.'
+                            : ' Your identity has been successfully processed on the blockchain.')
                       : verificationResult.blockchainRegistration.attempted
                         ? ' There was an issue registering your identity on the blockchain, but your credential verification was successful.'
                         : ' Blockchain registration was not attempted (likely because verification failed or blockchain is disabled).'}

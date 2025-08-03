@@ -57,7 +57,7 @@ export const VerificationResults: React.FC<VerificationResultsProps> = ({
           </svg>
         ),
         status: 'Partially Verified',
-        description: 'Some credentials were verified, but others failed verification',
+        description: 'Some credentials passed verification, but others failed. This means the user presented multiple credentials but not all of them could be verified successfully.',
       };
     } else {
       return {

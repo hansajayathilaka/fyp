@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ProofRequest, CredentialPresentation } from '../types';
 import { apiService } from '../services/api';
@@ -50,7 +50,7 @@ export const QRCodePage: React.FC = () => {
   };
 
   // Handle status updates from StatusMonitor
-  const handleStatusUpdate = (updatedProofRequest: ProofRequest) => {
+  const handleStatusUpdate = useCallback((updatedProofRequest: ProofRequest) => {
     console.log('QRCodePage: Status update received:', {
       oldStatus: proofRequest?.status,
       newStatus: updatedProofRequest.status,
@@ -75,25 +75,25 @@ export const QRCodePage: React.FC = () => {
         navigate(`/verify/${proofRequestId}`);
       }, 1000);
     }
-  };
+  }, [navigate, proofRequestId, proofRequest?.status]);
 
   // Handle presentation received
-  const handlePresentationReceived = (receivedPresentation: CredentialPresentation) => {
+  const handlePresentationReceived = useCallback((receivedPresentation: CredentialPresentation) => {
     setPresentation(receivedPresentation);
     console.log('Presentation received:', receivedPresentation);
-  };
+  }, []);
 
   // Handle timeout
-  const handleTimeout = () => {
+  const handleTimeout = useCallback(() => {
     setError('The proof request has expired. Please create a new request.');
-  };
+  }, []);
 
   // Handle monitoring errors
-  const handleMonitoringError = (errorMessage: string) => {
+  const handleMonitoringError = useCallback((errorMessage: string) => {
     console.error('Monitoring error:', errorMessage);
     // Don't set the main error state for monitoring errors, 
     // let the StatusMonitor component handle its own error display
-  };
+  }, []);
 
   // Handle QR code refresh
   const handleRefreshQRCode = () => {
@@ -210,6 +210,7 @@ export const QRCodePage: React.FC = () => {
           {/* Status Monitor */}
           <div className="xl:col-span-1">
             <StatusMonitor
+              key={proofRequest.id}
               proofRequestId={proofRequest.id}
               onStatusUpdate={handleStatusUpdate}
               onPresentationReceived={handlePresentationReceived}

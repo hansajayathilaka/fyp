@@ -14,8 +14,8 @@ export function useRpcErrorHandler() {
         const errorMessage = error.message || error.toString()
         
         // Handle specific RPC errors
-        if (errorMessage.includes('400') && errorMessage.includes('hashio.io')) {
-          console.warn('RPC Error: Bad request to Hedera testnet. This is expected during development.')
+        if (errorMessage.includes('400') && errorMessage.includes('rpcapi.sonic.fantom.network')) {
+          console.warn('RPC Error: Bad request to Fantom Sonic testnet. This is expected during development.')
           event.preventDefault() // Prevent the error from being logged as unhandled
           return
         }
@@ -37,7 +37,7 @@ export function useRpcErrorHandler() {
     // Listen for general errors
     const handleError = (event: ErrorEvent) => {
       const error = event.error
-      if (error && error.message && error.message.includes('hashio.io')) {
+      if (error && error.message && error.message.includes('rpcapi.sonic.fantom.network')) {
         console.warn('Suppressed RPC error:', error.message)
         event.preventDefault()
       }
@@ -67,7 +67,7 @@ export async function safeRpcCall<T>(
     const errorMsg = error instanceof Error ? error.message : String(error)
     
     // Log specific error types differently
-    if (errorMsg.includes('400') && errorMsg.includes('hashio.io')) {
+    if (errorMsg.includes('400') && errorMsg.includes('rpcapi.sonic.fantom.network')) {
       console.warn(errorMessage || 'RPC call failed with 400 error (expected during development)')
     } else if (errorMsg.includes('timeout')) {
       console.warn(errorMessage || 'RPC call timed out')

@@ -15,17 +15,45 @@ export enum UserType {
   ACADEMIC = 3
 }
 
+export interface BlockchainTransactionInfo {
+  transactionHash: string;
+  blockNumber: number;
+  blockHash: string;
+  gasUsed: string;
+  effectiveGasPrice: string;
+  explorerUrl: string;
+  networkName: string;
+  chainId: number;
+}
+
 export interface BlockchainActionResponse {
   success: boolean;
+  status: 'newly_registered' | 'already_registered' | 'failed';
   transactionHash?: string;
+  transactionInfo?: BlockchainTransactionInfo;
   error?: string;
+  alreadyRegistered?: boolean;
+  userFriendlyMessage: string;
 }
+
+// Network configuration for explorer URLs
+const NETWORK_EXPLORERS: Record<number, { name: string; baseUrl: string }> = {
+  57054: { // Sonic Testnet
+    name: 'sonicTestnet',
+    baseUrl: 'https://testnet.sonicscan.org'
+  },
+  31337: { // Hardhat Local
+    name: 'hardhat',
+    baseUrl: 'http://localhost:8545' // No explorer for local
+  }
+};
 
 export class BlockchainService {
   private provider!: ethers.JsonRpcProvider;
   private wallet!: ethers.Wallet;
   private contract!: ethers.Contract;
   private config: BlockchainConfig;
+  private networkInfo: { name: string; chainId: number } = { name: 'unknown', chainId: 0 };
 
   // Smart contract ABI for the registerUserByAdmin function
   private readonly contractABI = [
@@ -76,6 +104,11 @@ export class BlockchainService {
         this.wallet
       );
 
+      // Initialize network information asynchronously
+      this.initializeNetworkInfo().catch(error => {
+        console.warn('Failed to initialize network info:', error);
+      });
+
       console.log('Blockchain service initialized successfully');
       console.log(`Contract address: ${config.contractAddress}`);
       console.log(`Wallet address: ${this.wallet.address}`);
@@ -83,6 +116,52 @@ export class BlockchainService {
       console.error('Failed to initialize blockchain service:', error);
       throw error;
     }
+  }
+
+  /**
+   * Initialize network information
+   */
+  private async initializeNetworkInfo(): Promise<void> {
+    try {
+      const network = await this.provider.getNetwork();
+      this.networkInfo = {
+        name: NETWORK_EXPLORERS[Number(network.chainId)]?.name || 'unknown',
+        chainId: Number(network.chainId)
+      };
+      console.log(`Connected to network: ${this.networkInfo.name} (Chain ID: ${this.networkInfo.chainId})`);
+    } catch (error) {
+      console.warn('Failed to get network information:', error);
+    }
+  }
+
+  /**
+   * Generate explorer URL for transaction
+   */
+  private getExplorerUrl(transactionHash: string): string {
+    const explorer = NETWORK_EXPLORERS[this.networkInfo.chainId];
+    if (!explorer || explorer.name === 'hardhat') {
+      return `Transaction Hash: ${transactionHash}`;
+    }
+    return `${explorer.baseUrl}/tx/${transactionHash}`;
+  }
+
+  /**
+   * Create transaction info object
+   */
+  public createTransactionInfo(
+    transactionHash: string,
+    receipt: any
+  ): BlockchainTransactionInfo {
+    return {
+      transactionHash,
+      blockNumber: receipt.blockNumber,
+      blockHash: receipt.blockHash,
+      gasUsed: receipt.gasUsed.toString(),
+      effectiveGasPrice: receipt.effectiveGasPrice?.toString() || '0',
+      explorerUrl: this.getExplorerUrl(transactionHash),
+      networkName: this.networkInfo.name,
+      chainId: this.networkInfo.chainId
+    };
   }
 
   /**
@@ -96,7 +175,9 @@ export class BlockchainService {
       console.log('Blockchain integration is disabled');
       return {
         success: true,
-        error: 'Blockchain integration disabled'
+        status: 'already_registered',
+        error: 'Blockchain integration disabled',
+        userFriendlyMessage: 'Blockchain integration is disabled'
       };
     }
 
@@ -118,17 +199,46 @@ export class BlockchainService {
       
       console.log(`Transaction confirmed in block: ${receipt.blockNumber}`);
 
+      // Create detailed transaction information
+      const transactionInfo = this.createTransactionInfo(transaction.hash, receipt);
+      
+      console.log(`Transaction details:`, {
+        hash: transactionInfo.transactionHash,
+        block: transactionInfo.blockNumber,
+        gasUsed: transactionInfo.gasUsed,
+        explorerUrl: transactionInfo.explorerUrl
+      });
+
       return {
         success: true,
-        transactionHash: transaction.hash
+        status: 'newly_registered',
+        transactionHash: transaction.hash,
+        transactionInfo,
+        userFriendlyMessage: 'User registered on blockchain successfully'
       };
 
     } catch (error) {
       console.error(`Blockchain registration failed for session ${sessionId}:`, error);
       
+      // Check if the error is due to user already being registered
+      const errorAnalysis = this.analyzeBlockchainError(error);
+      
+      if (errorAnalysis.isAlreadyRegistered) {
+        console.log(`User already registered on blockchain for session: ${sessionId}`);
+        return {
+          success: true,
+          status: 'already_registered',
+          alreadyRegistered: true,
+          userFriendlyMessage: 'User is already registered on the blockchain',
+          error: undefined
+        };
+      }
+      
       return {
         success: false,
-        error: this.parseBlockchainError(error)
+        status: 'failed',
+        error: errorAnalysis.userFriendlyMessage,
+        userFriendlyMessage: errorAnalysis.userFriendlyMessage
       };
     }
   }
@@ -266,6 +376,71 @@ export class BlockchainService {
   }
 
   /**
+   * Analyze blockchain error and determine if user is already registered
+   */
+  private analyzeBlockchainError(error: any): { isAlreadyRegistered: boolean; userFriendlyMessage: string } {
+    // Log the full error for debugging
+    console.error('Full blockchain error details:', error);
+
+    if (!error) {
+      return {
+        isAlreadyRegistered: false,
+        userFriendlyMessage: 'Unknown blockchain error occurred'
+      };
+    }
+
+    // First check the direct reason field (most reliable)
+    if (error.reason) {
+      const reason = error.reason.toLowerCase();
+      if (reason.includes('user already registered') || reason.includes('already registered')) {
+        return {
+          isAlreadyRegistered: true,
+          userFriendlyMessage: 'User is already registered on the blockchain'
+        };
+      }
+    }
+
+    // Check revert args if available
+    if (error.revert && error.revert.args && error.revert.args.length > 0) {
+      const revertReason = error.revert.args[0].toLowerCase();
+      if (revertReason.includes('user already registered') || revertReason.includes('already registered')) {
+        return {
+          isAlreadyRegistered: true,
+          userFriendlyMessage: 'User is already registered on the blockchain'
+        };
+      }
+    }
+
+    // Check shortMessage field
+    if (error.shortMessage) {
+      const shortMessage = error.shortMessage.toLowerCase();
+      if (shortMessage.includes('user already registered') || shortMessage.includes('already registered')) {
+        return {
+          isAlreadyRegistered: true,
+          userFriendlyMessage: 'User is already registered on the blockchain'
+        };
+      }
+    }
+
+    // Fallback to checking error message
+    const errorMessage = error.message || (typeof error === 'string' ? error : '');
+    const messageLower = errorMessage.toLowerCase();
+    
+    if (messageLower.includes('user already registered') || messageLower.includes('already registered')) {
+      return {
+        isAlreadyRegistered: true,
+        userFriendlyMessage: 'User is already registered on the blockchain'
+      };
+    }
+
+    // For other errors, parse them normally
+    return {
+      isAlreadyRegistered: false,
+      userFriendlyMessage: this.parseBlockchainError(error)
+    };
+  }
+
+  /**
    * Parse blockchain error and return user-friendly message
    */
   private parseBlockchainError(error: any): string {
@@ -280,6 +455,26 @@ export class BlockchainService {
     if (error.code) {
       switch (error.code) {
         case 'CALL_EXCEPTION':
+          // Try to extract revert reason from CALL_EXCEPTION (most reliable)
+          if (error.reason) {
+            return `${error.reason}`;
+          }
+          // Check revert args
+          if (error.revert && error.revert.args && error.revert.args.length > 0) {
+            return `${error.revert.args[0]}`;
+          }
+          // Check shortMessage
+          if (error.shortMessage) {
+            // Extract the reason from shortMessage like 'execution reverted: "User already registered"'
+            const reasonMatch = error.shortMessage.match(/execution reverted:\s*"?([^"]+)"?/i);
+            if (reasonMatch && reasonMatch[1]) {
+              return reasonMatch[1];
+            }
+            return error.shortMessage;
+          }
+          if (error.data && error.data.message) {
+            return `${error.data.message}`;
+          }
           return 'Smart contract call failed - the transaction was reverted';
         case 'INSUFFICIENT_FUNDS':
           return 'Insufficient funds to complete the transaction';
@@ -306,6 +501,21 @@ export class BlockchainService {
     
     if (!errorMessage || errorMessage === '[object Object]') {
       return 'Blockchain transaction failed - please try again';
+    }
+    
+    // Try to extract revert reason from error message
+    const revertReasonMatch = errorMessage.match(/revert (.+?)(?:\s|$|")/i);
+    if (revertReasonMatch && revertReasonMatch[1]) {
+      const revertReason = revertReasonMatch[1].trim();
+      return `Smart contract error: ${revertReason}`;
+    }
+    
+    // Check for execution reverted with reason
+    if (errorMessage.includes('execution reverted:')) {
+      const reasonMatch = errorMessage.match(/execution reverted:\s*(.+)/i);
+      if (reasonMatch && reasonMatch[1]) {
+        return `Smart contract error: ${reasonMatch[1].trim()}`;
+      }
     }
     
     if (errorMessage.includes('transaction execution reverted')) {
@@ -394,6 +604,13 @@ export class BlockchainService {
   }
 
   /**
+   * Get provider instance
+   */
+  getProvider(): ethers.JsonRpcProvider | null {
+    return this.config.enabled ? this.provider : null;
+  }
+
+  /**
    * Get current configuration (without sensitive data)
    */
   getConfig(): Omit<BlockchainConfig, 'privateKey'> {
@@ -417,6 +634,12 @@ export class BlockchainService {
           this.contractABI,
           this.wallet
         );
+        
+        // Reinitialize network information
+        this.initializeNetworkInfo().catch(error => {
+          console.warn('Failed to reinitialize network info:', error);
+        });
+        
         console.log('Blockchain service configuration updated and reinitialized');
       } catch (error) {
         console.error('Failed to reinitialize blockchain service after config update:', error);

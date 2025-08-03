@@ -3,7 +3,7 @@
 import { ReactNode, useState, useEffect } from 'react'
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ConnectKitProvider } from 'connectkit'
+// ConnectKit removed - using custom wallet connection
 import { config } from '../lib/wagmi'
 
 interface ProvidersProps {
@@ -40,16 +40,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider
-          theme="auto"
-          mode="light"
-          options={{
-            initialChainId: 0, // Let wagmi handle chain selection
-            enforceSupportedChains: false, // Allow custom chains
-          }}
-        >
-          {mounted ? children : <div>Loading...</div>}
-        </ConnectKitProvider>
+        {mounted ? children : <div>Loading...</div>}
       </QueryClientProvider>
     </WagmiProvider>
   )

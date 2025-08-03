@@ -139,6 +139,10 @@ router.post('/', validateProofRequestConfig, async (req: Request, res: Response)
     console.log('Truvera API Response:', JSON.stringify(truveraResponse, null, 2));
 
     // Create our internal proof request object
+    // Calculate expiration based on the actual creation time from Truvera, not current time
+    const createdTime = new Date(truveraResponse.created);
+    const expirationTime = new Date(createdTime.getTime() + (config.timeoutMinutes || 30) * 60 * 1000);
+    
     const proofRequest: ProofRequest = {
       id: truveraResponse.id,
       qr: truveraResponse.qr,
@@ -146,10 +150,11 @@ router.post('/', validateProofRequestConfig, async (req: Request, res: Response)
       config: config,
       status: truveraResponse.verified ? 'completed' : (truveraResponse.expired ? 'expired' : 'active'),
       createdAt: truveraResponse.created,
-      expiresAt: new Date(Date.now() + (config.timeoutMinutes || 30) * 60 * 1000).toISOString()
+      expiresAt: expirationTime.toISOString()
     };
 
     console.log('Created proof request object:', JSON.stringify(proofRequest, null, 2));
+    console.log(`⏰ Timer calculation - Created: ${createdTime.toISOString()}, Expires: ${expirationTime.toISOString()}, Duration: ${config.timeoutMinutes || 30} minutes`);
 
     // Store in memory for session management
     proofRequestStore.set(proofRequest.id, proofRequest);
@@ -226,6 +231,7 @@ router.get('/:id/status', async (req: Request, res: Response) => {
     const truveraResponse = await truveraService.getProofRequestStatus(proofRequestId);
 
     // Update our stored proof request with latest status
+    // IMPORTANT: Preserve the original createdAt and expiresAt timestamps to prevent timer reset
     const updatedProofRequest: ProofRequest = {
       ...storedProofRequest,
       status: truveraResponse.verified ? 'completed' : (truveraResponse.expired ? 'expired' : 'active'),
@@ -234,12 +240,16 @@ router.get('/:id/status', async (req: Request, res: Response) => {
       response_url: truveraResponse.response_url,
       // Include presentation data if available
       presentation: truveraResponse.presentation || undefined,
+      // Explicitly preserve original timestamps to prevent frontend timer reset
+      createdAt: storedProofRequest.createdAt,
+      expiresAt: storedProofRequest.expiresAt,
     };
 
     // Update in store
     proofRequestStore.set(proofRequestId, updatedProofRequest);
 
     console.log(`Proof request status updated: ${proofRequestId} -> ${updatedProofRequest.status}`);
+    console.log(`Timestamps preserved - Created: ${updatedProofRequest.createdAt}, Expires: ${updatedProofRequest.expiresAt}`);
 
     const response: ApiResponse<ProofRequest> = {
       success: true,

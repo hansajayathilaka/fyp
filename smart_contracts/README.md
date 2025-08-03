@@ -8,7 +8,7 @@ A decentralized equity investment platform with blockchain technology and regula
 - ERC-1155 token creation for company equity
 - Order book trading system with automatic matching
 - Basic compliance monitoring
-- Hedera testnet deployment support
+- Fantom Sonic testnet deployment support
 
 ## Development Environment
 
@@ -31,7 +31,7 @@ A decentralized equity investment platform with blockchain technology and regula
    cp .env.example .env
    ```
 
-4. Add your private key to `.env` for Hedera testnet deployment
+4. Add your private key to `.env` for Fantom Sonic testnet deployment
 
 ### Available Scripts
 
@@ -39,7 +39,7 @@ A decentralized equity investment platform with blockchain technology and regula
 - `npm test` - Run tests
 - `npm run test:coverage` - Run tests with coverage
 - `npm run deploy:local` - Deploy to local Hardhat network
-- `npm run deploy:hedera` - Deploy to Hedera testnet
+- `npm run deploy:fantom` - Deploy to Fantom Sonic testnet
 - `npm run node` - Start local Hardhat node
 - `npm run clean` - Clean artifacts and cache
 
@@ -57,7 +57,7 @@ A decentralized equity investment platform with blockchain technology and regula
 ### Networks
 
 - **Local Development**: Hardhat Network (chainId: 31337)
-- **Testnet**: Hedera Testnet (chainId: 296)
+- **Testnet**: Fantom Sonic Testnet (chainId: 64165)
 
 ### Technology Stack
 
@@ -65,7 +65,7 @@ A decentralized equity investment platform with blockchain technology and regula
 - **Framework**: Hardhat
 - **Testing**: Chai + Ethers.js
 - **Standards**: OpenZeppelin ERC-1155
-- **Network**: Hedera Hashgraph
+- **Network**: Fantom Sonic (Ethereum-compatible)
 
 ## Getting Started
 

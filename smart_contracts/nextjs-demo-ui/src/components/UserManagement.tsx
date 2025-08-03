@@ -21,7 +21,7 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
 
   // State
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<'all' | 'individual' | 'company' | 'verified' | 'suspended'>('all')
+  const [filterType, setFilterType] = useState<'all' | 'active' | 'individual' | 'company' | 'verified' | 'suspended'>('active')
   const [sortBy, setSortBy] = useState<'address' | 'registration' | 'type' | 'status'>('registration')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [selectedUserForModal, setSelectedUserForModal] = useState<string | null>(null)
@@ -36,6 +36,13 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
   const { data: companyUsers } = regulatory.useGetUsersByType(1)
   const { data: platformStats } = regulatory.useGetPlatformStats()
 
+  // Calculate active users (non-suspended) - we'll need to filter this from all users
+  const activeUsers = useMemo(() => {
+    // For now, we'll handle this in the filteredUsers logic since we need to check each user's profile
+    // This is a placeholder that will be used in the filter tabs count
+    return allUsers || []
+  }, [allUsers])
+
   // Filter and search users
   const filteredUsers = useMemo(() => {
     if (!allUsers || !Array.isArray(allUsers)) return []
@@ -44,6 +51,11 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
 
     // Apply type filter
     switch (filterType) {
+      case 'active':
+        // For active users, we'll filter out suspended users in the UserCard component
+        // by not rendering suspended users when this filter is active
+        filtered = [...allUsers] as string[]
+        break
       case 'individual':
         filtered = individualUsers && Array.isArray(individualUsers) ? [...individualUsers] as string[] : []
         break
@@ -176,10 +188,12 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
         {/* Filter Tabs */}
         <div className="flex flex-wrap gap-2">
           {[
+            { id: 'active', label: 'Active Users', count: (allUsers?.length || 0) - (platformStats ? Number((platformStats as any)[4]?.toString() || '0') : 0) },
             { id: 'all', label: 'All Users', count: allUsers?.length || 0 },
             { id: 'individual', label: 'Individual', count: individualUsers?.length || 0 },
             { id: 'company', label: 'Company', count: companyUsers?.length || 0 },
             { id: 'verified', label: 'Verified', count: verifiedUsers?.length || 0 },
+            { id: 'suspended', label: 'Suspended', count: platformStats ? Number((platformStats as any)[4]?.toString() || '0') : 0 },
           ].map((filter) => (
             <button
               key={filter.id}
@@ -236,6 +250,7 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
                 onClick={() => handleUserClick(userAddress)}
                 onViewDetails={() => setSelectedUserForModal(userAddress)}
                 transactionState={userManagementTransaction}
+                filterType={filterType}
               />
             ))}
           </>
@@ -272,9 +287,10 @@ interface UserCardProps {
   onClick: () => void
   onViewDetails: () => void
   transactionState: ReturnType<typeof useEnhancedTransactionState>
+  filterType: 'all' | 'active' | 'individual' | 'company' | 'verified' | 'suspended'
 }
 
-function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, onViewDetails, transactionState }: UserCardProps) {
+function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, onViewDetails, transactionState, filterType }: UserCardProps) {
   const regulatory = useRegulatoryManagement()
   const { data: userProfile, isLoading } = regulatory.useGetUserProfile(userAddress as `0x${string}`)
 
@@ -317,6 +333,18 @@ function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, on
         </div>
       </div>
     )
+  }
+
+  // Filter logic based on user profile and filter type
+  if (profile) {
+    // Hide suspended users when 'active' filter is selected
+    if (filterType === 'active' && profile.isSuspended) {
+      return null
+    }
+    // Show only suspended users when 'suspended' filter is selected
+    if (filterType === 'suspended' && !profile.isSuspended) {
+      return null
+    }
   }
 
   return (

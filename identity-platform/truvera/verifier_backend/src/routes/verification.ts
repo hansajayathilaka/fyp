@@ -95,7 +95,9 @@ router.post('/', validateVerificationRequest, async (req: Request, res: Response
     // Try to register user on blockchain if verification was successful
     let blockchainRegistration: BlockchainRegistrationResult = {
       attempted: false,
-      success: false
+      success: false,
+      status: 'failed',
+      userFriendlyMessage: 'Blockchain registration not attempted'
     };
 
     if (verificationResult.verified) {
@@ -151,27 +153,52 @@ router.post('/', validateVerificationRequest, async (req: Request, res: Response
         blockchainRegistration = {
           attempted: true,
           success: blockchainResult.success,
+          status: blockchainResult.status,
           transactionHash: blockchainResult.transactionHash,
-          error: blockchainResult.error,
+          transactionDetails: blockchainResult.transactionInfo ? {
+            transactionHash: blockchainResult.transactionInfo.transactionHash,
+            blockNumber: blockchainResult.transactionInfo.blockNumber,
+            blockHash: blockchainResult.transactionInfo.blockHash,
+            gasUsed: blockchainResult.transactionInfo.gasUsed,
+            effectiveGasPrice: blockchainResult.transactionInfo.effectiveGasPrice,
+            explorerUrl: blockchainResult.transactionInfo.explorerUrl,
+            networkName: blockchainResult.transactionInfo.networkName,
+            chainId: blockchainResult.transactionInfo.chainId
+          } : undefined,
+          error: blockchainResult.success ? undefined : blockchainResult.error,
+          alreadyRegistered: blockchainResult.alreadyRegistered,
+          userFriendlyMessage: blockchainResult.userFriendlyMessage,
           userType: userType,
           ssiIdentifier: ssiIdentifier,
           walletAddress: walletAddress
         };
         
         if (blockchainResult.success) {
-          console.log(`User registered on blockchain successfully for session: ${sessionId}`);
-          console.log(`Transaction hash: ${blockchainResult.transactionHash}`);
-          console.log(`Wallet: ${walletAddress}, User type: ${userType}, SSI: ${ssiIdentifier}`);
+          if (blockchainResult.status === 'already_registered') {
+            console.log(`✅ User already registered on blockchain for session: ${sessionId}`);
+            console.log(`   Status: ALREADY_REGISTERED`);
+            console.log(`   Wallet: ${walletAddress}, User type: ${userType}, SSI: ${ssiIdentifier}`);
+          } else if (blockchainResult.status === 'newly_registered') {
+            console.log(`✅ User registered on blockchain successfully for session: ${sessionId}`);
+            console.log(`   Status: NEWLY_REGISTERED`);
+            console.log(`   Transaction hash: ${blockchainResult.transactionHash}`);
+            console.log(`   Wallet: ${walletAddress}, User type: ${userType}, SSI: ${ssiIdentifier}`);
+          }
         } else {
-          console.warn(`Blockchain registration failed for session ${sessionId}: ${blockchainResult.error}`);
+          console.warn(`❌ Blockchain registration failed for session ${sessionId}`);
+          console.warn(`   Status: FAILED`);
+          console.warn(`   Error: ${blockchainResult.userFriendlyMessage || blockchainResult.error}`);
         }
       } catch (error) {
         // Don't fail the verification if blockchain registration fails
         console.error(`Blockchain registration error for session ${sessionId}:`, error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown blockchain error';
         blockchainRegistration = {
           attempted: true,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown blockchain error',
+          status: 'failed',
+          error: errorMessage,
+          userFriendlyMessage: errorMessage,
           userType: userType,
           ssiIdentifier: ssiIdentifier,
           walletAddress: walletAddress
@@ -260,7 +287,9 @@ router.post('/batch', async (req: Request, res: Response) => {
         // Try blockchain registration for verified results
         let blockchainRegistration: BlockchainRegistrationResult = {
           attempted: false,
-          success: false
+          success: false,
+          status: 'failed',
+          userFriendlyMessage: 'Blockchain registration not attempted'
         };
 
         if (result.verified) {
@@ -275,14 +304,30 @@ router.post('/batch', async (req: Request, res: Response) => {
             blockchainRegistration = {
               attempted: true,
               success: blockchainResult.success,
+              status: blockchainResult.status,
               transactionHash: blockchainResult.transactionHash,
-              error: blockchainResult.error
+              transactionDetails: blockchainResult.transactionInfo ? {
+                transactionHash: blockchainResult.transactionInfo.transactionHash,
+                blockNumber: blockchainResult.transactionInfo.blockNumber,
+                blockHash: blockchainResult.transactionInfo.blockHash,
+                gasUsed: blockchainResult.transactionInfo.gasUsed,
+                effectiveGasPrice: blockchainResult.transactionInfo.effectiveGasPrice,
+                explorerUrl: blockchainResult.transactionInfo.explorerUrl,
+                networkName: blockchainResult.transactionInfo.networkName,
+                chainId: blockchainResult.transactionInfo.chainId
+              } : undefined,
+              error: blockchainResult.success ? undefined : blockchainResult.error,
+              alreadyRegistered: blockchainResult.alreadyRegistered,
+              userFriendlyMessage: blockchainResult.userFriendlyMessage
             };
           } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown blockchain error';
             blockchainRegistration = {
               attempted: true,
               success: false,
-              error: error instanceof Error ? error.message : 'Unknown blockchain error'
+              status: 'failed',
+              error: errorMessage,
+              userFriendlyMessage: errorMessage
             };
           }
         }
@@ -310,7 +355,9 @@ router.post('/batch', async (req: Request, res: Response) => {
           blockchainRegistration: {
             attempted: false,
             success: false,
-            error: 'Verification failed, blockchain registration not attempted'
+            status: 'failed',
+            error: 'Verification failed, blockchain registration not attempted',
+            userFriendlyMessage: 'Verification failed, blockchain registration not attempted'
           }
         };
         

@@ -15,6 +15,8 @@ const navigationItems = [
   { href: '/portfolio', label: 'Portfolio', description: 'Asset Overview' },
 ]
 
+
+
 export function Navigation() {
   const pathname = usePathname()
 
@@ -51,6 +53,7 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+
           </div>
 
           {/* Network Info and Wallet */}
@@ -87,6 +90,7 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+
           </div>
         </div>
       </div>
@@ -104,7 +108,7 @@ function NetworkIndicator() {
         networkInfo.isLocal ? 'bg-yellow-400' : 'bg-green-400'
       )} />
       <span className="text-gray-600">
-        {networkInfo.network === 'hardhat' ? 'Local' : 'Hedera Testnet'}
+        {networkInfo.network === 'hardhat' ? 'Local' : 'Fantom Sonic Testnet'}
       </span>
     </div>
   )

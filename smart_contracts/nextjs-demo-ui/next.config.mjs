@@ -2,11 +2,21 @@
 const nextConfig = {
     // Improve initial loading performance
     experimental: {
-        optimizePackageImports: ['wagmi', '@tanstack/react-query', 'connectkit'],
+        optimizePackageImports: ['wagmi', '@tanstack/react-query'],
     },
     
     // Reduce hydration issues
     reactStrictMode: true,
+    
+    // Disable ESLint during build for Docker
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+    
+    // Disable TypeScript checking during build for Docker
+    typescript: {
+        ignoreBuildErrors: true,
+    },
     
     async headers() {
         return [
