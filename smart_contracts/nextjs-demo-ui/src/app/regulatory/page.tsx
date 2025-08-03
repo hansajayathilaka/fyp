@@ -26,7 +26,7 @@ export default function RegulatoryPage() {
     <ClientOnly fallback={
       <PageLoadingFallback 
         title="Regulatory Management" 
-        description="Loading regulatory contracts and user verification system..."
+        description="Loading regulatory contracts and user validation system..."
         className="max-w-4xl"
       />
     }>
@@ -90,18 +90,18 @@ function RegulatoryContent() {
     regulatoryTransaction.setTransactionError(error, 'SSI Sign-in Failed')
   }
 
-  // Handle user verification
-  const handleVerifyUser = async (userAddress: string) => {
+  // Handle user validation
+  const handleValidateUser = async (userAddress: string) => {
     try {
       regulatoryTransaction.setTransactionSubmitting(
-        'User Verification',
-        `Verifying user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
+        'User Validation',
+        `Validating user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
       )
       regulatory.verifyUser(userAddress as `0x${string}`)
     } catch (error) {
       regulatoryTransaction.setTransactionError(
-        error instanceof Error ? error.message : 'Verification failed',
-        'User Verification Failed'
+        error instanceof Error ? error.message : 'Validation failed',
+        'User Validation Failed'
       )
     }
   }
@@ -177,7 +177,7 @@ function RegulatoryContent() {
             <div className="text-center">
               <p className="text-gray-600 mb-6">
                 Use your Self-Sovereign Identity (SSI) to register on the platform. 
-                Your identity will be verified through our secure SSI provider.
+                Your identity will be validated through our secure SSI provider.
               </p>
               
               <SSISignIn
@@ -216,7 +216,7 @@ function RegulatoryContent() {
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-medium text-gray-900 mb-2">About SSI Registration</h3>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Your identity is verified through a secure, decentralized process</li>
+                <li>• Your identity is validated through a secure, decentralized process</li>
                 <li>• No personal data is stored on our servers</li>
                 <li>• You maintain full control over your identity credentials</li>
                 <li>• Registration is required for trading and platform access</li>
@@ -281,7 +281,7 @@ function RegulatoryContent() {
               <span className="ml-2 text-blue-900">{getUserTypeDisplayName(Number(userProfile.userType))}</span>
             </div>
             <div>
-              <span className="text-blue-700 font-medium">Verified:</span>
+              <span className="text-blue-700 font-medium">Validated:</span>
               <span className={clsx("ml-2", userProfile.isVerified ? "text-green-600" : "text-red-600")}>
                 {userProfile.isVerified ? "Yes" : "No"}
               </span>
@@ -337,7 +337,7 @@ function RegulatoryContent() {
               <div className="text-center">
                 <p className="text-gray-600 mb-6">
                   Use your Self-Sovereign Identity (SSI) to register on the platform. 
-                  Your identity will be verified through our secure SSI provider.
+                  Your identity will be validated through our secure SSI provider.
                 </p>
                 
                 <SSISignIn
@@ -377,7 +377,7 @@ function RegulatoryContent() {
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">About SSI Registration</h3>
                 <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Your identity is verified through a secure, decentralized process</li>
+                  <li>• Your identity is validated through a secure, decentralized process</li>
                   <li>• No personal data is stored on our servers</li>
                   <li>• You maintain full control over your identity credentials</li>
                   <li>• Registration is required for trading and platform access</li>
@@ -410,7 +410,7 @@ function RegulatoryContent() {
                 </div>
                 
                 <div className="bg-green-50 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-green-900">Verified Users</h3>
+                  <h3 className="text-lg font-semibold text-green-900">Validated Users</h3>
                   <p className="text-3xl font-bold text-green-600">{platformStatsData.verifiedUsers.toString()}</p>
                 </div>
                 
@@ -430,7 +430,7 @@ function RegulatoryContent() {
                 </div>
                 
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Verification Rate</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Validation Rate</h3>
                   <p className="text-3xl font-bold text-gray-600">
                     {platformStatsData.totalUsers > BigInt(0)
                       ? Math.round(Number(platformStatsData.verifiedUsers * BigInt(100) / platformStatsData.totalUsers))

@@ -15,7 +15,7 @@ interface UserQuickActionsProps {
   transactionState?: ReturnType<typeof useEnhancedTransactionState>
 }
 
-type ActionType = 'verify' | 'suspend' | 'unsuspend' | null
+type ActionType = 'validate' | 'suspend' | 'unsuspend' | null
 
 export function UserQuickActions({ 
   userAddress, 
@@ -91,20 +91,20 @@ export function UserQuickActions({
     return null
   }
 
-  const handleVerifyUser = async () => {
+  const handleValidateUser = async () => {
     if (loadingAction || regulatory.isPending) return
     
     try {
-      setLoadingAction('verify')
+      setLoadingAction('validate')
       transaction.setTransactionSubmitting(
-        'User Verification',
-        `Verifying user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
+        'User Validation',
+        `Validating user ${userAddress.slice(0, 10)}...${userAddress.slice(-8)}...`
       )
       await regulatory.verifyUser(userAddress as `0x${string}`)
     } catch (error) {
       transaction.setTransactionError(
-        error instanceof Error ? error.message : 'Verification failed',
-        'User Verification Failed'
+        error instanceof Error ? error.message : 'Validation failed',
+        'User Validation Failed'
       )
       setLoadingAction(null)
     }
@@ -167,26 +167,26 @@ export function UserQuickActions({
         </button>
       )}
       
-      {/* Verify User */}
+      {/* Validate User */}
       {!userProfile.isVerified && !userProfile.isSuspended && (
         <button
-          onClick={handleVerifyUser}
+          onClick={handleValidateUser}
           disabled={isAnyActionLoading}
           className={clsx(
             "px-3 py-1 text-white text-xs rounded transition-colors flex items-center space-x-1",
-            loadingAction === 'verify' 
+            loadingAction === 'validate' 
               ? "bg-green-600" 
               : isAnyActionLoading 
                 ? "bg-gray-400 cursor-not-allowed" 
                 : "bg-green-600 hover:bg-green-700"
           )}
-          title="Verify User"
+          title="Validate User"
         >
-          {loadingAction === 'verify' && (
+          {loadingAction === 'validate' && (
             <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
           )}
           <span>
-            {loadingAction === 'verify' ? 'Verifying...' : 'Verify'}
+            {loadingAction === 'validate' ? 'Validating...' : 'Validate'}
           </span>
         </button>
       )}
@@ -343,11 +343,11 @@ export function UserDetailsModal({ userAddress, isOpen, onClose }: UserDetailsMo
                   <div className="flex items-center space-x-2">
                     {profile.isVerified ? (
                       <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                        Verified
+                        Validated
                       </span>
                     ) : (
                       <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
-                        Pending Verification
+                        Pending Validation
                       </span>
                     )}
                     {profile.isSuspended && (

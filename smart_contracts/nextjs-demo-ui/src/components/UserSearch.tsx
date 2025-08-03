@@ -289,7 +289,7 @@ export function UserProfileCard({ userAddress, className }: UserProfileCardProps
                 "w-2 h-2 rounded-full",
                 profile.isVerified ? "bg-green-400" : "bg-yellow-400"
               )} />
-              <span>{profile.isVerified ? "Verified" : "Pending Verification"}</span>
+              <span>{profile.isVerified ? "Validated" : "Pending Validation"}</span>
             </div>
             <div className={clsx(
               "flex items-center space-x-1",

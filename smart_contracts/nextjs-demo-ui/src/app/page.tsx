@@ -25,7 +25,7 @@ function HomeLoadingFallback() {
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
             A decentralized, transparent, and secure platform for equity investment using blockchain technology. 
-            Experience the future of investment markets with built-in compliance and real-time verification.
+            Experience the future of investment markets with built-in compliance and real-time validation.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
             <div className="flex items-center space-x-2 bg-purple-600 text-white py-2 px-4 rounded-md animate-pulse">
@@ -101,7 +101,7 @@ function StaticContent() {
             </div>
             <h3 className="text-xl font-semibold text-gray-900">SSI Registration</h3>
             <p className="text-gray-600">
-              Register using Self-Sovereign Identity (SSI) for secure, decentralized verification. 
+              Register using Self-Sovereign Identity (SSI) for secure, decentralized validation. 
               No personal data is stored on our servers - you maintain full control over your identity.
             </p>
           </div>
@@ -141,7 +141,7 @@ function StaticContent() {
             Get Started with SSI Registration
           </h2>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Join the platform using Self-Sovereign Identity for secure, decentralized verification. 
+            Join the platform using Self-Sovereign Identity for secure, decentralized validation. 
             No wallet connection required to begin registration.
           </p>
         </div>
@@ -155,7 +155,7 @@ function StaticContent() {
             </div>
             <h3 className="text-xl font-semibold">1. Click Register</h3>
             <p className="text-blue-100">
-              Click the "Register with SSI" button to start the secure identity verification process.
+              Click the "Register with SSI" button to start the secure identity validation process.
             </p>
           </div>
 
@@ -165,9 +165,9 @@ function StaticContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.332-.133-2.052-.382-3.016z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold">2. Verify Identity</h3>
+            <h3 className="text-xl font-semibold">2. Validate Identity</h3>
             <p className="text-blue-100">
-              Complete the SSI verification process in the secure popup window with your identity provider.
+              Complete the SSI validation process in the secure popup window with your identity provider.
             </p>
           </div>
 
@@ -179,7 +179,7 @@ function StaticContent() {
             </div>
             <h3 className="text-xl font-semibold">3. Connect Wallet</h3>
             <p className="text-blue-100">
-              After SSI verification, connect your wallet to complete registration and access all platform features.
+              After SSI validation, connect your wallet to complete registration and access all platform features.
             </p>
           </div>
         </div>
@@ -219,7 +219,7 @@ function StaticContent() {
               Regulatory Management
             </h3>
             <p className="text-gray-600 mb-6">
-              Manage user registration, verification, and compliance. See how administrators 
+              Manage user registration, validation, and compliance. See how administrators 
               control access and maintain regulatory standards.
             </p>
             <Link 
@@ -262,7 +262,7 @@ function StaticContent() {
             </h3>
             <p className="text-gray-600 mb-6">
               Invest in equity tokens through a secure marketplace. Place buy and sell orders, 
-              view order books, and execute trades with real-time verification.
+              view order books, and execute trades with real-time validation.
             </p>
             <Link 
               href="/marketplace"
@@ -313,7 +313,7 @@ function HomeContent() {
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
             A decentralized, transparent, and secure platform for equity investment using blockchain technology. 
-            Experience the future of investment markets with built-in compliance and real-time verification.
+            Experience the future of investment markets with built-in compliance and real-time validation.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
             <Link 
@@ -405,7 +405,7 @@ function HomeContent() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Real-time Transparency</h3>
                 <p className="text-gray-600">
-                  Every transaction is recorded on the blockchain with immediate verification 
+                  Every transaction is recorded on the blockchain with immediate validation 
                   through block explorers and transaction hashes.
                 </p>
               </div>
