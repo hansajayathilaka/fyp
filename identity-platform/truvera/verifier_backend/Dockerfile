@@ -38,6 +38,9 @@ RUN npm install && npm cache clean --force
 # Copy built application from builder stage
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 
+# Copy deployment-info.json file
+COPY --chown=nodejs:nodejs deployment-info.json ./
+
 # Build arguments for environment variables
 ARG PORT=4001
 ARG NODE_ENV=production
