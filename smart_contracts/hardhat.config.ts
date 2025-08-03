@@ -7,16 +7,11 @@ dotenv.config();
 
 // Ensure private key is available
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const HEDERA_TESTNET_URL = process.env.HEDERA_TESTNET_URL;
-const CHAIN_ID = process.env.CHAIN_ID;
+const SONIC_TESTNET_RPC_URL = process.env.SONIC_TESTNET_RPC_URL || "https://rpc.blaze.soniclabs.com";
+const SONICSCAN_API_KEY = process.env.SONICSCAN_API_KEY || "YOUR_SONICSCAN_TESTNET_API_KEY";
+
 if (!PRIVATE_KEY) {
   throw new Error("Please set your PRIVATE_KEY in a .env file");
-}
-if (!HEDERA_TESTNET_URL) {
-  throw new Error("Please set your HEDERA_TESTNET_URL in a .env file");
-}
-if (!CHAIN_ID) {
-  throw new Error("Please set your CHAIN_ID in a .env file");
 }
 
 const config: HardhatUserConfig = {
@@ -35,15 +30,11 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 31337,
     },
-    // Hedera testnet configuration
-    hederaTestnet: {
-      url: HEDERA_TESTNET_URL,
-      chainId: parseInt(CHAIN_ID, 10),
-      accounts: [PRIVATE_KEY],
-      gas: 300000,
-      gasPrice: 360000000000, // 360 gwei
-      timeout: 120000, // 2 minutes
-    },
+    sonicTestnet: {
+      url: SONIC_TESTNET_RPC_URL,
+      chainId: 57054,
+      accounts: [PRIVATE_KEY]
+    }
   },
   paths: {
     sources: "./contracts",
@@ -54,7 +45,19 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 40000,
   },
-
+  etherscan: {
+    apiKey: SONICSCAN_API_KEY, // Single API key for Etherscan v2
+    customChains: [
+      {
+        network: "sonicTestnet",
+        chainId: 57054,
+        urls: {
+          apiURL: "https://api-testnet.sonicscan.org/api",
+          browserURL: "https://testnet.sonicscan.org"
+        }
+      }
+    ]
+  }
 };
 
 export default config;

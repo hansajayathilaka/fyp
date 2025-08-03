@@ -67,4 +67,4 @@ export interface RegistrationFormState {
 }
 
 // Tab types for the regulatory interface
-export type RegulatoryTab = 'register' | 'users' | 'verify' | 'manage' | 'stats';
+export type RegulatoryTab = 'register' | 'users' | 'stats';

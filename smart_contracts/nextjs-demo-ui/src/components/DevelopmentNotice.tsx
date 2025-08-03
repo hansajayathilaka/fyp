@@ -9,8 +9,8 @@ export function DevelopmentNotice() {
 
   useEffect(() => {
     setNetworkInfo(getCurrentNetworkInfo())
-    // Show notice in development or when using Hedera testnet
-    if (process.env.NODE_ENV === 'development' || getCurrentNetworkInfo().network === 'hederaTestnet') {
+    // Show notice in development or when using Fantom Sonic testnet
+    if (process.env.NODE_ENV === 'development' || getCurrentNetworkInfo().network === 'fantomSonic') {
       setIsVisible(true)
     }
   }, [])
@@ -29,7 +29,7 @@ export function DevelopmentNotice() {
           <div className="text-sm">
             <span className="font-medium text-yellow-800">Development Mode:</span>
             <span className="text-yellow-700 ml-1">
-              Using {networkInfo.network === 'hederaTestnet' ? 'Hedera Testnet' : 'Local Network'}. 
+              Using {networkInfo.network === 'fantomSonic' ? 'Fantom Sonic Testnet' : 'Local Network'}. 
               Some RPC errors are expected and can be ignored.
             </span>
           </div>

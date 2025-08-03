@@ -80,49 +80,32 @@
   - _Requirements: 2.1, 2.4_
 
 - [x] 4. Implement user registration system
-
-
-
-
-
   - Create public registration API endpoints
   - Implement registration form validation and data storage
   - Set up registration status management
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
 - [x] 4.1 Create public registration API endpoints
-
-
-
   - Implement POST /api/register for user registration submission
   - Implement GET /api/schemas/public for available schemas
   - Implement GET /api/connection/qr for generating connection QR codes
   - Add input validation and sanitization for registration data
   - _Requirements: 6.1, 6.2, 6.5_
 
-
-
 - [x] 4.2 Implement registration data management
-
   - Create registration validation functions for required fields with Mongoose schema validation
   - Implement MongoDB operations for storing registration applications with Mongoose ODM and proper indexing
   - Set up automatic status tracking with timestamps and audit trail
   - Add connection establishment tracking for registered users with referential integrity
   - Implement data sanitization and security measures for user input
-
-
   - _Requirements: 6.3, 6.4, 9.2, 9.8_
 
 - [x] 4.3 Implement KERIA OOBI-based connection system
-
   - Create OOBI generation using client.identifiers().get() to extract OOBI URLs
   - Implement OOBI storage and invitation ID generation for QR code sharing
-
-
   - Add OOBI expiration and cleanup mechanisms
   - Create proper OOBI URL formatting for mobile wallet compatibility
   - _Requirements: 6.1, 6.2, 6.3_
-
 
 - [x] 4.4 Implement OOBI resolution and contact management
   - Create POST /oobis/resolve endpoint using client.oobis().resolve()
@@ -131,20 +114,13 @@
   - Create GET /api/connection/invitation/:id/qr for QR code generation with OOBI URLs
   - _Requirements: 6.4, 6.5, 6.6, 6.7_
 
-- [-] 5. Implement admin authentication and authorization
-
-
-
+- [x] 5. Implement admin authentication and authorization
   - Create admin user management system
   - Implement JWT-based authentication
   - Set up session management and security middleware
   - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
 - [x] 5.1 Create admin authentication system
-
-
-
-
   - Implement admin user model and password hashing
   - Create POST /api/admin/login endpoint with JWT token generation
   - Add authentication middleware for protecting admin routes

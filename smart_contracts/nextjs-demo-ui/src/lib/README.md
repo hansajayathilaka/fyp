@@ -4,11 +4,10 @@ This document explains how the decimal handling system works in the application,
 
 ## Overview
 
-The application supports multiple blockchain networks, each with different decimal places:
-- Ethereum: 18 decimals (wei)
-- Hedera: 8 decimals (tinybar)
+The application uses standard Ethereum-compatible decimal handling:
+- All networks: 18 decimals (wei)
 
-To handle these differences, we've implemented a centralized decimal handling system that:
+The system uses a centralized decimal handling system that:
 1. Detects the current network
 2. Normalizes values to the appropriate unit
 3. Formats values for display with the correct currency symbol
@@ -69,9 +68,8 @@ For currency values, use:
 
 ## Network Detection
 
-The system automatically detects the current network based on the `window.ethereum.chainId`:
-- Hedera testnet (0x128 = 296) and mainnet (0x129 = 297): 8 decimals
-- All other networks: 18 decimals (Ethereum)
+The system uses standard Ethereum decimal formatting:
+- All networks: 18 decimals (wei)
 
 ## Best Practices
 

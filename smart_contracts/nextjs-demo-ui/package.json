@@ -13,7 +13,6 @@
     "@tanstack/react-query": "^5.83.0",
     "@wagmi/connectors": "^5.8.6",
     "clsx": "^2.1.1",
-    "connectkit": "^1.9.1",
     "ethers": "^6.15.0",
     "next": "14.2.30",
     "react": "^18",

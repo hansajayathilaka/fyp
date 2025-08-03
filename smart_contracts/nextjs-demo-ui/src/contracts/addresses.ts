@@ -1,13 +1,13 @@
-import deploymentInfo from '../../../deployment-info.json'
+import deploymentInfo from '../../deployment-info.json'
 
-// Contract addresses from deployment
+// Contract addresses from local deployment-info.json
 export const CONTRACT_ADDRESSES = {
   REGULATORY_MANAGEMENT: deploymentInfo.regulatoryManagement as `0x${string}`,
   REGULATED_ERC1155_TOKEN: deploymentInfo.regulatedERC1155Token as `0x${string}`,
   REGULATED_MARKETPLACE: deploymentInfo.regulatedMarketplace as `0x${string}`,
 } as const
 
-// Network configuration
+// Network configuration from deployment info and environment variables
 export const DEPLOYMENT_INFO = {
   network: deploymentInfo.network,
   chainId: deploymentInfo.chainId,

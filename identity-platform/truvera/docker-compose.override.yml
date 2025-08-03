@@ -1,0 +1,35 @@
+# Docker Compose Override for Development
+# This file is automatically loaded by docker-compose and provides development-specific configurations
+
+version: '3.8'
+
+services:
+  issuer-backend:
+    volumes:
+      # Mount source code for development (optional - remove for production)
+      - ./issuer_backend/src:/app/src:ro
+    environment:
+      - NODE_ENV=development
+    # Enable hot reload in development (uncomment if using nodemon/tsx watch)
+    # command: npm run dev
+
+  issuer-frontend:
+    # Development build args
+    build:
+      args:
+        - VITE_NODE_ENV=development
+
+  verifier-backend:
+    volumes:
+      # Mount source code for development (optional - remove for production)
+      - ./verifier_backend/src:/app/src:ro
+    environment:
+      - NODE_ENV=development
+    # Enable hot reload in development (uncomment if using nodemon)
+    # command: npm run dev
+
+  verifier-frontend:
+    # Development build args
+    build:
+      args:
+        - VITE_NODE_ENV=development

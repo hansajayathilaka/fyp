@@ -18,6 +18,7 @@ import {
 } from '../../types/regulatory'
 import { UserManagement } from '../../components/UserManagement'
 import { UserSearch, UserProfileCard } from '../../components/UserSearch'
+import { SSISignIn } from '../../components/SSISignIn'
 import { clsx } from 'clsx'
 
 export default function RegulatoryPage() {
@@ -60,24 +61,33 @@ function RegulatoryContent() {
   const selectedUserData = selectedUserProfile as UserProfile | undefined
   const platformStatsData = platformStats ? convertPlatformStats(platformStats as PlatformStatsResult) : null
 
-  // Handle user registration
-  const handleRegisterUser = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!registrationForm.ssiIdentifier.trim()) return
-
+  // Handle SSI sign-in success
+  const handleSSISignInSuccess = async (ssiData: { identifier: string; userType: number }) => {
     try {
-      const userTypeText = registrationForm.userType === 0 ? 'Individual' : 'Company'
+      const userTypeText = ssiData.userType === 0 ? 'Individual' : 'Company'
       regulatoryTransaction.setTransactionSubmitting(
         'User Registration',
-        `Registering ${userTypeText} user with SSI: ${registrationForm.ssiIdentifier}...`
+        `Registering ${userTypeText} user with SSI: ${ssiData.identifier}...`
       )
-      regulatory.registerUser(registrationForm.ssiIdentifier, registrationForm.userType)
+      
+      // Update form state for display purposes
+      setRegistrationForm({
+        ssiIdentifier: ssiData.identifier,
+        userType: ssiData.userType
+      })
+      
+      regulatory.registerUser(ssiData.identifier, ssiData.userType)
     } catch (error) {
       regulatoryTransaction.setTransactionError(
         error instanceof Error ? error.message : 'Registration failed',
         'User Registration Failed'
       )
     }
+  }
+
+  // Handle SSI sign-in error
+  const handleSSISignInError = (error: string) => {
+    regulatoryTransaction.setTransactionError(error, 'SSI Sign-in Failed')
   }
 
   // Handle user verification
@@ -151,18 +161,89 @@ function RegulatoryContent() {
     }
   }, [selectedUserData])
 
+  // Show limited interface for non-connected users (SSI registration only)
   if (!isConnected) {
     return (
       <div className="max-w-4xl mx-auto p-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
           Regulatory Management
         </h1>
-        <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
+        
+        {/* SSI Registration Section for Non-Connected Users */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Register with SSI</h2>
+          
+          <div className="space-y-6">
+            <div className="text-center">
+              <p className="text-gray-600 mb-6">
+                Use your Self-Sovereign Identity (SSI) to register on the platform. 
+                Your identity will be verified through our secure SSI provider.
+              </p>
+              
+              <SSISignIn
+                onSignInSuccess={handleSSISignInSuccess}
+                onSignInError={handleSSISignInError}
+                disabled={regulatory.isPending}
+              />
+            </div>
+
+            {/* Show registration details after SSI sign-in */}
+            {registrationForm.ssiIdentifier && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-medium text-blue-900 mb-2">Registration Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-700 font-medium">SSI Identifier:</span>
+                    <span className="ml-2 text-blue-900">{registrationForm.ssiIdentifier}</span>
+                  </div>
+                  <div>
+                    <span className="text-blue-700 font-medium">User Type:</span>
+                    <span className="ml-2 text-blue-900">
+                      {registrationForm.userType === 0 ? 'Individual' : 'Company'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-yellow-800 text-sm">
+                    <strong>Next Step:</strong> Connect your wallet below to complete the registration process and access all platform features.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Information about SSI */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-2">About SSI Registration</h3>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Your identity is verified through a secure, decentralized process</li>
+                <li>• No personal data is stored on our servers</li>
+                <li>• You maintain full control over your identity credentials</li>
+                <li>• Registration is required for trading and platform access</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Wallet Connection Section */}
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Connect Wallet</h2>
           <p className="text-gray-600 mb-4">
-            Please connect your wallet to access regulatory management features.
+            After SSI registration, connect your wallet to complete the process and access all regulatory management features.
           </p>
           <WalletConnect />
         </div>
+
+        {/* Transaction Feedback */}
+        {regulatoryTransaction.transaction.status !== 'idle' && (
+          <div className="mt-6">
+            <TransactionFeedback 
+              transaction={regulatoryTransaction.transaction}
+              className="mt-6"
+              showImmediate={true}
+            />
+          </div>
+        )}
       </div>
     )
   }
@@ -227,8 +308,6 @@ function RegulatoryContent() {
           {[
             { id: 'register', label: 'User Registration' },
             { id: 'users', label: 'All Users' },
-            { id: 'verify', label: 'User Verification' },
-            { id: 'manage', label: 'User Management' },
             { id: 'stats', label: 'Platform Statistics' }
           ].map((tab) => (
             <button
@@ -254,58 +333,57 @@ function RegulatoryContent() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Register New User</h2>
             
-            <form onSubmit={handleRegisterUser} className="space-y-4">
-              <div>
-                <label htmlFor="ssiIdentifier" className="block text-sm font-medium text-gray-700 mb-1">
-                  SSI Identifier
-                </label>
-                <input
-                  type="text"
-                  id="ssiIdentifier"
-                  value={registrationForm.ssiIdentifier}
-                  onChange={(e) => setRegistrationForm(prev => ({ ...prev, ssiIdentifier: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-                  placeholder="Enter SSI identifier"
-                  required
+            <div className="space-y-6">
+              <div className="text-center">
+                <p className="text-gray-600 mb-6">
+                  Use your Self-Sovereign Identity (SSI) to register on the platform. 
+                  Your identity will be verified through our secure SSI provider.
+                </p>
+                
+                <SSISignIn
+                  onSignInSuccess={handleSSISignInSuccess}
+                  onSignInError={handleSSISignInError}
+                  disabled={regulatory.isPending}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">User Type</label>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="userType"
-                      value={0}
-                      checked={registrationForm.userType === 0}
-                      onChange={() => setRegistrationForm(prev => ({ ...prev, userType: 0 }))}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700">Individual</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="userType"
-                      value={1}
-                      checked={registrationForm.userType === 1}
-                      onChange={() => setRegistrationForm(prev => ({ ...prev, userType: 1 }))}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700">Company</span>
-                  </label>
+              {/* Show registration details after SSI sign-in */}
+              {registrationForm.ssiIdentifier && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="font-medium text-blue-900 mb-2">Registration Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-blue-700 font-medium">SSI Identifier:</span>
+                      <span className="ml-2 text-blue-900">{registrationForm.ssiIdentifier}</span>
+                    </div>
+                    <div>
+                      <span className="text-blue-700 font-medium">User Type:</span>
+                      <span className="ml-2 text-blue-900">
+                        {registrationForm.userType === 0 ? 'Individual' : 'Company'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {regulatory.isPending && (
+                    <div className="mt-4 flex items-center space-x-2 text-blue-700">
+                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm">Processing registration...</span>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
-              <button
-                type="submit"
-                disabled={regulatory.isPending || !registrationForm.ssiIdentifier.trim()}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {regulatory.isPending ? 'Registering...' : 'Register User'}
-              </button>
-            </form>
+              {/* Information about SSI */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-medium text-gray-900 mb-2">About SSI Registration</h3>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Your identity is verified through a secure, decentralized process</li>
+                  <li>• No personal data is stored on our servers</li>
+                  <li>• You maintain full control over your identity credentials</li>
+                  <li>• Registration is required for trading and platform access</li>
+                </ul>
+              </div>
+            </div>
           </div>
         )}
 
@@ -317,108 +395,7 @@ function RegulatoryContent() {
           />
         )}
 
-        {/* User Verification Tab */}
-        {activeTab === 'verify' && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">User Verification</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="verifyAddress" className="block text-sm font-medium text-gray-700 mb-1">
-                  Search User to Verify
-                </label>
-                <UserSearch
-                  onUserSelect={(address) => setUserManagementAddress(address)}
-                  placeholder="Search by address or SSI identifier..."
-                  showFullProfile={true}
-                />
-              </div>
 
-              {userManagementAddress && (
-                <UserProfileCard userAddress={userManagementAddress} />
-              )}
-
-              <button
-                onClick={() => handleVerifyUser(userManagementAddress)}
-                disabled={regulatory.isPending || !userManagementAddress || !selectedUserData || selectedUserData.isVerified}
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {regulatory.isPending ? 'Verifying...' : 'Verify User'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* User Management Tab */}
-        {activeTab === 'manage' && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">User Management</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="manageAddress" className="block text-sm font-medium text-gray-700 mb-1">
-                  User Address to Manage
-                </label>
-                <input
-                  type="text"
-                  id="manageAddress"
-                  value={userManagementAddress}
-                  onChange={(e) => setUserManagementAddress(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-                  placeholder="0x..."
-                />
-              </div>
-
-              {selectedUser && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">User Information</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                    <div>
-                      <span className="text-gray-600">SSI ID:</span>
-                      <span className="ml-2 text-gray-900">{selectedUser.ssiIdentifier}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Type:</span>
-                      <span className="ml-2 text-gray-900">{getUserTypeDisplayName(Number(selectedUser.userType))}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Verified:</span>
-                      <span className={clsx("ml-2", selectedUser.isVerified ? "text-green-600" : "text-red-600")}>
-                        {selectedUser.isVerified ? "Yes" : "No"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Can Trade:</span>
-                      <span className={clsx("ml-2", selectedUser.canTrade ? "text-green-600" : "text-red-600")}>
-                        {selectedUser.canTrade ? "Yes" : "No"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-3">
-                    {selectedUser.isSuspended ? (
-                      <button
-                        onClick={() => handleUnsuspendUser(userManagementAddress)}
-                        disabled={regulatory.isPending}
-                        className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {regulatory.isPending ? 'Processing...' : 'Unsuspend User'}
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleSuspendUser(userManagementAddress)}
-                        disabled={regulatory.isPending}
-                        className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {regulatory.isPending ? 'Processing...' : 'Suspend User'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Platform Statistics Tab */}
         {activeTab === 'stats' && (

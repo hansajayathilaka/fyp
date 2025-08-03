@@ -239,6 +239,126 @@ router.put('/config', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/blockchain/transaction/:hash
+ * Get transaction information by hash
+ */
+router.get('/transaction/:hash', async (req: Request, res: Response) => {
+  try {
+    const { hash } = req.params;
+
+    if (!hash || !/^0x[a-fA-F0-9]{64}$/.test(hash)) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'INVALID_TRANSACTION_HASH',
+          message: 'Transaction hash must be a valid 64-character hex string starting with 0x'
+        },
+        timestamp: new Date().toISOString()
+      };
+      res.status(400).json(response);
+      return;
+    }
+
+    console.log(`Getting transaction information for hash: ${hash}`);
+
+    const blockchainService = getBlockchainService();
+    const config = blockchainService.getConfig();
+
+    if (!config.enabled) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'BLOCKCHAIN_DISABLED',
+          message: 'Blockchain integration is disabled'
+        },
+        timestamp: new Date().toISOString()
+      };
+      res.status(503).json(response);
+      return;
+    }
+
+    // Get transaction receipt and details
+    const provider = blockchainService.getProvider();
+    if (!provider) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'BLOCKCHAIN_NOT_INITIALIZED',
+          message: 'Blockchain provider is not initialized'
+        },
+        timestamp: new Date().toISOString()
+      };
+      res.status(503).json(response);
+      return;
+    }
+
+    const [transaction, receipt] = await Promise.all([
+      provider.getTransaction(hash),
+      provider.getTransactionReceipt(hash)
+    ]);
+
+    if (!transaction) {
+      const response: ApiResponse = {
+        success: false,
+        error: {
+          code: 'TRANSACTION_NOT_FOUND',
+          message: 'Transaction not found on the blockchain'
+        },
+        timestamp: new Date().toISOString()
+      };
+      res.status(404).json(response);
+      return;
+    }
+
+    // Create transaction info using the service method
+    const transactionInfo = receipt ? blockchainService.createTransactionInfo(hash, receipt) : null;
+
+    const response: ApiResponse = {
+      success: true,
+      data: {
+        transaction: {
+          hash: transaction.hash,
+          from: transaction.from,
+          to: transaction.to,
+          value: transaction.value.toString(),
+          gasLimit: transaction.gasLimit.toString(),
+          gasPrice: transaction.gasPrice?.toString() || '0',
+          nonce: transaction.nonce,
+          data: transaction.data
+        },
+        receipt: receipt ? {
+          blockNumber: receipt.blockNumber,
+          blockHash: receipt.blockHash,
+          gasUsed: receipt.gasUsed.toString(),
+          effectiveGasPrice: (receipt as any).effectiveGasPrice?.toString() || transaction.gasPrice?.toString() || '0',
+          status: receipt.status,
+          logs: receipt.logs.length
+        } : null,
+        transactionInfo
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    res.json(response);
+
+  } catch (error) {
+    console.error(`Error getting transaction information for hash ${req.params.hash}:`, error);
+
+    const response: ApiResponse = {
+      success: false,
+      error: {
+        code: 'TRANSACTION_INFO_ERROR',
+        message: error instanceof Error ? error.message : 'Failed to get transaction information',
+        details: error instanceof Error ? { stack: error.stack } : error
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    res.status(500).json(response);
+  }
+});
+
+/**
  * POST /api/blockchain/test
  * Test blockchain connection
  */

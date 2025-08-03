@@ -1,7 +1,6 @@
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import * as fs from 'fs';
-import { parseAmount, formatAmount } from './decimal-utils';
 
 interface DeploymentInfo {
   regulatoryManagement: string;
@@ -252,7 +251,7 @@ async function demoTokenCreation(contracts: DemoContracts, company1: any, compan
     "TECH",
     "TechCorp Inc.",
     ethers.parseUnits("1000000", 0), // 1M max supply
-    parseAmount("0.01") // 0.01 ETH initial price
+    ethers.parseEther("0.01") // 0.01 ETH initial price
   );
   const receipt1 = await tx1.wait();
   console.log("✅ TechCorp shares created - Token ID: 1");
@@ -264,7 +263,7 @@ async function demoTokenCreation(contracts: DemoContracts, company1: any, compan
     "GREEN",
     "GreenEnergy Ltd.",
     ethers.parseUnits("500000", 0), // 500K max supply
-    parseAmount("0.02") // 0.02 ETH initial price
+    ethers.parseEther("0.02") // 0.02 ETH initial price
   );
   const receipt2 = await tx2.wait();
   console.log("✅ GreenEnergy shares created - Token ID: 2");
@@ -328,14 +327,14 @@ async function demoMarketplaceDeposits(
   // Individual 1 deposits ETH
   console.log("\n1️⃣ Individual 1 depositing 2 ETH...");
   await contracts.regulatedMarketplace.connect(individual1).depositETH({
-    value: parseAmount("2.0")
+    value: ethers.parseEther("2.0")
   });
   console.log("✅ 2 ETH deposited by Individual 1");
 
   // Individual 2 deposits ETH
   console.log("\n2️⃣ Individual 2 depositing 3 ETH...");
   await contracts.regulatedMarketplace.connect(individual2).depositETH({
-    value: parseAmount("3.0")
+    value: ethers.parseEther("3.0")
   });
   console.log("✅ 3 ETH deposited by Individual 2");
 
@@ -353,8 +352,8 @@ async function demoMarketplaceDeposits(
   const individual2ETH = await contracts.regulatedMarketplace.getUserETHBalance(individual2.address);
   const company1Tokens = await contracts.regulatedMarketplace.getUserTokenBalance(company1.address, 1);
 
-  console.log("Individual 1 ETH balance:", formatAmount(individual1ETH), "ETH");
-  console.log("Individual 2 ETH balance:", formatAmount(individual2ETH), "ETH");
+  console.log("Individual 1 ETH balance:", ethers.formatEther(individual1ETH), "ETH");
+  console.log("Individual 2 ETH balance:", ethers.formatEther(individual2ETH), "ETH");
   console.log("Company 1 TechCorp shares balance:", company1Tokens.toString());
 }
 
@@ -371,7 +370,7 @@ async function demoTradingScenarios(
   const buyOrderTx = await contracts.regulatedMarketplace.connect(individual1).placeBuyOrder(
     1, // Token ID
     ethers.parseUnits("100", 0), // Amount
-    parseAmount("0.015") // Price per token
+    ethers.parseEther("0.015") // Price per token
   );
   const buyReceipt = await buyOrderTx.wait();
   console.log("✅ Buy order placed");
@@ -381,7 +380,7 @@ async function demoTradingScenarios(
   const sellOrderTx = await contracts.regulatedMarketplace.connect(company1).placeSellOrder(
     1, // Token ID
     ethers.parseUnits("50", 0), // Amount
-    parseAmount("0.015") // Price per token
+    ethers.parseEther("0.015") // Price per token
   );
   const sellReceipt = await sellOrderTx.wait();
   console.log("✅ Sell order placed - Should auto-match with buy order!");
@@ -397,10 +396,10 @@ async function demoTradingScenarios(
   const individual1Balance = await contracts.regulatedMarketplace.getUserBalance(individual1.address);
   const company1Balance = await contracts.regulatedMarketplace.getUserBalance(company1.address);
 
-  console.log("Individual 1 ETH balance:", formatAmount(individual1Balance.ethBalance), "ETH");
+  console.log("Individual 1 ETH balance:", ethers.formatEther(individual1Balance.ethBalance), "ETH");
   console.log("Individual 1 token balances:", individual1Balance.tokenIds.length > 0 ?
     individual1Balance.tokenBalanceAmounts[0].toString() : "0");
-  console.log("Company 1 ETH balance:", formatAmount(company1Balance.ethBalance), "ETH");
+  console.log("Company 1 ETH balance:", ethers.formatEther(company1Balance.ethBalance), "ETH");
 }
 
 async function demoOrderManagement(
@@ -415,7 +414,7 @@ async function demoOrderManagement(
   const orderTx = await contracts.regulatedMarketplace.connect(individual2).placeBuyOrder(
     1, // Token ID
     ethers.parseUnits("200", 0), // Amount
-    parseAmount("0.012") // Price per token
+    ethers.parseEther("0.012") // Price per token
   );
   const orderReceipt = await orderTx.wait();
 
@@ -445,7 +444,7 @@ async function demoOrderManagement(
   console.log("Trader:", order.trader);
   console.log("Token ID:", order.tokenId.toString());
   console.log("Amount:", order.amount.toString());
-  console.log("Price:", formatAmount(order.price), "ETH");
+  console.log("Price:", ethers.formatEther(order.price), "ETH");
   console.log("Status:", order.status === 0n ? "Active" : order.status === 1n ? "Filled" : "Cancelled");
 
   // Cancel the order
@@ -519,7 +518,7 @@ export async function createSampleData() {
       symbol: "TEST",
       companyName: "Test Corp",
       maxSupply: ethers.parseUnits("100000", 0),
-      initialPrice: parseAmount("0.01")
+      initialPrice: ethers.parseEther("0.01")
     }
   };
 }

@@ -214,7 +214,7 @@ export function NoEthState({ className }: { className?: string }) {
           </p>
           <div className="flex space-x-2">
             <button
-              onClick={() => window.open('https://faucet.hedera.com/', '_blank')}
+              onClick={() => window.open('https://faucet.fantom.network/', '_blank')}
               className="text-sm px-3 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors"
             >
               Get Test ETH

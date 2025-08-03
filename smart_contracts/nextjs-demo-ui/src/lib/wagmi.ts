@@ -1,6 +1,6 @@
 import { createConfig, http } from 'wagmi'
 import { hardhat } from 'wagmi/chains'
-import { injected, metaMask, walletConnect } from 'wagmi/connectors'
+import { injected, metaMask } from 'wagmi/connectors'
 import { DEPLOYMENT_INFO } from '../contracts/addresses'
 
 // HTTP transport with rate limiting and batching
@@ -15,27 +15,32 @@ function createHttpTransport(url: string) {
   })
 }
 
-// Define custom Hedera testnet chain
-const hederaTestnetCustom = {
-  id: 296,
-  name: 'Hedera Testnet',
+// Get environment variables
+const SONIC_RPC_URL = process.env.NEXT_PUBLIC_SONIC_RPC_URL || 'https://rpc.blaze.soniclabs.com'
+const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '57054')
+const BLOCK_EXPLORER_URL = process.env.NEXT_PUBLIC_BLOCK_EXPLORER_URL || 'https://testnet.sonicscan.org'
+
+// Define Sonic testnet chain
+const sonicTestnet = {
+  id: CHAIN_ID,
+  name: 'Sonic Testnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'HBAR',
-    symbol: 'HBAR',
+    name: 'ETH',
+    symbol: 'ETH',
   },
   rpcUrls: {
     default: {
-      http: ['https://testnet.hashio.io/api/v1'],
+      http: [SONIC_RPC_URL],
     },
     public: {
-      http: ['https://testnet.hashio.io/api/v1'],
+      http: [SONIC_RPC_URL],
     },
   },
   blockExplorers: {
     default: { 
-      name: 'HashScan', 
-      url: 'https://hashscan.io/testnet'
+      name: 'Sonic Explorer', 
+      url: BLOCK_EXPLORER_URL
     },
   },
   testnet: true,
@@ -45,19 +50,15 @@ const hederaTestnetCustom = {
 const isHardhatDeployment = DEPLOYMENT_INFO.network === 'hardhat'
 
 export const config = createConfig({
-  chains: [hardhat, hederaTestnetCustom],
+  chains: [hardhat, sonicTestnet],
   connectors: [
     injected(),
     metaMask(),
-    walletConnect({ 
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'demo-project-id' 
-    }),
   ],
   transports: {
     [hardhat.id]: createHttpTransport('http://127.0.0.1:8545'),
-    [hederaTestnetCustom.id]: createHttpTransport('https://testnet.hashio.io/api/v1'),
+    [sonicTestnet.id]: createHttpTransport(SONIC_RPC_URL),
   },
-
 })
 
 // Helper function to get the correct block explorer URL
@@ -67,8 +68,8 @@ export function getBlockExplorerUrl(hash: string, type: 'tx' | 'address' = 'tx')
     // Return a placeholder or local explorer if available
     return `#${hash}` // Placeholder for local development
   } else {
-    // For Hedera testnet
-    return `https://hashscan.io/testnet/${type}/${hash}`
+    // For Sonic testnet
+    return `${BLOCK_EXPLORER_URL}/${type}/${hash}`
   }
 }
 
@@ -78,7 +79,7 @@ export function getCurrentNetworkInfo() {
     network: DEPLOYMENT_INFO.network,
     chainId: DEPLOYMENT_INFO.chainId,
     isLocal: isHardhatDeployment,
-    blockExplorerUrl: isHardhatDeployment ? null : 'https://hashscan.io/testnet'
+    blockExplorerUrl: isHardhatDeployment ? null : BLOCK_EXPLORER_URL
   }
 }
 

@@ -27,17 +27,17 @@ export function EtherscanLink({
       return `#local-${type}-${hash}`
     }
     
-    // For Hedera testnet
-    const baseUrl = 'https://hashscan.io/testnet'
+    // For Sonic testnet
+    const baseUrl = 'https://testnet.sonicscan.org'
     switch (type) {
       case 'tx':
-        return `${baseUrl}/transaction/${hash}`
+        return `${baseUrl}/tx/${hash}`
       case 'address':
-        return `${baseUrl}/account/${hash}`
+        return `${baseUrl}/address/${hash}`
       case 'block':
         return `${baseUrl}/block/${hash}`
       default:
-        return `${baseUrl}/transaction/${hash}`
+        return `${baseUrl}/tx/${hash}`
     }
   }
 
@@ -78,7 +78,7 @@ export function EtherscanLink({
           : 'text-blue-600 hover:text-blue-800 hover:underline',
         className
       )}
-      title={networkInfo.isLocal ? 'Local development - no block explorer available' : `View on ${networkInfo.network === 'hardhat' ? 'Local Explorer' : 'HashScan'}`}
+      title={networkInfo.isLocal ? 'Local development - no block explorer available' : `View on ${networkInfo.network === 'hardhat' ? 'Local Explorer' : 'SonicScan'}`}
     >
       <span>{getDisplayText()}</span>
       {showIcon && (

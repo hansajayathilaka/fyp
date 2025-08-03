@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ProofRequest, CredentialPresentation } from '../types';
 import { apiService } from '../services/api';
+import CountdownTimer from './CountdownTimer';
 
 interface StatusMonitorProps {
   proofRequestId: string;
@@ -26,14 +27,13 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
   const [isPolling, setIsPolling] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState<number>(timeoutMinutes * 60);
   const [currentStatus, setCurrentStatus] = useState<string>('active');
   const [pollCount, setPollCount] = useState<number>(0);
+  const [currentProofRequest, setCurrentProofRequest] = useState<ProofRequest | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<Date>(new Date());
   const isPollingRef = useRef<boolean>(false);
   const isMountedRef = useRef<boolean>(true);
   const currentStatusRef = useRef<string>('active');
@@ -50,10 +50,6 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
-    }
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
     }
     
     isPollingRef.current = false;
@@ -108,6 +104,13 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
         
         if (isMountedRef.current) {
           setLastUpdate(new Date());
+          setCurrentProofRequest(proofRequest);
+          
+          // Only update expiresAt if it's different to prevent timer restart
+          if (proofRequest.expiresAt && proofRequest.expiresAt !== expiresAt) {
+            console.log(`StatusMonitor: Updating expiresAt from ${expiresAt} to ${proofRequest.expiresAt}`);
+            setExpiresAt(proofRequest.expiresAt);
+          }
         }
         
         // Always call the parent callback
@@ -167,21 +170,19 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
 
     console.log(`StatusMonitor: Starting polling with ${pollInterval}ms interval (first poll will wait ${pollInterval}ms)`);
     
-    // Reset refs
+    // Reset status but preserve poll count
     currentStatusRef.current = 'active';
-    pollCountRef.current = 0;
+    // DON'T reset pollCountRef.current = 0; - only reset on first mount
     
     // Update state
     if (isMountedRef.current) {
       setIsPolling(true);
       setError(null);
-      setPollCount(0);
+      // DON'T reset setPollCount(0); - preserve the count
       setCurrentStatus('active');
-      setTimeRemaining(timeoutMinutes * 60);
     }
     
     isPollingRef.current = true;
-    startTimeRef.current = new Date();
 
     // DO NOT call pollStatus() immediately - wait for the first interval
     console.log('StatusMonitor: Waiting for first poll interval...');
@@ -200,7 +201,7 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
       }
     }, pollInterval);
 
-    // Set up timeout
+    // Set up timeout based on configured timeout minutes
     timeoutRef.current = setTimeout(() => {
       console.log('StatusMonitor: Timeout reached, stopping polling');
       if (isMountedRef.current) {
@@ -212,25 +213,6 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
         onTimeout();
       }
     }, timeoutMinutes * 60 * 1000);
-
-    // Set up countdown timer
-    countdownRef.current = setInterval(() => {
-      if (!isMountedRef.current) return;
-      
-      const elapsed = Math.floor((new Date().getTime() - startTimeRef.current.getTime()) / 1000);
-      const remaining = Math.max(0, timeoutMinutes * 60 - elapsed);
-      setTimeRemaining(remaining);
-
-      if (remaining === 0 && isMountedRef.current) {
-        console.log('StatusMonitor: Countdown reached zero, stopping polling');
-        setIsPolling(false);
-        isPollingRef.current = false;
-        cleanup();
-        if (onTimeout) {
-          onTimeout();
-        }
-      }
-    }, 1000);
   }, [pollInterval, timeoutMinutes, onTimeout]);
 
   // Stop polling
@@ -243,8 +225,13 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
 
   // Auto-start polling when component mounts
   useEffect(() => {
-    console.log('StatusMonitor: Component mounted, starting polling');
+    console.log('StatusMonitor: Component mounted, initializing');
     isMountedRef.current = true;
+    
+    // Initialize poll count only on first mount
+    pollCountRef.current = 0;
+    setPollCount(0);
+    
     startPolling();
     
     return () => {
@@ -260,14 +247,14 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
       console.log(`StatusMonitor: ProofRequestId changed to ${proofRequestId}, restarting polling`);
       cleanup();
       
-      // Reset refs and state
+      // Reset status but NOT poll count
       currentStatusRef.current = 'active';
-      pollCountRef.current = 0;
+      // DON'T reset pollCountRef.current = 0; - let it continue counting
       
       if (isMountedRef.current) {
         setCurrentStatus('active');
         setError(null);
-        setPollCount(0);
+        // Don't reset poll count state either
       }
       
       // Small delay to ensure cleanup is complete before restarting
@@ -279,12 +266,7 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
     }
   }, [proofRequestId]);
 
-  // Format time remaining
-  const formatTimeRemaining = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
+
 
   // Get status color
   const getStatusColor = (status: string): string => {
@@ -328,17 +310,6 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
           )}
           <button
-            onClick={() => {
-              console.log('StatusMonitor: Manual poll triggered at', new Date().toLocaleTimeString());
-              if (pollStatusRef.current) {
-                pollStatusRef.current();
-              }
-            }}
-            className="px-4 py-2 text-sm rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 font-medium transition-colors"
-          >
-            🔄 Poll Now
-          </button>
-          <button
             onClick={isPolling ? stopPolling : startPolling}
             className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
               isPolling
@@ -346,7 +317,7 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
                 : 'bg-green-100 text-green-800 hover:bg-green-200'
             }`}
           >
-            {isPolling ? '⏸️ Stop' : '▶️ Start'} Monitoring
+            {isPolling ? '⏸️ Pause' : '▶️ Resume'} Monitoring
           </button>
         </div>
       </div>
@@ -371,11 +342,14 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
               <span className="text-2xl">⏱️</span>
               <div>
                 <p className="text-base font-medium text-gray-800">Time Remaining</p>
-                <p className={`text-xl font-bold ${
-                  timeRemaining < 300 ? 'text-red-600' : 'text-gray-900'
-                }`}>
-                  {formatTimeRemaining(timeRemaining)}
-                </p>
+                {expiresAt ? (
+                  <CountdownTimer 
+                    expiresAt={expiresAt}
+                    onExpired={onTimeout}
+                  />
+                ) : (
+                  <p className="text-xl font-bold text-gray-900">--:--</p>
+                )}
               </div>
             </div>
           </div>
@@ -480,7 +454,7 @@ export const StatusMonitor: React.FC<StatusMonitorProps> = ({
               <p>• Waiting for a credential holder to scan the QR code</p>
               <p>• The system is checking for presentations every {pollInterval / 1000} seconds</p>
               <p>• Poll count: <span className="font-semibold">{pollCount}</span></p>
-              <p>• This request will expire in <span className="font-semibold">{formatTimeRemaining(timeRemaining)}</span></p>
+              <p>• This request will expire when the timer above reaches zero</p>
             </>
           )}
           {currentStatus === 'completed' && (

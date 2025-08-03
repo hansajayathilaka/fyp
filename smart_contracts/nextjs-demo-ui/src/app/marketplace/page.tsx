@@ -33,8 +33,6 @@ function MarketplaceContent() {
   const [currentTransactionType, setCurrentTransactionType] = useState<string>('')
 
   // Form states
-  const [depositAmount, setDepositAmount] = useState('')
-  const [withdrawAmount, setWithdrawAmount] = useState('')
   const [orderForm, setOrderForm] = useState({
     tokenId: '',
     amount: '',
@@ -55,47 +53,7 @@ function MarketplaceContent() {
     }
   }, [activeTokens, selectedTokenId])
 
-  // Handle deposit ETH
-  const handleDepositETH = async () => {
-    if (!depositAmount) return
-    
-    try {
-      setCurrentTransactionType('ETH Deposit')
-      marketplaceTransaction.setTransactionSubmitting(
-        'ETH Deposit', 
-        `Depositing ${depositAmount} ETH to marketplace...`
-      )
-      const value = toWei(depositAmount)
-      marketplace.depositETH(value)
-      setDepositAmount('')
-    } catch (error) {
-      marketplaceTransaction.setTransactionError(
-        error instanceof Error ? error.message : 'Deposit failed',
-        'ETH Deposit Failed'
-      )
-    }
-  }
 
-  // Handle withdraw ETH
-  const handleWithdrawETH = async () => {
-    if (!withdrawAmount) return
-    
-    try {
-      setCurrentTransactionType('ETH Withdrawal')
-      marketplaceTransaction.setTransactionSubmitting(
-        'ETH Withdrawal', 
-        `Withdrawing ${withdrawAmount} ETH from marketplace...`
-      )
-      const amount = toWei(withdrawAmount)
-      marketplace.withdrawETH(amount)
-      setWithdrawAmount('')
-    } catch (error) {
-      marketplaceTransaction.setTransactionError(
-        error instanceof Error ? error.message : 'Withdrawal failed',
-        'ETH Withdrawal Failed'
-      )
-    }
-  }
 
   // Handle place order
   const handlePlaceOrder = async () => {
@@ -214,7 +172,7 @@ function MarketplaceContent() {
           {[
             { id: 'trade', label: 'Trading' },
             { id: 'orders', label: 'Order Book' },
-            { id: 'balances', label: 'Balances' },
+            { id: 'balances', label: 'Token Balances' },
             { id: 'completed', label: 'My Orders' }
           ].map((tab) => (
             <button
@@ -379,73 +337,16 @@ function MarketplaceContent() {
 
       {/* Balances Tab */}
       {activeTab === 'balances' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* ETH Balance Management */}
-          <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">ETH Balance</h2>
-            
-            {userData && (
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <div className="text-lg font-medium">
-                  {fromWei(userData[0])}
-                </div>
-                <div className="text-sm text-gray-600">Available Balance</div>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {/* Deposit ETH */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Deposit ETH</label>
-                <div className="flex space-x-2">
-                  <input
-                    type="number"
-                    step="0.001"
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    placeholder="Amount to deposit"
-                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-                  />
-                  <button
-                    onClick={handleDepositETH}
-                    disabled={!depositAmount}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300"
-                  >
-                    Deposit
-                  </button>
-                </div>
-              </div>
-
-              {/* Withdraw ETH */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Withdraw ETH</label>
-                <div className="flex space-x-2">
-                  <input
-                    type="number"
-                    step="0.001"
-                    value={withdrawAmount}
-                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                    placeholder="Amount to withdraw"
-                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-                  />
-                  <button
-                    onClick={handleWithdrawETH}
-                    disabled={!withdrawAmount}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-300"
-                  >
-                    Withdraw
-                  </button>
-                </div>
-              </div>
-            </div>
-
-
-          </div>
-
+        <div className="max-w-4xl">
           {/* Token Balances */}
           <div className="bg-white rounded-lg border p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Tradable Token Balances</h2>
-            <p className="text-sm text-gray-600 mb-4">Tokens deposited in marketplace and available for trading</p>
+            <p className="text-sm text-gray-600 mb-2">Tokens deposited in marketplace and available for trading</p>
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> To manage your ETH balance (deposit/withdraw), please visit the <a href="/portfolio" className="underline hover:text-blue-900">Portfolio page</a>.
+              </p>
+            </div>
             
             {userData && userData[1].length > 0 ? (
               <div className="space-y-3">

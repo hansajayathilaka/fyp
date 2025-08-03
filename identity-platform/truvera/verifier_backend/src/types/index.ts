@@ -55,11 +55,26 @@ export interface VerificationResult {
   blockchainRegistration?: BlockchainRegistrationResult;
 }
 
+export interface BlockchainTransactionDetails {
+  transactionHash: string;
+  blockNumber: number;
+  blockHash: string;
+  gasUsed: string;
+  effectiveGasPrice: string;
+  explorerUrl: string;
+  networkName: string;
+  chainId: number;
+}
+
 export interface BlockchainRegistrationResult {
   attempted: boolean;
   success: boolean;
+  status: 'newly_registered' | 'already_registered' | 'failed';
   transactionHash?: string;
+  transactionDetails?: BlockchainTransactionDetails;
   error?: string;
+  alreadyRegistered?: boolean;
+  userFriendlyMessage: string;
   userType?: number;
   ssiIdentifier?: string;
   walletAddress?: string;

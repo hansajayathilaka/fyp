@@ -1,0 +1,7 @@
+.env
+identity-platform/SSI-SDK/
+identity-platform/hyperledger-identus/
+identity-platform/identus-cloud-agent/
+identity-platform/signify-ts/
+identity-platform/ssi-platform/
+identity-platform/veridian-wallet/

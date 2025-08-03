@@ -125,6 +125,7 @@ app.get('/api', (req, res) => {
       'POST /api/blockchain/register-user - Register user on blockchain',
       'GET /api/blockchain/config - Get blockchain configuration',
       'PUT /api/blockchain/config - Update blockchain configuration',
+      'GET /api/blockchain/transaction/:hash - Get transaction information by hash',
       'POST /api/blockchain/test - Test blockchain connection',
     ],
   });

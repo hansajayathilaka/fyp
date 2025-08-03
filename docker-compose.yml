@@ -1,0 +1,100 @@
+services:
+  # Issuer Backend
+  issuer-backend:
+    build:
+      context: ./identity-platform/truvera/issuer_backend
+      dockerfile: Dockerfile
+      args:
+        - PORT=${ISSUER_BACKEND_PORT:-3001}
+        - NODE_ENV=${NODE_ENV:-production}
+        - TRUVERA_API_URL=${TRUVERA_API_URL}
+        - TRUVERA_API_KEY=${TRUVERA_API_KEY}
+        - SESSION_SECRET=${ISSUER_SESSION_SECRET}
+        - ISSUER_DID=${ISSUER_DID}
+        - CREDENTIAL_SCHEMA_URL=${CREDENTIAL_SCHEMA_URL}
+        - CORS_ORIGINS=${ISSUER_CORS_ORIGINS}
+    image: asia-southeast1-docker.pkg.dev/fyp-deip/fyp-registry/issuer-backend:${TAG:-latest}
+    container_name: issuer-backend
+    ports:
+      - "${ISSUER_BACKEND_PORT:-3001}:${ISSUER_BACKEND_PORT:-3001}"
+    restart: unless-stopped
+
+  # Issuer Frontend
+  issuer-frontend:
+    build:
+      context: ./identity-platform/truvera/issuer_frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${ISSUER_FRONTEND_API_URL}
+        - VITE_TRUVERA_API_URL=${TRUVERA_API_URL}
+        - VITE_NODE_ENV=${NODE_ENV:-production}
+    image: asia-southeast1-docker.pkg.dev/fyp-deip/fyp-registry/issuer-frontend:${TAG:-latest}
+    container_name: issuer-frontend
+    ports:
+      - "${ISSUER_FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - issuer-backend
+    restart: unless-stopped
+
+  # Verifier Backend
+  verifier-backend:
+    build:
+      context: ./identity-platform/truvera/verifier_backend
+      dockerfile: Dockerfile
+      args:
+        - PORT=${VERIFIER_BACKEND_PORT:-4001}
+        - NODE_ENV=${NODE_ENV:-production}
+        - TRUVERA_API_URL=${TRUVERA_API_URL}
+        - TRUVERA_API_KEY=${TRUVERA_API_KEY}
+        - FRONTEND_URL=${VERIFIER_FRONTEND_URL}
+        - BLOCKCHAIN_ENABLED=${BLOCKCHAIN_ENABLED:-true}
+        - SMART_CONTRACT_ADDRESS=${SMART_CONTRACT_ADDRESS}
+        - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
+    image: asia-southeast1-docker.pkg.dev/fyp-deip/fyp-registry/verifier-backend:${TAG:-latest}
+    container_name: verifier-backend
+    ports:
+      - "${VERIFIER_BACKEND_PORT:-4001}:${VERIFIER_BACKEND_PORT:-4001}"
+    environment:
+      - ACCOUNT_PRIVATE_KEY=${ACCOUNT_PRIVATE_KEY}
+    restart: unless-stopped
+
+  # Verifier Frontend
+  verifier-frontend:
+    build:
+      context: ./identity-platform/truvera/verifier_frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VERIFIER_FRONTEND_API_URL}
+        - VITE_TRUVERA_API_URL=${TRUVERA_API_URL}
+        - VITE_CUSTOM_INTEGRATION_ENABLED=${VITE_CUSTOM_INTEGRATION_ENABLED:-false}
+        - VITE_DEFAULT_TIMEOUT_MINUTES=${VITE_DEFAULT_TIMEOUT_MINUTES:-15}
+        - VITE_NODE_ENV=${NODE_ENV:-production}
+    image: asia-southeast1-docker.pkg.dev/fyp-deip/fyp-registry/verifier-frontend:${TAG:-latest}
+    container_name: verifier-frontend
+    ports:
+      - "${VERIFIER_FRONTEND_PORT:-4000}:80"
+    depends_on:
+      - verifier-backend
+    restart: unless-stopped
+
+  # Smart Contracts Next.js Demo UI
+  smart-contracts-ui:
+    build:
+      context: ./smart_contracts
+      dockerfile: nextjs-demo-ui/Dockerfile
+      args:
+        - NEXT_PUBLIC_SMART_CONTRACT_ADDRESS=${SMART_CONTRACT_ADDRESS}
+        - NEXT_PUBLIC_BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
+        - NEXT_PUBLIC_DEFAULT_NETWORK=${DEFAULT_NETWORK:-hardhat}
+        - NEXT_PUBLIC_FALLBACK_DECIMALS=${FALLBACK_DECIMALS:-18}
+        - NEXT_PUBLIC_SSI_SIGNIN_URL=${NEXT_PUBLIC_SSI_SIGNIN_URL}
+    image: asia-southeast1-docker.pkg.dev/fyp-deip/fyp-registry/smart-contracts-ui:${TAG:-latest}
+    container_name: smart-contracts-ui
+    ports:
+      - "${SMART_CONTRACTS_UI_PORT:-3002}:3000"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: fyp-network
+    driver: bridge
