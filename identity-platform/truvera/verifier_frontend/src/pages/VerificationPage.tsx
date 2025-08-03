@@ -284,11 +284,18 @@ export const VerificationPage: React.FC = () => {
           {/* Header */}
           <div className="mb-10">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900">Verification Complete</h1>
-                <p className="mt-3 text-xl text-gray-700">
-                  {proofRequest ? `Results for "${proofRequest.config.name}"` : 'Credential verification results'}
-                </p>
+              <div className="flex items-center space-x-4">
+                <img 
+                  src="/favicon.svg" 
+                  alt="DEIP Logo" 
+                  className="w-12 h-12"
+                />
+                <div>
+                  <h1 className="text-4xl font-bold text-gray-900">Verification Complete</h1>
+                  <p className="mt-3 text-xl text-gray-700">
+                    {proofRequest ? `Results for "${proofRequest.config.name}"` : 'Credential verification results'}
+                  </p>
+                </div>
               </div>
               <div className="flex space-x-4">
                 <button

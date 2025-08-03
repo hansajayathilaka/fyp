@@ -27,11 +27,13 @@ export function Navigation() {
           {/* Logo and Title */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-12 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">DEIP</span>
-              </div>
-              <span className="text-xl font-semibold text-gray-900">
-                Decentralized Equity Investment Platform
+              <img 
+                src="/favicon.svg" 
+                alt="DEIP Logo" 
+                className="w-10 h-10"
+              />
+              <span className="text-xl font-semibold text-gray-900 hidden sm:block">
+                DEIP
               </span>
             </Link>
           </div>

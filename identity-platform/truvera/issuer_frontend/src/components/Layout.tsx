@@ -82,9 +82,16 @@ export default function Layout({ children }: LayoutProps) {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900">
-            SSI Issuing Platform
-          </h1>
+          <div className="flex items-center justify-center space-x-4 mb-2">
+            <img 
+              src="/favicon.svg" 
+              alt="Logo" 
+              className="w-12 h-12"
+            />
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
+              SSI Issuing Platform
+            </h1>
+          </div>
           <p className="text-center text-gray-600 mt-2 text-sm md:text-base lg:text-lg">
             Secure credential issuance with Truvera
           </p>

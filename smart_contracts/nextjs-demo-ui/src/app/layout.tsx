@@ -22,6 +22,12 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "DEIP - Decentralized Equity Investment Platform",
   description: "A decentralized platform for equity investment with blockchain technology and regulatory compliance",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.png', type: 'image/png' }
+    ],
+  },
 };
 
 export default function RootLayout({

@@ -171,11 +171,18 @@ export const QRCodePage: React.FC = () => {
         {/* Header */}
         <div className="mb-10">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">Credential Verification</h1>
-              <p className="mt-3 text-xl text-gray-700">
-                Present your credential by scanning the QR code below
-              </p>
+            <div className="flex items-center space-x-4">
+              <img 
+                src="/favicon.svg" 
+                alt="DEIP Logo" 
+                className="w-12 h-12"
+              />
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900">Credential Verification</h1>
+                <p className="mt-3 text-xl text-gray-700">
+                  Present your credential by scanning the QR code below
+                </p>
+              </div>
             </div>
             <div className="flex space-x-4">
               <button
