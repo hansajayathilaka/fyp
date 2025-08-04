@@ -447,11 +447,9 @@ export const VerificationPage: React.FC = () => {
                       <span className="font-semibold text-gray-800 text-base">User Type:</span>
                       <span className="ml-3 font-bold text-xl text-blue-600">
                         {verificationResult.blockchainRegistration.userType === 0 && '👤 Individual'}
-                        {verificationResult.blockchainRegistration.userType === 1 && '🏢 Organization'}
-                        {verificationResult.blockchainRegistration.userType === 2 && '🏛️ Government'}
-                        {verificationResult.blockchainRegistration.userType === 3 && '🎓 Academic'}
+                        {verificationResult.blockchainRegistration.userType === 1 && '🏢 Company'}
                         {verificationResult.blockchainRegistration.userType !== undefined &&
-                          ![0, 1, 2, 3].includes(verificationResult.blockchainRegistration.userType) &&
+                          ![0, 1].includes(verificationResult.blockchainRegistration.userType) &&
                           `Unknown (${verificationResult.blockchainRegistration.userType})`}
                       </span>
                     </div>

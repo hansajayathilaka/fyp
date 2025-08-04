@@ -63,7 +63,7 @@ npm run test:blockchain
 ## Test Data
 
 The tests use mock credentials with:
-- **User Type**: Organization (based on `organizationName` field)
+- **User Type**: Company (based on `organizationName` field)
 - **SSI Identifier**: `did:example:user123`
 - **Contract Address**: Placeholder address
 - **Private Key**: Test private key (not real)
