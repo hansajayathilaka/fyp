@@ -10,9 +10,7 @@ export interface BlockchainConfig {
 
 export enum UserType {
   INDIVIDUAL = 0,
-  ORGANIZATION = 1,
-  GOVERNMENT = 2,
-  ACADEMIC = 3
+  COMPANY = 1
 }
 
 export interface BlockchainTransactionInfo {
@@ -330,26 +328,14 @@ export class BlockchainService {
       return UserType.INDIVIDUAL;
     }
 
-    // Check for organization indicators
+    // Check for company/organization indicators
     if (credentialSubject.organizationName || 
         credentialSubject.companyName || 
         credentialSubject.businessName ||
-        credentialSubject.entityType === 'organization') {
-      return UserType.ORGANIZATION;
-    }
-
-    // Check for government indicators
-    if (credentialSubject.governmentId || 
-        credentialSubject.governmentAgency ||
-        credentialSubject.entityType === 'government') {
-      return UserType.GOVERNMENT;
-    }
-
-    // Check for academic indicators
-    if (credentialSubject.institutionName || 
-        credentialSubject.academicInstitution ||
-        credentialSubject.entityType === 'academic') {
-      return UserType.ACADEMIC;
+        credentialSubject.entityType === 'organization' ||
+        credentialSubject.entityType === 'company' ||
+        credentialSubject.investorType === 'Company') {
+      return UserType.COMPANY;
     }
 
     // Check credential type for additional hints
@@ -358,14 +344,11 @@ export class BlockchainService {
       
       for (const type of types) {
         const typeStr = type.toLowerCase();
-        if (typeStr.includes('organization') || typeStr.includes('business')) {
-          return UserType.ORGANIZATION;
-        }
-        if (typeStr.includes('government') || typeStr.includes('official')) {
-          return UserType.GOVERNMENT;
-        }
-        if (typeStr.includes('academic') || typeStr.includes('education')) {
-          return UserType.ACADEMIC;
+        if (typeStr.includes('organization') || 
+            typeStr.includes('business') || 
+            typeStr.includes('company') ||
+            typeStr.includes('corporate')) {
+          return UserType.COMPANY;
         }
       }
     }

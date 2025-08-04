@@ -191,14 +191,14 @@ export function usePortfolioErrorHandling(config: Partial<RetryConfig> = {}) {
       case 'contract':
         return [
           'Check your wallet balance',
-          'Verify transaction parameters',
+          'Validate transaction parameters',
           'Contact support if issue persists'
         ]
       case 'validation':
         return [
           'Check input values',
           'Ensure sufficient balance',
-          'Verify all required fields'
+          'Validate all required fields'
         ]
       case 'unknown':
       default:

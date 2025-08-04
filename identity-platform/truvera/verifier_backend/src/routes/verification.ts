@@ -127,12 +127,13 @@ router.post('/', validateVerificationRequest, async (req: Request, res: Response
           }
           
           // Determine user type (simplified version of blockchain service logic)
-          if (credentialSubject?.organizationName || credentialSubject?.companyName || credentialSubject?.businessName || credentialSubject?.entityType === 'organization') {
-            userType = 1; // ORGANIZATION
-          } else if (credentialSubject?.governmentId || credentialSubject?.governmentAgency || credentialSubject?.entityType === 'government') {
-            userType = 2; // GOVERNMENT
-          } else if (credentialSubject?.institutionName || credentialSubject?.academicInstitution || credentialSubject?.entityType === 'academic') {
-            userType = 3; // ACADEMIC
+          if (credentialSubject?.organizationName || 
+              credentialSubject?.companyName || 
+              credentialSubject?.businessName || 
+              credentialSubject?.entityType === 'organization' ||
+              credentialSubject?.entityType === 'company' ||
+              credentialSubject?.investorType === 'Company') {
+            userType = 1; // COMPANY
           } else {
             userType = 0; // INDIVIDUAL
           }

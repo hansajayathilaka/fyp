@@ -284,11 +284,18 @@ export const VerificationPage: React.FC = () => {
           {/* Header */}
           <div className="mb-10">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900">Verification Complete</h1>
-                <p className="mt-3 text-xl text-gray-700">
-                  {proofRequest ? `Results for "${proofRequest.config.name}"` : 'Credential verification results'}
-                </p>
+              <div className="flex items-center space-x-4">
+                <img 
+                  src="/favicon.svg" 
+                  alt="DEIP Logo" 
+                  className="w-12 h-12"
+                />
+                <div>
+                  <h1 className="text-4xl font-bold text-gray-900">Verification Complete</h1>
+                  <p className="mt-3 text-xl text-gray-700">
+                    {proofRequest ? `Results for "${proofRequest.config.name}"` : 'Credential verification results'}
+                  </p>
+                </div>
               </div>
               <div className="flex space-x-4">
                 <button
@@ -440,11 +447,9 @@ export const VerificationPage: React.FC = () => {
                       <span className="font-semibold text-gray-800 text-base">User Type:</span>
                       <span className="ml-3 font-bold text-xl text-blue-600">
                         {verificationResult.blockchainRegistration.userType === 0 && '👤 Individual'}
-                        {verificationResult.blockchainRegistration.userType === 1 && '🏢 Organization'}
-                        {verificationResult.blockchainRegistration.userType === 2 && '🏛️ Government'}
-                        {verificationResult.blockchainRegistration.userType === 3 && '🎓 Academic'}
+                        {verificationResult.blockchainRegistration.userType === 1 && '🏢 Company'}
                         {verificationResult.blockchainRegistration.userType !== undefined &&
-                          ![0, 1, 2, 3].includes(verificationResult.blockchainRegistration.userType) &&
+                          ![0, 1].includes(verificationResult.blockchainRegistration.userType) &&
                           `Unknown (${verificationResult.blockchainRegistration.userType})`}
                       </span>
                     </div>

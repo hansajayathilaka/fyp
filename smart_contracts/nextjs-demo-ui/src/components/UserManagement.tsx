@@ -127,7 +127,7 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
           </div>
           <div className="bg-green-50 rounded-lg p-3">
             <div className="text-lg font-bold text-green-600">{(platformStats as any)[1]?.toString() || '0'}</div>
-            <div className="text-xs text-green-700">Verified</div>
+            <div className="text-xs text-green-700">Validated</div>
           </div>
           <div className="bg-purple-50 rounded-lg p-3">
             <div className="text-lg font-bold text-purple-600">{(platformStats as any)[2]?.toString() || '0'}</div>
@@ -192,7 +192,7 @@ export function UserManagement({ onUserSelect, selectedAddress }: UserManagement
             { id: 'all', label: 'All Users', count: allUsers?.length || 0 },
             { id: 'individual', label: 'Individual', count: individualUsers?.length || 0 },
             { id: 'company', label: 'Company', count: companyUsers?.length || 0 },
-            { id: 'verified', label: 'Verified', count: verifiedUsers?.length || 0 },
+            { id: 'verified', label: 'Validated', count: verifiedUsers?.length || 0 },
             { id: 'suspended', label: 'Suspended', count: platformStats ? Number((platformStats as any)[4]?.toString() || '0') : 0 },
           ].map((filter) => (
             <button
@@ -373,7 +373,7 @@ function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, on
               )}
               {profile?.isVerified && (
                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                  Verified
+                  Validated
                 </span>
               )}
               {profile?.isSuspended && (
@@ -476,7 +476,7 @@ function UserCard({ userAddress, isSelected, isCurrentUser, isAdmin, onClick, on
             <>
               {profile.isVerified ? (
                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                  Verified
+                  Validated
                 </span>
               ) : (
                 <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">

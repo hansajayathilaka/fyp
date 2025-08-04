@@ -1,11 +1,11 @@
 {
-  "regulatoryManagement": "0xB765bD6a5010411a6a3B13c17632330e98AF422E",
-  "regulatedERC1155Token": "0xe50E9c1F30A8e227068709ba205e7127711D8b52",
-  "regulatedMarketplace": "0xD1A6E3a32BfA61FfaE435d880451b92285B2166A",
+  "regulatoryManagement": "0x0944e2F2E72CE2A88283Ea2508185E8fF035d4Ba",
+  "regulatedERC1155Token": "0x02D82833A1D4f425c99356E3A1aA3124a72aC2Bf",
+  "regulatedMarketplace": "0x43a4492587109F79E7cB374B68fd364754a7DaE3",
   "deployer": "0x3D4ED8288A1264ce3Ba01E0F2dc8C8541bFbB5Ff",
   "network": "sonicTestnet",
   "chainId": 57054,
-  "deploymentTime": "2025-08-03T04:03:47.398Z",
+  "deploymentTime": "2025-08-04T03:51:47.083Z",
   "contractABIs": {
     "regulatoryManagement": "RegulatoryManagement",
     "regulatedERC1155Token": "RegulatedERC1155Token",

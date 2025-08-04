@@ -66,9 +66,16 @@ export const ProofRequestPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <header className="text-center mb-12">
           <div className="mb-6">
-            <h1 className="text-5xl font-bold text-gray-900 mb-3">
-              DEIP Credential Verifier
-            </h1>
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <img 
+                src="/favicon.svg" 
+                alt="DEIP Logo" 
+                className="w-16 h-16"
+              />
+              <h1 className="text-5xl font-bold text-gray-900">
+                DEIP Credential Verifier
+              </h1>
+            </div>
             <p className="text-xl text-gray-700 max-w-2xl mx-auto">
               Generate QR codes for users to scan and present their credentials securely
             </p>

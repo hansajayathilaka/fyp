@@ -29,7 +29,7 @@ function ETHBalanceSection() {
   const ethTransaction = useEnhancedTransactionState()
   const { errorState, setError, clearError, retry, safeExecute } = usePortfolioErrorHandling()
 
-  // Check user verification status
+  // Check user validation status
   const { data: userProfile } = regulatory.useGetUserProfile(address)
   const { data: canTrade } = regulatory.useCanUserTrade(address)
 

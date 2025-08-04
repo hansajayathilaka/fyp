@@ -277,7 +277,7 @@ function TokensContent() {
             </div>
             {!canCreateTokens && (
               <div className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded">
-                Token creation requires company verification
+                Token creation requires company validation
               </div>
             )}
           </div>
