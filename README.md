@@ -1,5 +1,9 @@
 # Decentralized Equity Investment Platform
 
+> **Published:** "Enhancing Regulatory Compliance and Efficiency of Decentralized Equity
+> Investment Platforms — A Critical Evaluation" — ICTIS 2025, Springer LNNS.
+> https://link.springer.com/chapter/10.1007/978-981-96-9275-0_44
+
 ## Introduction
 This project aims to address the limitations of existing equity investment platforms by leveraging **Directed Acyclic Graph (DAG)-based blockchain architecture**. The solution ensures **scalability, efficiency, and regulatory compliance** with integrated **Know Your Customer (KYC)** processes. Our platform focuses on delivering faster, more secure, and cost-effective solutions for equity markets.
 
