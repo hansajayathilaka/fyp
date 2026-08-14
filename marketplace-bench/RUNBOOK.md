@@ -97,12 +97,14 @@ SEED_TOKEN_COUNT=60 SEED_LISTING_COUNT=40 npx hardhat run scripts/seed.ts --netw
 
 Each writes its own `seed-fixtures.<network>.json` (kept separate so seeding one chain
 never clobbers the other's fixtures). This step mints/approves/lists **sequentially, one
-transaction at a time**, so it's bounded by each chain's block time: measured on this
-setup, `SEED_TOKEN_COUNT=60 SEED_LISTING_COUNT=40` (140 transactions) took **~8 minutes
-on besuLocal** (2s block period) and well under a minute on confluxLocal (0.5s block
-period). Scale expectations roughly linearly with `tokenCount` before raising it — the
-plan's n≥30-per-condition floor (§8) is about *benchmark* sample size (`bench.ts`'s
-`BATCH_SIZE × REPEATS`), not the seed pool, so there's rarely a reason to seed much more
+transaction at a time** — measured on this setup, `SEED_TOKEN_COUNT=60
+SEED_LISTING_COUNT=40` (140 transactions) took **~5-6 minutes on both chains**. That's
+*not* block-time-bound the way you'd expect (Besu's 2s period vs. Conflux's 0.5s made
+little difference) — ethers.js's receipt-polling interval dominates over actual block
+time at this scale. Scale expectations roughly linearly with `tokenCount` before raising
+it — the plan's n≥30-per-condition floor (§8) is about *benchmark* sample size
+(`bench.ts`'s `BATCH_SIZE × REPEATS`), not the seed pool, so there's rarely a reason to
+seed much more
 than you'll actually consume as `buy`/`cancel` fixtures.
 
 ## 6. Run the benchmark harness on both chains
