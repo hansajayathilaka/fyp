@@ -1,0 +1,88 @@
+# Track B linear side: Hyperledger Besu, IBFT2.0, multi-validator PoA cluster (plan §5).
+#
+# Setup order:
+#   1. ./generate-genesis.sh <nodeCount>       # writes ./networkFiles/genesis.json + node0..N-1/{key,key.pub}
+#   2. ./generate-static-nodes.sh              # writes static-nodes.json into each node dir (peer discovery)
+#   3. docker compose up
+#
+# Default here is 4 validators. For the 3-node condition (plan §5's "3 and 4 nodes
+# minimum"), regenerate with ./generate-genesis.sh 3, re-run generate-static-nodes.sh,
+# and comment out besu-3 below.
+#
+# Resource limits are set explicitly (not left at "similar" defaults) so Track B results
+# are comparable node-for-node against whichever DAG-chain cluster runs alongside it.
+x-besu-resources: &besu-resources
+  deploy:
+    resources:
+      limits:
+        cpus: "2"
+        memory: 2G
+
+x-besu-common: &besu-common
+  image: hyperledger/besu:latest
+  <<: *besu-resources
+
+services:
+  besu-0:
+    <<: *besu-common
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./networkFiles/genesis.json:/config/genesis.json:ro
+      - ./networkFiles/node0:/data
+    command: >
+      --genesis-file=/config/genesis.json
+      --node-private-key-file=/data/key
+      --data-path=/data
+      --p2p-host=besu-0
+      --p2p-port=30303
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --rpc-http-api=ETH,NET,IBFT,WEB3
+      --host-allowlist=*
+      --min-gas-price=0
+
+  besu-1:
+    <<: *besu-common
+    volumes:
+      - ./networkFiles/genesis.json:/config/genesis.json:ro
+      - ./networkFiles/node1:/data
+    command: >
+      --genesis-file=/config/genesis.json
+      --node-private-key-file=/data/key
+      --data-path=/data
+      --p2p-host=besu-1
+      --p2p-port=30303
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --min-gas-price=0
+
+  besu-2:
+    <<: *besu-common
+    volumes:
+      - ./networkFiles/genesis.json:/config/genesis.json:ro
+      - ./networkFiles/node2:/data
+    command: >
+      --genesis-file=/config/genesis.json
+      --node-private-key-file=/data/key
+      --data-path=/data
+      --p2p-host=besu-2
+      --p2p-port=30303
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --min-gas-price=0
+
+  besu-3:
+    <<: *besu-common
+    volumes:
+      - ./networkFiles/genesis.json:/config/genesis.json:ro
+      - ./networkFiles/node3:/data
+    command: >
+      --genesis-file=/config/genesis.json
+      --node-private-key-file=/data/key
+      --data-path=/data
+      --p2p-host=besu-3
+      --p2p-port=30303
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --min-gas-price=0

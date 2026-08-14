@@ -1,0 +1,16 @@
+node_modules
+.env
+cache
+artifacts
+dist
+typechain-types
+coverage
+coverage.json
+bench-output/*
+!bench-output/.gitkeep
+deployment-addresses.json
+seed-fixtures.json
+analysis/output/
+analysis/.venv*
+analysis/__pycache__/
+

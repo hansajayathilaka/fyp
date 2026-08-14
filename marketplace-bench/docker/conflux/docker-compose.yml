@@ -1,0 +1,57 @@
+# Track B DAG side (if Conflux is chosen in §2.1): conflux-rust official image, a
+# bootnode plus N peers, independent multi-node devnet — no Kubernetes needed (plan §5).
+#
+# Setup: copy devnode.toml.template to conf/bootnode.toml and conf/peer<i>.toml, filling
+# in the per-node values (public_address, bootnodes enode URL once the bootnode's node id
+# is known from its logs), then `docker compose up`.
+#
+# Node count matches the Besu cluster: 4 here (bootnode + 3 peers), or drop peer-2 for
+# the 3-node condition — count the bootnode as one of the N nodes for parity with
+# ../besu/docker-compose.yml's N validators.
+x-conflux-resources: &conflux-resources
+  deploy:
+    resources:
+      limits:
+        cpus: "2"
+        memory: 2G
+
+x-conflux-common: &conflux-common
+  image: confluxchain/conflux-rust:latest
+  <<: *conflux-resources
+
+services:
+  bootnode:
+    <<: *conflux-common
+    ports:
+      - "8545:8545" # eSpace JSON-RPC — point hardhat.config.ts's dagChain network here
+    volumes:
+      - ./conf/bootnode.toml:/conflux/run/conflux.toml:ro
+      - ./data/bootnode:/conflux/run/blockchain_data
+    command: ["--config", "/conflux/run/conflux.toml"]
+
+  peer-0:
+    <<: *conflux-common
+    volumes:
+      - ./conf/peer0.toml:/conflux/run/conflux.toml:ro
+      - ./data/peer0:/conflux/run/blockchain_data
+    command: ["--config", "/conflux/run/conflux.toml"]
+    depends_on:
+      - bootnode
+
+  peer-1:
+    <<: *conflux-common
+    volumes:
+      - ./conf/peer1.toml:/conflux/run/conflux.toml:ro
+      - ./data/peer1:/conflux/run/blockchain_data
+    command: ["--config", "/conflux/run/conflux.toml"]
+    depends_on:
+      - bootnode
+
+  peer-2:
+    <<: *conflux-common
+    volumes:
+      - ./conf/peer2.toml:/conflux/run/conflux.toml:ro
+      - ./data/peer2:/conflux/run/blockchain_data
+    command: ["--config", "/conflux/run/conflux.toml"]
+    depends_on:
+      - bootnode

@@ -1,0 +1,27 @@
+# Template conflux-rust node config for a local, independent (non-mainnet, non-testnet)
+# multi-node devnet, per plan §5. Copy to node<i>.toml per node and fill in the per-node
+# values marked below.
+#
+# conflux-rust's config keys have moved across releases — verify these against the
+# `conflux-rust` version pinned in docker-compose.yml before relying on this file
+# (same caution the plan gives for Solidity/EVM version ceilings in §4.3).
+
+# --- per-node: set uniquely for each node ---
+# public_address = "node<i>:32323"
+# jsonrpc_http_port = 12539
+# jsonrpc_ws_port = 12535
+# mining_author = "<node's own address, only relevant if this node also mines>"
+
+# --- shared across all nodes in the devnet ---
+mode = "dev"
+dev_block_interval_ms = 250
+
+# eSpace (EVM-compatible) RPC — this is what hardhat.config.ts's dagChain network talks to.
+evm_chain_id = 71
+jsonrpc_http_eth_port = 8545
+jsonrpc_ws_eth_port = 8546
+
+# Peer discovery: bootnode's enode-style address, set on every non-bootnode node.
+# bootnodes = "cfxnode://<bootnode-id>@bootnode:32323"
+
+log_level = "info"
