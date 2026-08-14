@@ -278,7 +278,13 @@ async function main() {
     }
     for (let i = 0; i < totalNeeded; i++) {
       const { tokenId, seller, price } = pool[i];
-      const buyer = allSigners.find((s) => s.address.toLowerCase() !== seller.toLowerCase())!;
+      // Round-robin the buyer per job — picking the same account for every buy would
+      // serialize concurrent sends onto one nonce sequence (plan §6.1's explicit warning).
+      let buyerIndex = i % allSigners.length;
+      if (allSigners[buyerIndex].address.toLowerCase() === seller.toLowerCase()) {
+        buyerIndex = (buyerIndex + 1) % allSigners.length;
+      }
+      const buyer = allSigners[buyerIndex];
       jobs.push(() =>
         marketplace.connect(buyer).buyItem(tokenId, { value: BigInt(price), ...overrides })
       );
@@ -292,8 +298,11 @@ async function main() {
         `Not enough active listings for cancel bench: need ${totalNeeded}, have ${pool.length}.`
       );
     }
-    for (let i = 0; i < totalNeeded; i++) {
-      const { tokenId, seller } = pool[i];
+    // Draw from the tail, not the head: a `buy` run against these same fixtures consumes
+    // listings from the front, and reusing that range here would make every cancel
+    // spuriously revert with NotActive instead of measuring a real cancel.
+    const slice = pool.slice(pool.length - totalNeeded);
+    for (const { tokenId, seller } of slice) {
       const signer = allSigners.find((s) => s.address.toLowerCase() === seller.toLowerCase())!;
       jobs.push(() => marketplace.connect(signer).cancelListing(tokenId, overrides));
     }
