@@ -49,7 +49,7 @@ interface SeedFixtures {
 }
 
 const ADDRESSES_FILE = path.join(__dirname, "..", "deployment-addresses.json");
-const FIXTURES_FILE = path.join(__dirname, "..", "seed-fixtures.json");
+const FIXTURES_FILE = path.join(__dirname, "..", `seed-fixtures.${network.name}.json`);
 const OUTPUT_DIR = path.join(__dirname, "..", "bench-output");
 const TIMEOUT_MS = Number(process.env.BENCH_TIMEOUT_MS ?? 60_000);
 
@@ -152,7 +152,7 @@ async function timeTx(
 
 function loadFixtures(): SeedFixtures {
   if (!fs.existsSync(FIXTURES_FILE)) {
-    throw new Error(`No seed-fixtures.json found. Run seed.ts first (${FIXTURES_FILE}).`);
+    throw new Error(`No seed fixtures found for this network. Run seed.ts first (${FIXTURES_FILE}).`);
   }
   return JSON.parse(fs.readFileSync(FIXTURES_FILE, "utf-8"));
 }

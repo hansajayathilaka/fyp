@@ -1,0 +1,44 @@
+# Local DAG-vs-linear comparison: one Besu IBFT2.0 node (linear) + one Conflux dev node
+# (DAG), both fully self-contained — no external services, no secrets. Every config file
+# and key in this directory is a hardcoded, throwaway, local-only dev credential; see
+# ../../RUNBOOK.md for the full walkthrough.
+#
+# Ports (host):
+#   Besu     eSpace RPC  -> http://localhost:8545
+#   Conflux  eSpace RPC  -> http://localhost:8546
+#   Conflux  CoreSpace RPC (bootstrap use only) -> http://localhost:12537
+services:
+  besu-local:
+    image: hyperledger/besu:latest
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./besu/genesis.json:/config/genesis.json:ro
+      - ./besu/validator-key:/config/key:ro
+      - besu-local-data:/data
+    command: >
+      --genesis-file=/config/genesis.json
+      --node-private-key-file=/config/key/key
+      --data-path=/data
+      --rpc-http-enabled
+      --rpc-http-host=0.0.0.0
+      --rpc-http-api=ETH,NET,IBFT,WEB3
+      --host-allowlist=*
+      --min-gas-price=0
+
+  conflux-local:
+    image: confluxchain/conflux-rust:latest
+    ports:
+      - "12537:12537"
+      - "8546:8545"
+    volumes:
+      # Not read-only: the image's own init script re-opens conflux.toml in append
+      # mode on every start (even when there's nothing new to append), so a read-only
+      # mount makes it crash with EROFS before the node ever comes up.
+      - ./conflux/conflux.toml:/root/run/conflux.toml
+      - ./conflux/genesis_secrets.txt:/conflux/genesis_secrets.txt:ro
+      - conflux-local-data:/root/run/blockchain_data
+
+volumes:
+  besu-local-data:
+  conflux-local-data:

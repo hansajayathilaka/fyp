@@ -13,9 +13,11 @@ needed, which is the operational advantage over the Hedera Solo path (see
    set `bootnodes = "cfxnode://<id>@bootnode:32323"` in each peer's config.
 3. `docker compose up` for the full cluster.
 
-eSpace (EVM-compatible) JSON-RPC is exposed on `localhost:8545` from the bootnode —
-point `hardhat.config.ts`'s `dagChain` network at it (`DAG_CHAIN_RPC_URL=http://localhost:8545`,
-`DAG_CHAIN_ID=71` to match `devnode.toml.template`'s `evm_chain_id`, or set your own).
+eSpace (EVM-compatible) JSON-RPC is exposed on `localhost:8545` from the bootnode. For a
+known-working single-node config to adapt per-peer (dev mode, chain IDs, the
+`cancun_opcodes_transition_number` opcode fix, genesis funding), see
+`../local/conflux/conflux.toml` — it's the same `conflux-rust` image, live-tested, just
+one node instead of a bootnode+peers topology.
 
 ## Node count
 
@@ -29,9 +31,11 @@ difference is attributable to consensus/ledger structure, not hardware.
 
 ## Status
 
-Phase 4 scaffolding: Compose syntax is validated (`docker compose config`), but a live
-cluster hasn't been brought up in this environment, and `devnode.toml`'s config keys
-should be checked against the pinned `conflux-rust` image's current docs before use —
-conflux-rust's config surface has changed across releases (same caveat the plan raises
-for Solidity/EVM version ceilings). Bringing the cluster up and collecting Track B data
-is follow-up work once the chain decision in `../../docs/chain-decision.md` is resolved.
+Phase 4 scaffolding, node-count variable specifically. `../local/conflux/` runs this same
+image in single-node dev mode and is live-tested (genesis funding, opcode transitions,
+eSpace RPC — all confirmed working, see `../../RUNBOOK.md`). The bootnode+peers topology
+in *this* directory hasn't been brought up and confirmed forming consensus — `mode =
+"dev"` (single-node auto-mining) and a real multi-node peer-discovery topology are
+different code paths in conflux-rust, so the single-node validation doesn't carry over
+automatically. Bringing this cluster up and collecting Track B throughput-vs-node-count
+data (plan §10 phase 5) is follow-up work.

@@ -9,7 +9,7 @@ coverage.json
 bench-output/*
 !bench-output/.gitkeep
 deployment-addresses.json
-seed-fixtures.json
+seed-fixtures*.json
 analysis/output/
 analysis/.venv*
 analysis/__pycache__/

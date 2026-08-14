@@ -23,7 +23,10 @@ interface SeedFixtures {
 }
 
 const ADDRESSES_FILE = path.join(__dirname, "..", "deployment-addresses.json");
-const FIXTURES_FILE = path.join(__dirname, "..", "seed-fixtures.json");
+// Namespaced per network — comparing multiple chains in one session means seeding each
+// of them, and a single shared file would let the second seed run silently clobber the
+// first chain's fixtures.
+const FIXTURES_FILE = path.join(__dirname, "..", `seed-fixtures.${network.name}.json`);
 
 const TOKEN_COUNT = Number(process.env.SEED_TOKEN_COUNT ?? 40);
 const LISTING_COUNT = Number(process.env.SEED_LISTING_COUNT ?? 20);
