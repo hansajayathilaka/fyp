@@ -1,9 +1,9 @@
-# Open Decision: DAG Chain Pick (§2.1)
+# DAG Chain Pick (§2.1)
 
-Status: **unresolved — intentionally left open**. Per the plan, this only needs to be
-resolved once §3's build checklist is green against the local Hardhat network (it is —
-see Phase 1). Everything in this repo up to and including the benchmark harness is
-network-agnostic and does not depend on this choice.
+Status: **resolved as Conflux for the local comparison** (see `RUNBOOK.md`). Track A
+(public testnets, plan §10 phase 3) is a separate decision — Hedera is still on the table
+there if a fixed-fee-vs-market-fee comparison becomes the more interesting result to
+report; nothing below forecloses that.
 
 ## The choice
 
@@ -29,6 +29,14 @@ a confound to explain away.
 
 Either is defensible; a thesis panel will likely ask for this justification, which is why
 this table lives in the repo rather than only in the original plan document.
+
+**Resolution for the local comparison (`docker/local/`, see `RUNBOOK.md`): Conflux.**
+The isolation argument above was the deciding factor — running both chains locally with
+identical gas mechanics means H4 becomes a direct, apples-to-apples price-elasticity
+comparison (plan §7's non-reframed case) rather than something requiring the Hedera
+fixed-fee caveat. Conflux's Docker-only local setup (no Kubernetes) also made it the
+faster path to a working comparison, which mattered given everything here had to run
+without any external infrastructure.
 
 ## What's already wired up for either choice
 

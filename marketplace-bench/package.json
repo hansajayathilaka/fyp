@@ -9,10 +9,20 @@
     "deploy:local": "hardhat run scripts/deploy.ts --network hardhat",
     "seed:local": "hardhat run scripts/seed.ts --network hardhat",
     "bench:local": "hardhat run scripts/bench.ts --network hardhat",
+    "compare:up": "docker compose -f docker/local/docker-compose.yml up -d",
+    "compare:down": "docker compose -f docker/local/docker-compose.yml down",
+    "compare:fund-conflux": "ts-node scripts/fund-conflux-espace.ts",
     "node": "hardhat node",
     "clean": "hardhat clean"
   },
-  "keywords": ["blockchain", "dag", "hedera", "conflux", "benchmark", "hardhat"],
+  "keywords": [
+    "blockchain",
+    "dag",
+    "hedera",
+    "conflux",
+    "benchmark",
+    "hardhat"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -24,6 +34,7 @@
     "dotenv": "^17.4.2",
     "ethers": "^6.17.0",
     "hardhat": "^2.29.0",
+    "js-conflux-sdk": "^2.6.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
