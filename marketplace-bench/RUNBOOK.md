@@ -126,6 +126,13 @@ repeat that gets tagged and excluded from analysis automatically. Optional:
 Conflux eSpace has a real gas market, unlike Hedera), `BENCH_NODE_COUNT` (informational
 tag; this setup is the 1-node baseline).
 
+**Cost caveat, read before reporting cost numbers:** `docker/local/besu/genesis.json`
+sets `--min-gas-price=0`, so besuLocal's per-operation cost will come out at (or near)
+zero — that's a property of this local dev genesis, not a finding about linear-chain
+architecture. A real cost comparison needs a non-zero, realistic gas price on the Besu
+side (edit the genesis or pass `BENCH_PRICE_TIER_GWEI`); latency and throughput numbers
+from this setup aren't affected by this and are meaningful as-is.
+
 Each run appends a CSV to `bench-output/{chain}-{operation}-{timestamp}.csv`. Because
 `bench.ts` reads/writes fixtures per network, you can safely alternate chains without
 resetting anything between them — just don't run `buy` or `cancel` against more listings
