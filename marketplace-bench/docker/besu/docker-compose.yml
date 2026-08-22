@@ -11,6 +11,13 @@
 #
 # Resource limits are set explicitly (not left at "similar" defaults) so Track B results
 # are comparable node-for-node against whichever DAG-chain cluster runs alongside it.
+#
+# Static IPs (not compose service hostnames) for peer addresses: Besu's static-nodes.json
+# parser requires each enode's host component to be a literal IP address — a DNS hostname
+# like "besu-0" fails validation at startup with "Illegal static enode supplied" /
+# "incorrectly formatted enode element" (confirmed empirically; the parser runs before the
+# container's embedded DNS resolution would even come into play). A fixed-subnet network
+# with static per-service addresses lets generate-static-nodes.sh bake in real IPs instead.
 x-besu-resources: &besu-resources
   deploy:
     resources:
@@ -22,11 +29,20 @@ x-besu-common: &besu-common
   image: hyperledger/besu:latest
   <<: *besu-resources
 
+networks:
+  besu-net:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
 services:
   besu-0:
     <<: *besu-common
     ports:
-      - "8545:8545"
+      - "8547:8545"
+    networks:
+      besu-net:
+        ipv4_address: 172.28.0.10
     volumes:
       - ./networkFiles/genesis.json:/config/genesis.json:ro
       - ./networkFiles/node0:/data
@@ -34,7 +50,7 @@ services:
       --genesis-file=/config/genesis.json
       --node-private-key-file=/data/key
       --data-path=/data
-      --p2p-host=besu-0
+      --p2p-host=0.0.0.0
       --p2p-port=30303
       --rpc-http-enabled
       --rpc-http-host=0.0.0.0
@@ -44,6 +60,9 @@ services:
 
   besu-1:
     <<: *besu-common
+    networks:
+      besu-net:
+        ipv4_address: 172.28.0.11
     volumes:
       - ./networkFiles/genesis.json:/config/genesis.json:ro
       - ./networkFiles/node1:/data
@@ -51,7 +70,7 @@ services:
       --genesis-file=/config/genesis.json
       --node-private-key-file=/data/key
       --data-path=/data
-      --p2p-host=besu-1
+      --p2p-host=0.0.0.0
       --p2p-port=30303
       --rpc-http-enabled
       --rpc-http-host=0.0.0.0
@@ -59,6 +78,9 @@ services:
 
   besu-2:
     <<: *besu-common
+    networks:
+      besu-net:
+        ipv4_address: 172.28.0.12
     volumes:
       - ./networkFiles/genesis.json:/config/genesis.json:ro
       - ./networkFiles/node2:/data
@@ -66,7 +88,7 @@ services:
       --genesis-file=/config/genesis.json
       --node-private-key-file=/data/key
       --data-path=/data
-      --p2p-host=besu-2
+      --p2p-host=0.0.0.0
       --p2p-port=30303
       --rpc-http-enabled
       --rpc-http-host=0.0.0.0
@@ -74,6 +96,9 @@ services:
 
   besu-3:
     <<: *besu-common
+    networks:
+      besu-net:
+        ipv4_address: 172.28.0.13
     volumes:
       - ./networkFiles/genesis.json:/config/genesis.json:ro
       - ./networkFiles/node3:/data
@@ -81,7 +106,7 @@ services:
       --genesis-file=/config/genesis.json
       --node-private-key-file=/data/key
       --data-path=/data
-      --p2p-host=besu-3
+      --p2p-host=0.0.0.0
       --p2p-port=30303
       --rpc-http-enabled
       --rpc-http-host=0.0.0.0

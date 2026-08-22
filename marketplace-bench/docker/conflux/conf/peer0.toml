@@ -1,0 +1,46 @@
+# conflux-rust config for peer-0 of a 4-node local devnet (bootnode + 3 peers).
+# Adapted from ../devnode.toml.template and the known-working single-node
+# ../../local/conflux/conflux.toml — chain_id/evm_chain_id and every hardfork transition
+# height below match bootnode.toml exactly (required for all nodes to compute the same
+# genesis block and actually be able to sync/converge).
+node_type = "archive"
+mode = "dev"
+dev_block_interval_ms = 500
+mining_author = "0xf39fd6e51aad88f6f4ce6ab8827279cffFb92266"
+jsonrpc_http_port = 12537
+jsonrpc_ws_port = 12535
+jsonrpc_http_eth_port = 8545
+public_rpc_apis = "all"
+public_evm_rpc_apis = "evm,ethdebug"
+chain_id = 1024
+evm_chain_id = 1025
+genesis_secrets = "/conflux/genesis_secrets.txt"
+tanzanite_transition_height = 4
+hydra_transition_number = 5
+hydra_transition_height = 5
+cip43_init_end_number = 5
+pos_reference_enable_height = 5
+dao_vote_transition_number = 6
+dao_vote_transition_height = 6
+sigma_fix_transition_number = 6
+cip107_transition_number = 7
+cip112_transition_height = 7
+cip118_transition_number = 7
+cip119_transition_number = 7
+base_fee_burn_transition_number = 10
+base_fee_burn_transition_height = 10
+# Enables PUSH0 (Shanghai) and MCOPY (Cancun) opcodes, which OpenZeppelin 5.x contracts
+# compiled with evmVersion "cancun" (hardhat.config.ts) emit unconditionally.
+cancun_opcodes_transition_number = 10
+c2_fix_transition_height = 11
+eoa_code_transition_height = 12
+
+# --- per-node network identity ---
+public_address = "172.29.0.11"
+net_key = "2222222222222222222222222222222222222222222222222222222222222222"
+# Filled in after `docker compose up bootnode` — see ../README.md step 2. Placeholder
+# value below is replaced with the real cfxnode://<id>@172.29.0.10:32323 once known.
+bootnodes = "cfxnode://4f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa385b6b1b8ead809ca67454d9683fcf2ba03456d6fe2c4abe2b07f0fbdbb2f1c1@172.29.0.10:32323"
+
+enable_discovery = true
+log_level = "info"
