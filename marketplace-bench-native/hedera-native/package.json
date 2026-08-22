@@ -1,0 +1,24 @@
+{
+  "name": "hedera-native-bench",
+  "version": "1.0.0",
+  "description": "Hedera native HTS/HCS leg of the DAG-vs-linear blockchain benchmark comparison (marketplace-bench-native). No smart-contract VM: uses the Hedera JS SDK directly against a local hedera-local-node consensus + mirror node.",
+  "private": true,
+  "scripts": {
+    "postinstall": "node scripts/patch-hedera-local-ports.js",
+    "node:start": "node scripts/run-hedera-cli.js start",
+    "node:stop": "node scripts/run-hedera-cli.js stop",
+    "node:restart": "node scripts/run-hedera-cli.js restart",
+    "deploy": "ts-node scripts/deploy.ts",
+    "seed": "ts-node scripts/seed.ts",
+    "bench": "ts-node scripts/bench.ts"
+  },
+  "devDependencies": {
+    "@hashgraph/hedera-local": "2.40.2",
+    "@types/node": "^24.13.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@hashgraph/sdk": "^2.81.0"
+  }
+}

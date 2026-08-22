@@ -1,0 +1,20 @@
+services:
+  sui-local:
+    image: mysten/sui-tools:testnet
+    container_name: sui-local
+    # `sui-test-validator` (the old dedicated localnet binary) is deprecated upstream;
+    # `sui start --force-regenesis --with-faucet` is the current replacement and is what
+    # ships inside this image. --force-regenesis gives a fresh genesis (and fresh funded
+    # accounts) every container start, matching the "no persistent secrets" spirit of the
+    # existing besu/conflux local tracks.
+    command:
+      - sui
+      - start
+      - --force-regenesis
+      - --with-faucet
+      - --epoch-duration-ms=60000
+    ports:
+      - "9000:9000"   # JSON-RPC (sui client / TS SDK)
+      - "9123:9123"   # faucet HTTP API
+      - "9184:9184"   # Prometheus metrics
+    restart: unless-stopped
