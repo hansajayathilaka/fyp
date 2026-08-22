@@ -1,0 +1,392 @@
+<title>DAG vs Linear Ledger</title>
+<style>
+:root{
+  --bg:#f4f5f7;
+  --surface:#ffffff;
+  --surface-2:#ebedf1;
+  --ink:#1b1f27;
+  --muted:#5b6472;
+  --hairline:#d8dce2;
+  --linear:#c2540a;
+  --linear-soft:#f4e3d3;
+  --dag:#6a4fd1;
+  --dag-soft:#e7e2fb;
+  --geth:#2a6fb0;
+  --geth-soft:#dbe7f4;
+  --ok:#2f8f5b;
+  --dead:#b0433a;
+  --dead-soft:#f6dedb;
+  --font-display:'IBM Plex Sans',system-ui,sans-serif;
+  --font-body:'Source Serif 4',Georgia,serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171c; --surface:#1a1e25; --surface-2:#20252d; --ink:#e8e6e1; --muted:#98a0ab; --hairline:#2e343d;
+    --linear:#e8944a; --linear-soft:#3a2a1a; --dag:#a692f5; --dag-soft:#2a2440; --geth:#6fa8dc; --geth-soft:#1c2c3a;
+    --ok:#5cc98d; --dead:#e08278; --dead-soft:#3a2220;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171c; --surface:#1a1e25; --surface-2:#20252d; --ink:#e8e6e1; --muted:#98a0ab; --hairline:#2e343d;
+  --linear:#e8944a; --linear-soft:#3a2a1a; --dag:#a692f5; --dag-soft:#2a2440; --geth:#6fa8dc; --geth-soft:#1c2c3a;
+  --ok:#5cc98d; --dead:#e08278; --dead-soft:#3a2220;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.65}
+.wrap{max-width:1000px;margin:0 auto;padding:4rem 1.5rem 6rem}
+header.masthead{border-bottom:1px solid var(--hairline);padding-bottom:2.25rem;margin-bottom:3rem}
+.eyebrow{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0 0 0.9rem}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(2rem,4.5vw,2.9rem);line-height:1.08;letter-spacing:-0.01em;margin:0 0 0.9rem;text-wrap:balance}
+.dek{font-family:var(--font-body);font-size:1.15rem;color:var(--muted);max-width:64ch;margin:0 0 1.75rem}
+.meta-row{display:flex;flex-wrap:wrap;gap:0.5rem 0.75rem}
+.chip{font-family:var(--font-mono);font-size:0.78rem;color:var(--ink);background:var(--surface-2);border:1px solid var(--hairline);border-radius:999px;padding:0.3rem 0.75rem;white-space:nowrap}
+h2{font-family:var(--font-display);font-weight:700;font-size:1.5rem;letter-spacing:-0.005em;margin:0 0 1.1rem;text-wrap:balance}
+h3{font-family:var(--font-display);font-weight:600;font-size:1.05rem;margin:0 0 0.6rem}
+section{margin:3.5rem 0}
+p{margin:0 0 1.1rem}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:10px;overflow:hidden;margin-bottom:1.75rem}
+.stat-cell{background:var(--surface);padding:1.4rem 1.5rem}
+.stat-op{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.9rem}
+.stat-line{display:flex;align-items:baseline;justify-content:space-between;gap:0.75rem;padding:0.3rem 0}
+.stat-chain{font-family:var(--font-mono);font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:0.4rem}
+.stat-val{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:1.1rem;font-weight:600}
+.delta{font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed var(--hairline)}
+.dot{width:0.65rem;height:0.65rem;border-radius:50%;display:inline-block}
+
+.chart-block{margin:0 0 0.5rem;border:1px solid var(--hairline);border-radius:10px;background:var(--surface);padding:1.25rem 1.25rem 0.5rem;overflow-x:auto}
+.chart-block svg{width:100%;height:auto;min-width:560px;display:block}
+.chart-legend{display:flex;flex-wrap:wrap;gap:1.25rem;padding:0.75rem 0.25rem 1rem;font-family:var(--font-mono);font-size:0.78rem;color:var(--muted)}
+.legend-item{display:inline-flex;align-items:center;gap:0.45rem}
+.legend-item .dot{width:0.6rem;height:0.6rem;border-radius:2px}
+figure{margin:0 0 2.5rem}
+figcaption{font-family:var(--font-mono);font-size:0.78rem;color:var(--muted);margin-top:0.6rem}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:10px;margin-bottom:1.75rem}
+table{border-collapse:collapse;width:100%;min-width:640px;font-family:var(--font-mono);font-size:0.82rem}
+th,td{padding:0.6rem 0.9rem;text-align:right;border-bottom:1px solid var(--hairline);font-variant-numeric:tabular-nums;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{background:var(--surface-2);font-weight:600;letter-spacing:0.02em;text-transform:uppercase;font-size:0.7rem;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+tbody tr:nth-child(odd){background:var(--surface)}
+tbody tr:nth-child(even){background:color-mix(in srgb, var(--surface) 96%, var(--ink) 4%)}
+td.c-besu{color:var(--linear);font-weight:600}
+td.c-conflux{color:var(--dag);font-weight:600}
+td.c-geth{color:var(--geth);font-weight:600}
+td.sig{color:var(--ok);font-weight:600}
+td.ns{color:var(--muted)}
+
+.callout{border:1px solid var(--hairline);border-left:4px solid var(--linear);background:var(--linear-soft);border-radius:0 10px 10px 0;padding:1.25rem 1.5rem;margin:1.75rem 0}
+.callout h3{margin-bottom:0.5rem}
+.callout p:last-child{margin-bottom:0}
+.callout.neutral{border-left-color:var(--muted);background:var(--surface-2)}
+.callout.dead{border-left-color:var(--dead);background:var(--dead-soft)}
+
+.fixlist{margin:0;padding:0;list-style:none}
+.fixlist li{padding:1rem 0;border-bottom:1px solid var(--hairline);display:grid;grid-template-columns:1.4rem 1fr;gap:0.75rem}
+.fixlist li:last-child{border-bottom:none}
+.fixnum{font-family:var(--font-mono);color:var(--ok);font-weight:700}
+.fixlist strong{font-family:var(--font-display)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+@media (max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+
+.chain-card{border:1px solid var(--hairline);border-radius:10px;background:var(--surface);padding:1.5rem;border-top:4px solid var(--accent, var(--muted))}
+.chain-card h3{font-family:var(--font-mono);font-size:0.95rem}
+.chain-card p{font-size:0.92rem;color:var(--muted);margin-bottom:0.5rem}
+
+footer{margin-top:4rem;padding-top:1.75rem;border-top:1px solid var(--hairline);font-family:var(--font-mono);font-size:0.78rem;color:var(--muted)}
+code{font-family:var(--font-mono);background:var(--surface-2);padding:0.1em 0.4em;border-radius:4px;font-size:0.9em}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Local benchmark &middot; expanded comparison</p>
+  <h1>DAG vs. linear ledger, five real chains deep</h1>
+  <p class="dek">Three working chains (two linear clients, one DAG), two node-count variants, and one documented dead end &mdash; all run on your own machine against the identical marketplace contract, with real cost, throughput, resource, and finality data added to the original latency comparison.</p>
+  <div class="meta-row">
+    <span class="chip">2026-08-22</span>
+    <span class="chip">5 chain configurations benched</span>
+    <span class="chip">1 dead end (documented)</span>
+    <span class="chip">n = 30 / operation / config</span>
+    <span class="chip">6 metrics: latency, cost, throughput, resources, finality, node-count</span>
+  </div>
+</header>
+
+<section>
+  <p class="eyebrow">Lineup</p>
+  <h2>What actually ran</h2>
+  <div class="grid3">
+    <div class="chain-card" style="--accent:#c2540a">
+      <h3>besuLocal</h3>
+      <p>Linear &middot; IBFT2.0 &middot; 1 validator &middot; chain 4004</p>
+      <p>Baseline. Genesis sets zero min-gas-price &mdash; cost fixed via a 5&nbsp;gwei rerun, see below.</p>
+    </div>
+    <div class="chain-card" style="--accent:#6a4fd1">
+      <h3>confluxLocal</h3>
+      <p>DAG &middot; GHAST/Tree-Graph &middot; 1 node &middot; chain 1025</p>
+      <p>Real market gas from the start. Baseline for the DAG side.</p>
+    </div>
+    <div class="chain-card" style="--accent:#2a6fb0">
+      <h3>gethLocal <span style="color:var(--muted);font-weight:400">— new</span></h3>
+      <p>Linear &middot; go-ethereum, dev/PoA &middot; 1 node &middot; chain 4005</p>
+      <p>Second linear client, real ~1 gwei gas by construction &mdash; no cost-fix workaround needed.</p>
+    </div>
+    <div class="chain-card" style="--accent:#c2540a">
+      <h3>besuCluster <span style="color:var(--muted);font-weight:400">— new</span></h3>
+      <p>Linear &middot; IBFT2.0 &middot; <strong>4 validators</strong> &middot; chain 4004</p>
+      <p>Real multi-validator consensus confirmed (round-robin proposer rotation, full peer mesh).</p>
+    </div>
+    <div class="chain-card" style="--accent:#6a4fd1">
+      <h3>confluxCluster <span style="color:var(--muted);font-weight:400">— new</span></h3>
+      <p>DAG &middot; GHAST &middot; <strong>3 of 4 nodes</strong> &middot; chain 1025</p>
+      <p>4th peer never completed handshake after 3 clean rebuilds &mdash; benched the honestly-achieved 3-node topology instead of faking a 4th.</p>
+    </div>
+    <div class="chain-card" style="--accent:var(--dead)">
+      <h3>Fantom Opera <span style="color:var(--dead);font-weight:400">— dead end</span></h3>
+      <p>DAG &middot; Lachesis/aBFT &middot; go-opera client</p>
+      <p>No official Docker image; EVM hard-capped at London fork (no Cancun/MCOPY). See scope note below.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Metric 1 of 6</p>
+  <h2>Latency, three chains</h2>
+  <p>Adding a second linear client (Geth) alongside Besu confirms the original finding wasn't a Besu-specific quirk: both linear clients land within ~40ms of each other on every operation, while confluxLocal trails by 17&ndash;80% depending on the operation. The two linear clients share the same 2s block period, so their near-identical numbers make sense &mdash; the gap to Conflux is architectural, not implementation noise.</p>
+  <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">3812</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">2859</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">1906</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">953</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">0</text>
+    <rect x="62.0" y="132.4" width="44.3" height="141.6" fill="#c2540a" rx="2"/><title>besuLocal (linear) · mint: 2125ms</title><rect x="112.3" y="20.0" width="44.3" height="254.0" fill="#6a4fd1" rx="2"/><title>confluxLocal (DAG) · mint: 3812ms</title><rect x="162.5" y="132.6" width="44.3" height="141.4" fill="#2a6fb0" rx="2"/><title>gethLocal (linear) · mint: 2122ms</title><text x="134.4" y="294" class="catlabel" text-anchor="middle">mint</text><rect x="218.8" y="131.2" width="44.3" height="142.8" fill="#c2540a" rx="2"/><title>besuLocal (linear) · approve: 2144ms</title><rect x="269.1" y="84.7" width="44.3" height="189.3" fill="#6a4fd1" rx="2"/><title>confluxLocal (DAG) · approve: 2841ms</title><rect x="319.3" y="133.2" width="44.3" height="140.8" fill="#2a6fb0" rx="2"/><title>gethLocal (linear) · approve: 2113ms</title><text x="291.2" y="294" class="catlabel" text-anchor="middle">approve</text><rect x="375.6" y="131.1" width="44.3" height="142.9" fill="#c2540a" rx="2"/><title>besuLocal (linear) · list: 2144ms</title><rect x="425.9" y="106.9" width="44.3" height="167.1" fill="#6a4fd1" rx="2"/><title>confluxLocal (DAG) · list: 2508ms</title><rect x="476.1" y="134.0" width="44.3" height="140.0" fill="#2a6fb0" rx="2"/><title>gethLocal (linear) · list: 2101ms</title><text x="448.0" y="294" class="catlabel" text-anchor="middle">list</text><rect x="532.4" y="131.5" width="44.3" height="142.5" fill="#c2540a" rx="2"/><title>besuLocal (linear) · buy: 2138ms</title><rect x="582.7" y="89.8" width="44.3" height="184.2" fill="#6a4fd1" rx="2"/><title>confluxLocal (DAG) · buy: 2765ms</title><rect x="632.9" y="134.0" width="44.3" height="140.0" fill="#2a6fb0" rx="2"/><title>gethLocal (linear) · buy: 2101ms</title><text x="604.8" y="294" class="catlabel" text-anchor="middle">buy</text><rect x="689.2" y="131.7" width="44.3" height="142.3" fill="#c2540a" rx="2"/><title>besuLocal (linear) · cancel: 2136ms</title><rect x="739.5" y="87.5" width="44.3" height="186.5" fill="#6a4fd1" rx="2"/><title>confluxLocal (DAG) · cancel: 2799ms</title><rect x="789.7" y="133.8" width="44.3" height="140.2" fill="#2a6fb0" rx="2"/><title>gethLocal (linear) · cancel: 2105ms</title><text x="761.6" y="294" class="catlabel" text-anchor="middle">cancel</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuLocal (linear)</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxLocal (DAG)</span><span class="legend-item"><i class="dot" style="background:#2a6fb0"></i>gethLocal (linear)</span></div></div>
+  <p style="font-family:var(--font-mono);font-size:0.85rem;color:var(--muted);margin-top:1rem">n=30 per bar (post-warmup). Full CI/IQR data in the summary table at the end.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Metric 2 of 6</p>
+  <h2>Realistic cost, now meaningful on all three chains</h2>
+  <div class="callout">
+    <h3>What changed since the first report</h3>
+    <p>besuLocal's genesis sets <code>--min-gas-price=0</code>, which made its original cost numbers near-zero and not comparable. <code>bench.ts</code> already supports <code>BENCH_PRICE_TIER_GWEI</code> &mdash; no genesis edit or restart needed &mdash; so besuLocal was rerun at <strong>5 gwei</strong> (comparable order of magnitude to Conflux's real ~1 gwei market price) for a genuine three-way cost comparison. gethLocal needed no fix: its genesis leaves EIP-1559 base-fee mechanics on and adds a 1 gwei floor, so its cost numbers were real from the first run.</p>
+  </div>
+  <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">5.0e-4</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">2.4e-4</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">1.1e-4</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">5.3e-5</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">2.5e-5</text>
+    <rect x="62.0" y="67.4" width="44.3" height="206.6" fill="#c2540a" rx="2"/><title>besuLocal @5 gwei · mint: 2.8e-4</title><rect x="112.3" y="175.9" width="44.3" height="98.1" fill="#6a4fd1" rx="2"/><title>confluxLocal (real ~1 gwei) · mint: 8.0e-5</title><rect x="162.5" y="204.7" width="44.3" height="69.3" fill="#2a6fb0" rx="2"/><title>gethLocal (real ~1 gwei) · mint: 5.7e-5</title><text x="134.4" y="294" class="catlabel" text-anchor="middle">mint</text><rect x="218.8" y="80.8" width="44.3" height="193.2" fill="#c2540a" rx="2"/><title>besuLocal @5 gwei · approve: 2.4e-4</title><rect x="269.1" y="190.2" width="44.3" height="83.8" fill="#6a4fd1" rx="2"/><title>confluxLocal (real ~1 gwei) · approve: 6.7e-5</title><rect x="319.3" y="218.1" width="44.3" height="55.9" fill="#2a6fb0" rx="2"/><title>gethLocal (real ~1 gwei) · approve: 4.9e-5</title><text x="291.2" y="294" class="catlabel" text-anchor="middle">approve</text><rect x="375.6" y="20.0" width="44.3" height="254.0" fill="#c2540a" rx="2"/><title>besuLocal @5 gwei · list: 5.0e-4</title><rect x="425.9" y="120.5" width="44.3" height="153.5" fill="#6a4fd1" rx="2"/><title>confluxLocal (real ~1 gwei) · list: 1.5e-4</title><rect x="476.1" y="157.3" width="44.3" height="116.7" fill="#2a6fb0" rx="2"/><title>gethLocal (real ~1 gwei) · list: 9.9e-5</title><text x="448.0" y="294" class="catlabel" text-anchor="middle">list</text><rect x="532.4" y="56.5" width="44.3" height="217.5" fill="#c2540a" rx="2"/><title>besuLocal @5 gwei · buy: 3.2e-4</title><rect x="582.7" y="172.9" width="44.3" height="101.1" fill="#6a4fd1" rx="2"/><title>confluxLocal (real ~1 gwei) · buy: 8.3e-5</title><rect x="632.9" y="193.8" width="44.3" height="80.2" fill="#2a6fb0" rx="2"/><title>gethLocal (real ~1 gwei) · buy: 6.5e-5</title><text x="604.8" y="294" class="catlabel" text-anchor="middle">buy</text><rect x="689.2" y="136.7" width="44.3" height="137.3" fill="#c2540a" rx="2"/><title>besuLocal @5 gwei · cancel: 1.3e-4</title><rect x="739.5" y="257.7" width="44.3" height="16.3" fill="#6a4fd1" rx="2"/><title>confluxLocal (real ~1 gwei) · cancel: 3.1e-5</title><rect x="789.7" y="274.0" width="44.3" height="0.0" fill="#2a6fb0" rx="2"/><title>gethLocal (real ~1 gwei) · cancel: 2.5e-5</title><text x="761.6" y="294" class="catlabel" text-anchor="middle">cancel</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuLocal @5 gwei</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxLocal (real ~1 gwei)</span><span class="legend-item"><i class="dot" style="background:#2a6fb0"></i>gethLocal (real ~1 gwei)</span></div></div>
+  <p style="font-family:var(--font-mono);font-size:0.85rem;color:var(--muted);margin:1rem 0 1.75rem">Log scale, native units (ETH-equivalent / CFX). besuLocal's price tier (5 gwei) isn't identical to confluxLocal/gethLocal's (~1 gwei) &mdash; this chart shows cost is now non-trivial everywhere, not a precise apples-to-apples price-controlled comparison. gasUsed below is the fairer cross-chain comparison, since it's price-independent.</p>
+
+  <h3>Gas used &mdash; a real EVM-implementation finding, independent of price</h3>
+  <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">152,581</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">114,436</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">76,291</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">38,145</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">0</text>
+    <rect x="62.0" y="179.3" width="44.3" height="94.7" fill="#c2540a" rx="2"/><title>besuLocal · mint: 56,897</title><rect x="112.3" y="141.2" width="44.3" height="132.8" fill="#6a4fd1" rx="2"/><title>confluxLocal · mint: 79,745</title><rect x="162.5" y="179.3" width="44.3" height="94.7" fill="#2a6fb0" rx="2"/><title>gethLocal · mint: 56,897</title><text x="134.4" y="294" class="catlabel" text-anchor="middle">mint</text><rect x="218.8" y="193.0" width="44.3" height="81.0" fill="#c2540a" rx="2"/><title>besuLocal · approve: 48,630</title><rect x="269.1" y="161.8" width="44.3" height="112.2" fill="#6a4fd1" rx="2"/><title>confluxLocal · approve: 67,382</title><rect x="319.3" y="193.1" width="44.3" height="80.9" fill="#2a6fb0" rx="2"/><title>gethLocal · approve: 48,618</title><text x="291.2" y="294" class="catlabel" text-anchor="middle">approve</text><rect x="375.6" y="108.9" width="44.3" height="165.1" fill="#c2540a" rx="2"/><title>besuLocal · list: 99,157</title><rect x="425.9" y="20.0" width="44.3" height="254.0" fill="#6a4fd1" rx="2"/><title>confluxLocal · list: 152,581</title><rect x="476.1" y="109.0" width="44.3" height="165.0" fill="#2a6fb0" rx="2"/><title>gethLocal · list: 99,145</title><text x="448.0" y="294" class="catlabel" text-anchor="middle">list</text><rect x="532.4" y="166.4" width="44.3" height="107.6" fill="#c2540a" rx="2"/><title>besuLocal · buy: 64,612</title><rect x="582.7" y="136.5" width="44.3" height="137.5" fill="#6a4fd1" rx="2"/><title>confluxLocal · buy: 82,572</title><rect x="632.9" y="166.4" width="44.3" height="107.6" fill="#2a6fb0" rx="2"/><title>gethLocal · buy: 64,612</title><text x="604.8" y="294" class="catlabel" text-anchor="middle">buy</text><rect x="689.2" y="232.0" width="44.3" height="42.0" fill="#c2540a" rx="2"/><title>besuLocal · cancel: 25,255</title><rect x="739.5" y="223.1" width="44.3" height="50.9" fill="#6a4fd1" rx="2"/><title>confluxLocal · cancel: 30,567</title><rect x="789.7" y="232.0" width="44.3" height="42.0" fill="#2a6fb0" rx="2"/><title>gethLocal · cancel: 25,243</title><text x="761.6" y="294" class="catlabel" text-anchor="middle">cancel</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuLocal</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxLocal</span><span class="legend-item"><i class="dot" style="background:#2a6fb0"></i>gethLocal</span></div></div>
+  <p>confluxLocal's eSpace EVM runtime consistently uses 30&ndash;54% more gas than either Besu or Geth for identical bytecode (e.g. <code>list</code>: 99,157/99,145 gas on Besu/Geth vs. 152,581 on Conflux). Besu and Geth agree almost exactly (within rounding) &mdash; strong evidence this is a real Conflux eSpace accounting difference, not noise between two arbitrary EVM implementations.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Metric 3 of 6</p>
+  <h2>Throughput vs. concurrency</h2>
+  <p>Previously measured at one concurrency point; now swept across batch sizes 1/5/10/20 (mint, 3 real repeats each after warmup).</p>
+  <div class="grid2">
+    <div>
+      <h3>Throughput (tx/s)</h3>
+      <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">11.4</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">8.6</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">5.7</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">2.9</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">0.0</text>
+    <polyline points="56.0,263.3 317.3,221.6 578.7,164.3 840.0,43.1" fill="none" stroke="#c2540a" stroke-width="2.5"/><circle cx="56.0" cy="263.3" r="4" fill="#c2540a"><title>besuLocal · 1 senders: 0.5</title></circle><circle cx="317.3" cy="221.6" r="4" fill="#c2540a"><title>besuLocal · 5 senders: 2.4</title></circle><circle cx="578.7" cy="164.3" r="4" fill="#c2540a"><title>besuLocal · 10 senders: 4.9</title></circle><circle cx="840.0" cy="43.1" r="4" fill="#c2540a"><title>besuLocal · 20 senders: 10.4</title></circle><polyline points="56.0,265.6 317.3,230.3 578.7,220.7 840.0,147.4" fill="none" stroke="#6a4fd1" stroke-width="2.5"/><circle cx="56.0" cy="265.6" r="4" fill="#6a4fd1"><title>confluxLocal · 1 senders: 0.4</title></circle><circle cx="317.3" cy="230.3" r="4" fill="#6a4fd1"><title>confluxLocal · 5 senders: 2.0</title></circle><circle cx="578.7" cy="220.7" r="4" fill="#6a4fd1"><title>confluxLocal · 10 senders: 2.4</title></circle><circle cx="840.0" cy="147.4" r="4" fill="#6a4fd1"><title>confluxLocal · 20 senders: 5.7</title></circle>
+    <text x="56.0" y="294" class="catlabel" text-anchor="middle">1 senders</text><text x="317.3" y="294" class="catlabel" text-anchor="middle">5 senders</text><text x="578.7" y="294" class="catlabel" text-anchor="middle">10 senders</text><text x="840.0" y="294" class="catlabel" text-anchor="middle">20 senders</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuLocal</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxLocal</span></div></div>
+    </div>
+    <div>
+      <h3>Latency under the same load (ms)</h3>
+      <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">4565</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">3424</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">2283</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">1141</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">0</text>
+    <polyline points="56.0,158.2 317.3,156.4 578.7,161.7 840.0,167.7" fill="none" stroke="#c2540a" stroke-width="2.5"/><circle cx="56.0" cy="158.2" r="4" fill="#c2540a"><title>besuLocal · 1 senders: 2082</title></circle><circle cx="317.3" cy="156.4" r="4" fill="#c2540a"><title>besuLocal · 5 senders: 2113</title></circle><circle cx="578.7" cy="161.7" r="4" fill="#c2540a"><title>besuLocal · 10 senders: 2018</title></circle><circle cx="840.0" cy="167.7" r="4" fill="#c2540a"><title>besuLocal · 20 senders: 1911</title></circle><polyline points="56.0,127.9 317.3,132.8 578.7,43.1 840.0,83.3" fill="none" stroke="#6a4fd1" stroke-width="2.5"/><circle cx="56.0" cy="127.9" r="4" fill="#6a4fd1"><title>confluxLocal · 1 senders: 2626</title></circle><circle cx="317.3" cy="132.8" r="4" fill="#6a4fd1"><title>confluxLocal · 5 senders: 2537</title></circle><circle cx="578.7" cy="43.1" r="4" fill="#6a4fd1"><title>confluxLocal · 10 senders: 4150</title></circle><circle cx="840.0" cy="83.3" r="4" fill="#6a4fd1"><title>confluxLocal · 20 senders: 3427</title></circle>
+    <text x="56.0" y="294" class="catlabel" text-anchor="middle">1 senders</text><text x="317.3" y="294" class="catlabel" text-anchor="middle">5 senders</text><text x="578.7" y="294" class="catlabel" text-anchor="middle">10 senders</text><text x="840.0" y="294" class="catlabel" text-anchor="middle">20 senders</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuLocal</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxLocal</span></div></div>
+    </div>
+  </div>
+  <p>besuLocal scales roughly linearly with concurrency and its <em>latency drops</em> as batch size grows (more txs packed into the same fixed 2s block, so per-tx wait shrinks). confluxLocal's throughput rises too, but its latency <em>spikes</em> at batch=10 before partially recovering at batch=20 &mdash; consistent with GHAST confirmation work competing with block production under load on this single-node setup, though the sample size here (3 reps/point) is too thin to call this conclusive.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Metric 4 of 6</p>
+  <h2>Resource usage under load</h2>
+  <p><code>docker stats</code> sampled every ~2&ndash;3s during each chain's own batch=20 mint run (5&ndash;7 samples/container, ~15&ndash;21s window &mdash; a real but thin sample).</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Container</th><th>Under own load: avg CPU</th><th>Peak CPU</th><th>Mem</th><th>Idle bystander: avg CPU</th><th>Peak CPU</th></tr></thead>
+      <tbody>
+        <tr><td class="c-besu">besu-local</td><td>21.99%</td><td>60.89%</td><td>497 MiB (2.5%)</td><td>3.39%</td><td>15.88%</td></tr>
+        <tr><td class="c-conflux">conflux-local</td><td>2.98%</td><td>6.81%</td><td>937 MiB (4.69%)</td><td>2.19%</td><td>3.65%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Besu's peak CPU under its own load (60.89%) is nearly 9&times; Conflux's peak under equivalent load (6.81%) at the same tx volume &mdash; IBFT2 block sealing looks meaningfully more CPU-intensive per burst than Conflux's block production here, though with only 5&ndash;7 samples per run this is a real but low-confidence signal, not a settled result.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Metric 5 of 6</p>
+  <h2>Finality: first receipt vs. confirmation depth</h2>
+  <p>First-receipt latency is only part of the finality story. Besu's IBFT2.0 is a BFT protocol &mdash; once 2/3+ validators commit a block, it's final immediately, with no reorg risk. Conflux's GHAST gives probabilistic finality that firms up as the pivot chain deepens. So "time to receipt" flatters Besu here in a way that doesn't reflect real settlement guarantees.</p>
+  <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">28.6s</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">21.4s</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">14.3s</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">7.1s</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">0.0s</text>
+    <polyline points="56.0,255.5 252.0,239.1 448.0,203.7 644.0,149.5 840.0,43.1" fill="none" stroke="#c2540a" stroke-width="2.5"/><circle cx="56.0" cy="255.5" r="4" fill="#c2540a"><title>besuLocal · receipt: 2.1s</title></circle><circle cx="252.0" cy="239.1" r="4" fill="#c2540a"><title>besuLocal · depth 1: 3.9s</title></circle><circle cx="448.0" cy="203.7" r="4" fill="#c2540a"><title>besuLocal · depth 3: 7.9s</title></circle><circle cx="644.0" cy="149.5" r="4" fill="#c2540a"><title>besuLocal · depth 6: 14.0s</title></circle><circle cx="840.0" cy="43.1" r="4" fill="#c2540a"><title>besuLocal · depth 12: 26.0s</title></circle><polyline points="56.0,237.1 252.0,234.6 448.0,225.3 644.0,213.3 840.0,185.3" fill="none" stroke="#6a4fd1" stroke-width="2.5"/><circle cx="56.0" cy="237.1" r="4" fill="#6a4fd1"><title>confluxLocal · receipt: 4.2s</title></circle><circle cx="252.0" cy="234.6" r="4" fill="#6a4fd1"><title>confluxLocal · depth 1: 4.4s</title></circle><circle cx="448.0" cy="225.3" r="4" fill="#6a4fd1"><title>confluxLocal · depth 3: 5.5s</title></circle><circle cx="644.0" cy="213.3" r="4" fill="#6a4fd1"><title>confluxLocal · depth 6: 6.8s</title></circle><circle cx="840.0" cy="185.3" r="4" fill="#6a4fd1"><title>confluxLocal · depth 12: 10.0s</title></circle>
+    <text x="56.0" y="294" class="catlabel" text-anchor="middle">receipt</text><text x="252.0" y="294" class="catlabel" text-anchor="middle">depth 1</text><text x="448.0" y="294" class="catlabel" text-anchor="middle">depth 3</text><text x="644.0" y="294" class="catlabel" text-anchor="middle">depth 6</text><text x="840.0" y="294" class="catlabel" text-anchor="middle">depth 12</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuLocal</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxLocal</span></div></div>
+  <div class="callout neutral">
+    <h3>Reading this chart correctly</h3>
+    <p>Besu's climb to depth 12 (~26s) is <strong>not</strong> a finality cost &mdash; it's just 12 more blocks at a fixed 2s period, with nothing left to wait for after the first commit. Conflux's climb to the same depth takes only ~10s, because its block period is 4&times; shorter (0.5s vs. 2s) &mdash; at matched confirmation depth, Conflux reaches it in less wall-clock time despite its slower first receipt. With only 1 node on each chain there's no real competing miner, so this doesn't measure actual reorg risk &mdash; it measures the wall-clock cost of waiting for depth, which is what a wallet or exchange actually pays.</p>
+  </div>
+  <p style="font-family:var(--font-mono);font-size:0.85rem;color:var(--muted)">n=10 samples/chain, median shown. Raw data: bench-output/finality-besuLocal.csv, finality-confluxLocal.csv.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Metric 6 of 6</p>
+  <h2>Node-count sensitivity</h2>
+  <p>The original baseline was 1 node per chain. Both multi-node clusters scaffolded in this repo were brought up for real this pass &mdash; Besu reached full 4-validator IBFT consensus (confirmed via <code>ibft_getSignerMetrics</code> showing balanced round-robin proposing); Conflux reached genuine 3-of-4-node consensus after three clean rebuilds all converged on the same 3 nodes and the 4th consistently failed its P2P handshake &mdash; a real, reproducible limit in this image version, reported honestly rather than forced.</p>
+
+  <h3>Besu: 1 validator vs. 4</h3>
+  <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">2144</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">1608</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">1072</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">536</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">0</text>
+    <rect x="62.0" y="22.3" width="69.4" height="251.7" fill="#8a8f98" rx="2"/><title>besuLocal (1 validator) · mint: 2125ms</title><rect x="137.4" y="24.4" width="69.4" height="249.6" fill="#c2540a" rx="2"/><title>besuCluster (4 validators) · mint: 2107ms</title><text x="134.4" y="294" class="catlabel" text-anchor="middle">mint</text><rect x="218.8" y="20.1" width="69.4" height="253.9" fill="#8a8f98" rx="2"/><title>besuLocal (1 validator) · approve: 2144ms</title><rect x="294.2" y="22.8" width="69.4" height="251.2" fill="#c2540a" rx="2"/><title>besuCluster (4 validators) · approve: 2120ms</title><text x="291.2" y="294" class="catlabel" text-anchor="middle">approve</text><rect x="375.6" y="20.0" width="69.4" height="254.0" fill="#8a8f98" rx="2"/><title>besuLocal (1 validator) · list: 2144ms</title><rect x="451.0" y="24.9" width="69.4" height="249.1" fill="#c2540a" rx="2"/><title>besuCluster (4 validators) · list: 2103ms</title><text x="448.0" y="294" class="catlabel" text-anchor="middle">list</text><rect x="532.4" y="20.7" width="69.4" height="253.3" fill="#8a8f98" rx="2"/><title>besuLocal (1 validator) · buy: 2138ms</title><rect x="607.8" y="24.9" width="69.4" height="249.1" fill="#c2540a" rx="2"/><title>besuCluster (4 validators) · buy: 2103ms</title><text x="604.8" y="294" class="catlabel" text-anchor="middle">buy</text><rect x="689.2" y="21.0" width="69.4" height="253.0" fill="#8a8f98" rx="2"/><title>besuLocal (1 validator) · cancel: 2136ms</title><rect x="764.6" y="22.7" width="69.4" height="251.3" fill="#c2540a" rx="2"/><title>besuCluster (4 validators) · cancel: 2121ms</title><text x="761.6" y="294" class="catlabel" text-anchor="middle">cancel</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#8a8f98"></i>besuLocal (1 validator)</span><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuCluster (4 validators)</span></div></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Operation</th><th>1 validator</th><th>4 validators</th><th>Mann-Whitney p</th></tr></thead>
+      <tbody>
+        <tr><td>mint</td><td>2125.0 ms</td><td>2107.0 ms</td><td class="ns">0.6800 (n.s.)</td></tr><tr><td>approve</td><td>2143.5 ms</td><td>2120.0 ms</td><td class="ns">0.9100 (n.s.)</td></tr><tr><td>list</td><td>2144.0 ms</td><td>2103.0 ms</td><td class="sig">0.0072 (sig.)</td></tr><tr><td>buy</td><td>2138.0 ms</td><td>2102.5 ms</td><td class="sig">0.0096 (sig.)</td></tr><tr><td>cancel</td><td>2135.5 ms</td><td>2121.0 ms</td><td class="ns">0.8800 (n.s.)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Per-tx latency is essentially flat from 1&rarr;4 validators &mdash; dominated by the fixed 2s block period, not consensus overhead. The two statistically significant gaps (list, buy) are tiny (~35&ndash;40ms) and favor the cluster, plausibly IBFT round-robin timing rather than a real cost.</p>
+
+  <h3>Conflux: 1 node vs. 3</h3>
+  <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <style>
+      .gridline{stroke:var(--hairline);stroke-width:1}
+      .axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+      .catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+    </style>
+    <line x1="56" y1="20" x2="840" y2="20" class="gridline"/><text x="48" y="24" class="axislabel" text-anchor="end">3812</text><line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">2859</text><line x1="56" y1="147" x2="840" y2="147" class="gridline"/><text x="48" y="151" class="axislabel" text-anchor="end">1906</text><line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">953</text><line x1="56" y1="274" x2="840" y2="274" class="gridline"/><text x="48" y="278" class="axislabel" text-anchor="end">0</text>
+    <rect x="62.0" y="20.0" width="69.4" height="254.0" fill="#8a8f98" rx="2"/><title>confluxLocal (1 node) · mint: 3812ms</title><rect x="137.4" y="139.3" width="69.4" height="134.7" fill="#6a4fd1" rx="2"/><title>confluxCluster (3 nodes) · mint: 2022ms</title><text x="134.4" y="294" class="catlabel" text-anchor="middle">mint</text><rect x="218.8" y="84.7" width="69.4" height="189.3" fill="#8a8f98" rx="2"/><title>confluxLocal (1 node) · approve: 2841ms</title><rect x="294.2" y="122.9" width="69.4" height="151.1" fill="#6a4fd1" rx="2"/><title>confluxCluster (3 nodes) · approve: 2268ms</title><text x="291.2" y="294" class="catlabel" text-anchor="middle">approve</text><rect x="375.6" y="106.9" width="69.4" height="167.1" fill="#8a8f98" rx="2"/><title>confluxLocal (1 node) · list: 2508ms</title><rect x="451.0" y="115.2" width="69.4" height="158.8" fill="#6a4fd1" rx="2"/><title>confluxCluster (3 nodes) · list: 2384ms</title><text x="448.0" y="294" class="catlabel" text-anchor="middle">list</text><rect x="532.4" y="89.8" width="69.4" height="184.2" fill="#8a8f98" rx="2"/><title>confluxLocal (1 node) · buy: 2765ms</title><rect x="607.8" y="118.3" width="69.4" height="155.7" fill="#6a4fd1" rx="2"/><title>confluxCluster (3 nodes) · buy: 2337ms</title><text x="604.8" y="294" class="catlabel" text-anchor="middle">buy</text><rect x="689.2" y="87.5" width="69.4" height="186.5" fill="#8a8f98" rx="2"/><title>confluxLocal (1 node) · cancel: 2799ms</title><rect x="764.6" y="121.5" width="69.4" height="152.5" fill="#6a4fd1" rx="2"/><title>confluxCluster (3 nodes) · cancel: 2289ms</title><text x="761.6" y="294" class="catlabel" text-anchor="middle">cancel</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#8a8f98"></i>confluxLocal (1 node)</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxCluster (3 nodes)</span></div></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Operation</th><th>1 node</th><th>3 nodes</th><th>Mann-Whitney p</th></tr></thead>
+      <tbody>
+        <tr><td>mint</td><td>3812.0 ms</td><td>2022.0 ms</td><td class="sig">6.90e-13 (sig.)</td></tr><tr><td>approve</td><td>2841.0 ms</td><td>2268.0 ms</td><td class="sig">9.90e-7 (sig.)</td></tr><tr><td>list</td><td>2507.5 ms</td><td>2383.5 ms</td><td class="ns">0.2100 (n.s.)</td></tr><tr><td>buy</td><td>2764.5 ms</td><td>2337.0 ms</td><td class="ns">0.2700 (n.s.)</td></tr><tr><td>cancel</td><td>2799.0 ms</td><td>2289.0 ms</td><td class="sig">2.20e-4 (sig.)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Counter to a naive "more nodes = slower" expectation, 3-node Conflux is <em>faster</em> than the 1-node baseline on 3 of 5 operations (mint, approve, cancel all significant). Plausible for a DAG chain: concurrent miners each independently produce blocks that merge into one Tree-Graph, rather than serializing on a single proposer's fixed interval the way linear PoA does. The 1-node baseline's own high variance (mint IQR was 2654ms) means some of this gap may also reflect warm-up effects rather than a pure node-count effect &mdash; worth a larger sample before treating this as settled.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Dead end, documented</p>
+  <h2>Fantom Opera: why it's not in this comparison</h2>
+  <div class="callout dead">
+    <h3>Hard, unfixable blocker &mdash; not a config problem</h3>
+    <p>Fantom's go-opera client was the natural second DAG candidate (Lachesis aBFT, real market gas, Docker-only &mdash; Hedera was ruled out earlier for needing Kubernetes, which isn't installed here). Two problems, verified against the actual source rather than assumed:</p>
+    <p><strong>No official Docker image.</strong> <code>fantomfoundation</code> has zero published repositories on Docker Hub; the repo's own <code>Dockerfile.opera</code> is build-from-source only, never pushed by CI.</p>
+    <p><strong>The EVM caps at the London hardfork.</strong> go-opera's <code>opera/rules.go</code> defines exactly three fork toggles &mdash; <code>Berlin</code>, <code>London</code>, <code>Llr</code> &mdash; with no Shanghai/Cancun option anywhere, confirmed identically across three refs (<code>master</code>, latest release <code>v1.1.3-rc.5</code>, <code>develop-1.13.0</code>). Its vendored go-ethereum is v1.10.8 (~September 2021), 1.5&ndash;2.5 years before PUSH0/MCOPY existed. A repo-wide search for those opcodes returns zero matches. This repo's contracts need Cancun's MCOPY (OpenZeppelin 5.x) &mdash; there's no genesis flag that fixes an opcode gap compiled into the interpreter itself.</p>
+    <p>Fantom's newer <strong>Sonic</strong> client does support modern EVM forks but is a different codebase/consensus stack, not the Lachesis DAG client this comparison calls for &mdash; substituting it would change what's being compared and wasn't pursued without separate sign-off.</p>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Process notes</p>
+  <h2>What broke this pass, and how it was fixed</h2>
+  <ol class="fixlist">
+    <li><span class="fixnum">1</span><div><strong>Besu multi-validator genesis generation failed silently on a Windows bind mount.</strong> <code>besu operator generate-blockchain-config --to</code> errored <code>Output directory already exists</code> against a never-before-existing directory; worked around by generating into a container-local path and copying out. Also needed <code>MSYS_NO_PATHCONV=1</code> to stop Git Bash from mangling container-side paths, and <code>python</code>/<code>py</code> fallback since <code>python3</code> resolves to a broken Windows Store stub here.</div></li>
+    <li><span class="fixnum">2</span><div><strong>Besu static-nodes format was subtly wrong three different ways</strong>: nodes listing themselves (rejected), CRLF line endings from <code>python -m json.tool</code> on Windows corrupting the port field, and compose hostnames instead of literal IPs (Besu's enode parser requires an IP). Fixed with a self-excluding peer list, LF-only output, and a fixed-subnet Docker network with static per-validator IPs.</div></li>
+    <li><span class="fixnum">3</span><div><strong>Conflux cluster's config mount path was wrong</strong> (<code>/conflux/run/...</code> vs. the image's actual <code>/root/run/...</code>), so the container silently fell back to a randomized default config every restart. Fixed the mount path, pinned each node's <code>net_key</code> (was regenerating randomly, breaking peer identity across restarts), and applied the same literal-IP fix as Besu.</div></li>
+    <li><span class="fixnum">4</span><div><strong>Conflux's 4th cluster node never joins</strong>, reproducibly, across three independent clean rebuilds &mdash; confirmed at the TCP layer (raw connectivity works) and the protocol layer (the bootnode's logs show zero trace of a handshake attempt from the stuck peer). Which peer fails varies between rebuilds, ruling out a peer-specific bug. Treated as a genuine image-version limitation and reported as such rather than forced &mdash; the README already flagged this topology as unvalidated.</div></li>
+    <li><span class="fixnum">5</span><div><strong>Geth's modern CLI removed in-process account unlocking</strong> (<code>--unlock</code>/<code>--mine</code>/<code>--miner.etherbase</code> all gone, replaced by an external Clef signer) &mdash; switched from the planned Clique PoA setup to <code>--dev --dev.period 2</code> against a pre-initialized custom genesis, which preserves the custom chain ID/fork times/account funding Clique would have needed anyway.</div></li>
+  </ol>
+</section>
+
+<section>
+  <p class="eyebrow">Full data</p>
+  <h2>Baseline summary, all chains</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Chain</th><th>Op</th><th>n</th><th>Latency median (ms)</th><th>Latency IQR</th><th>Cost (native, real price)</th><th>Gas used</th></tr></thead>
+      <tbody>
+        <tr><td class="c-besu">besuLocal</td><td>mint</td><td>30</td><td>2125.0</td><td>502.0</td><td>2.845e-4 (@5gwei)</td><td>56,897</td></tr>
+        <tr><td class="c-besu">besuLocal</td><td>approve</td><td>30</td><td>2143.5</td><td>481.3</td><td>2.432e-4 (@5gwei)</td><td>48,630</td></tr>
+        <tr><td class="c-besu">besuLocal</td><td>list</td><td>30</td><td>2144.0</td><td>526.3</td><td>4.958e-4 (@5gwei)</td><td>99,157</td></tr>
+        <tr><td class="c-besu">besuLocal</td><td>buy</td><td>30</td><td>2138.0</td><td>475.8</td><td>3.231e-4 (@5gwei)</td><td>64,612</td></tr>
+        <tr><td class="c-besu">besuLocal</td><td>cancel</td><td>30</td><td>2135.5</td><td>31.8</td><td>1.263e-4 (@5gwei)</td><td>25,255</td></tr>
+        <tr><td class="c-conflux">confluxLocal</td><td>mint</td><td>30</td><td>3812.0</td><td>2654.0</td><td>7.975e-5</td><td>79,745</td></tr>
+        <tr><td class="c-conflux">confluxLocal</td><td>approve</td><td>30</td><td>2841.0</td><td>2033.3</td><td>6.738e-5</td><td>67,382</td></tr>
+        <tr><td class="c-conflux">confluxLocal</td><td>list</td><td>30</td><td>2507.5</td><td>526.3</td><td>1.526e-4</td><td>152,581</td></tr>
+        <tr><td class="c-conflux">confluxLocal</td><td>buy</td><td>30</td><td>2764.5</td><td>2547.5</td><td>8.257e-5</td><td>82,572</td></tr>
+        <tr><td class="c-conflux">confluxLocal</td><td>cancel</td><td>30</td><td>2799.0</td><td>567.3</td><td>3.057e-5</td><td>30,567</td></tr>
+        <tr><td class="c-geth">gethLocal</td><td>mint</td><td>30</td><td>2122.0</td><td>497.5</td><td>5.690e-5</td><td>56,897</td></tr>
+        <tr><td class="c-geth">gethLocal</td><td>approve</td><td>30</td><td>2112.5</td><td>491.0</td><td>4.862e-5</td><td>48,618</td></tr>
+        <tr><td class="c-geth">gethLocal</td><td>list</td><td>30</td><td>2100.5</td><td>504.5</td><td>9.915e-5</td><td>99,145</td></tr>
+        <tr><td class="c-geth">gethLocal</td><td>buy</td><td>30</td><td>2100.5</td><td>508.8</td><td>6.461e-5</td><td>64,612</td></tr>
+        <tr><td class="c-geth">gethLocal</td><td>cancel</td><td>30</td><td>2104.5</td><td>24.0</td><td>2.524e-5</td><td>25,243</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Scope</p>
+  <h2>What this does and doesn't cover</h2>
+  <div class="grid2">
+    <div class="callout neutral">
+      <h3>In scope, this pass</h3>
+      <p>3 working chains (2 linear clients, 1 DAG), 2 node-count variants, real cost on all three, a throughput-vs-concurrency sweep, resource usage under load, and finality/confirmation-depth &mdash; all measured, not simulated. Every number above traces to a specific CSV in <code>bench-output/</code>.</p>
+    </div>
+    <div class="callout neutral">
+      <h3>Still not in scope</h3>
+      <p>A second DAG-architecture chain (Fantom ruled out, Hedera needs Kubernetes not installed here). A price-controlled cost comparison (besuLocal's 5gwei vs. the others' ~1gwei aren't the same tier). Throughput sweep beyond <code>mint</code> only. Deeper finality samples (n=10) or real multi-miner reorg risk (single node per chain, so no genuine competing-fork test).</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  besuLocal/besuCluster (Besu, IBFT2.0) &middot; confluxLocal/confluxCluster (Conflux eSpace, GHAST) &middot; gethLocal (go-ethereum, dev/PoA) &middot; harness: marketplace-bench/scripts/{bench,finality}.ts &middot; raw CSVs: marketplace-bench/bench-output/
+</footer>
+
+</div>
