@@ -1,0 +1,275 @@
+<title>DAG vs Linear, Native Execution</title>
+<style>
+:root{
+  --bg:#f4f5f7;
+  --surface:#ffffff;
+  --surface-2:#ebedf1;
+  --ink:#1b1f27;
+  --muted:#5b6472;
+  --hairline:#d8dce2;
+  --linear:#c2540a;
+  --linear-soft:#f4e3d3;
+  --conflux:#6a4fd1;
+  --conflux-soft:#e7e2fb;
+  --sui:#1a9e8f;
+  --sui-soft:#d7f0ec;
+  --hedera:#c23b6b;
+  --hedera-soft:#f7dce7;
+  --ok:#2f8f5b;
+  --dead:#b0433a;
+  --dead-soft:#f6dedb;
+  --font-display:'IBM Plex Sans',system-ui,sans-serif;
+  --font-body:'Source Serif 4',Georgia,serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171c; --surface:#1a1e25; --surface-2:#20252d; --ink:#e8e6e1; --muted:#98a0ab; --hairline:#2e343d;
+    --linear:#e8944a; --linear-soft:#3a2a1a; --conflux:#a692f5; --conflux-soft:#2a2440; --sui:#4fcbb8; --sui-soft:#123330; --hedera:#e880a8; --hedera-soft:#3a1f2a;
+    --ok:#5cc98d; --dead:#e08278; --dead-soft:#3a2220;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171c; --surface:#1a1e25; --surface-2:#20252d; --ink:#e8e6e1; --muted:#98a0ab; --hairline:#2e343d;
+  --linear:#e8944a; --linear-soft:#3a2a1a; --conflux:#a692f5; --conflux-soft:#2a2440; --sui:#4fcbb8; --sui-soft:#123330; --hedera:#e880a8; --hedera-soft:#3a1f2a;
+  --ok:#5cc98d; --dead:#e08278; --dead-soft:#3a2220;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.65}
+.wrap{max-width:1000px;margin:0 auto;padding:4rem 1.5rem 6rem}
+header.masthead{border-bottom:1px solid var(--hairline);padding-bottom:2.25rem;margin-bottom:3rem}
+.eyebrow{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin:0 0 0.9rem}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(2rem,4.5vw,2.9rem);line-height:1.08;letter-spacing:-0.01em;margin:0 0 0.9rem;text-wrap:balance}
+h2{font-family:var(--font-display);font-weight:700;font-size:1.5rem;letter-spacing:-0.01em;margin:0 0 0.9rem}
+h3{font-family:var(--font-display);font-weight:600;font-size:1.05rem;margin:0 0 0.4rem}
+p{margin:0 0 1rem}
+a{color:var(--ink)}
+.lede{font-size:1.15rem;color:var(--muted);max-width:62ch}
+section{margin-bottom:3.5rem}
+.chart-block{background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:1.5rem 1.5rem 0.5rem;margin:1.25rem 0}
+.chart-block svg{width:100%;height:auto;min-width:560px;display:block}
+.chart-legend{display:flex;flex-wrap:wrap;gap:1.1rem;padding:1rem 0;font-family:var(--font-mono);font-size:0.8rem;color:var(--muted)}
+.legend-item{display:inline-flex;align-items:center;gap:0.4rem}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:0.82rem;margin:1rem 0}
+th,td{text-align:left;padding:0.55rem 0.7rem;border-bottom:1px solid var(--hairline);white-space:nowrap}
+th{color:var(--muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em}
+.table-wrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:10px}
+.table-wrap table{margin:0}
+.chain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem;margin:1.25rem 0}
+.chain-card{background:var(--surface);border:1px solid var(--hairline);border-left:4px solid var(--ink);border-radius:8px;padding:1rem 1.1rem}
+.chain-card.linear{border-left-color:var(--linear)}
+.chain-card.conflux{border-left-color:var(--conflux)}
+.chain-card.sui{border-left-color:var(--sui)}
+.chain-card.hedera{border-left-color:var(--hedera)}
+.chain-card p{margin:0.15rem 0;font-size:0.9rem;color:var(--muted)}
+.badge{display:inline-block;font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;padding:0.15rem 0.5rem;border-radius:4px;margin-bottom:0.4rem}
+.badge.linear{background:var(--linear-soft);color:var(--linear)}
+.badge.conflux{background:var(--conflux-soft);color:var(--conflux)}
+.badge.sui{background:var(--sui-soft);color:var(--sui)}
+.badge.hedera{background:var(--hedera-soft);color:var(--hedera)}
+.callout{background:var(--surface-2);border-radius:10px;padding:1.1rem 1.3rem;font-size:0.92rem}
+.callout.win{border-left:4px solid var(--ok)}
+.callout.warn{border-left:4px solid var(--dead)}
+.finding{font-family:var(--font-mono);font-size:0.85rem;color:var(--muted);margin-top:0.75rem}
+code{font-family:var(--font-mono);font-size:0.9em;background:var(--surface-2);padding:0.1em 0.35em;border-radius:4px}
+.gridline{stroke:var(--hairline);stroke-width:1}
+.axislabel{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+.catlabel{font-family:var(--font-mono);font-size:12px;fill:var(--ink)}
+footer{border-top:1px solid var(--hairline);padding-top:1.5rem;margin-top:3rem;font-family:var(--font-mono);font-size:0.8rem;color:var(--muted)}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Local benchmark &middot; native-execution track &middot; sibling to <code>../marketplace-bench</code></p>
+  <h1>Take the EVM shim off the DAG chains, and the DAG advantage shows up</h1>
+  <p class="lede">The original comparison (<code>marketplace-bench/REPORT.html</code>) tested Conflux and Hedera through their EVM-compatibility layers &mdash; eSpace and the Smart Contract Service &mdash; and found no DAG advantage. That's not a DAG result; it's an EVM-shim result. This track re-runs the same marketplace lifecycle through each DAG chain's <strong>native</strong> execution environment instead: Conflux <strong>Core Space</strong> (Solidity on the Conflux VM, not the EVM), <strong>Sui</strong> (Move), and <strong>Hedera</strong> (native Token Service + atomic transfers, no smart-contract VM at all). Besu stays as the linear baseline, unmodified &mdash; Solidity/EVM already is native there.</p>
+</header>
+
+<section>
+  <p class="eyebrow">Lineup</p>
+  <h2>Four chains, four execution models</h2>
+  <div class="chain-grid">
+    <div class="chain-card linear">
+      <span class="badge linear">Linear</span>
+      <h3>besuLocal</h3>
+      <p>IBFT2.0, 1 validator, 2s block period</p>
+      <p>Solidity / EVM &mdash; native</p>
+    </div>
+    <div class="chain-card conflux">
+      <span class="badge conflux">DAG</span>
+      <h3>confluxCore</h3>
+      <p>Tree-Graph / GHAST, CoreSpace RPC</p>
+      <p>Solidity compiled for the Conflux VM (not EVM), <code>js-conflux-sdk</code></p>
+    </div>
+    <div class="chain-card sui">
+      <span class="badge sui">DAG</span>
+      <h3>sui</h3>
+      <p>Narwhal-Bullshark consensus DAG, object-DAG ownership</p>
+      <p>Move &mdash; native</p>
+    </div>
+    <div class="chain-card hedera">
+      <span class="badge hedera">DAG</span>
+      <h3>hedera</h3>
+      <p>Hashgraph, gossip-about-gossip</p>
+      <p>Native HTS + atomic <code>TransferTransaction</code> &mdash; no smart-contract VM</p>
+    </div>
+  </div>
+  <p>Same marketplace lifecycle everywhere &mdash; mint an item, approve/list it for sale, buy it, cancel a listing &mdash; mapped onto each chain's own primitives rather than forced through a common EVM interface. Sui has no allowance step (object ownership replaces it, so <code>approve</code> is n/a); Hedera has no on-ledger listing primitive (its <code>approve</code> step <em>is</em> the listing, via an NFT allowance). <code>BATCH_SIZE=5 REPEATS=6</code> everywhere, one warmup repeat excluded, n=25 non-warmup transactions per chain/operation cell. 540 real transactions total, 100% success across every cell.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Headline</p>
+  <h2>Latency: two of three native DAG chains blow past linear &mdash; one doesn't</h2>
+  <div class="chart-block"><svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" role="img">
+    <line x1="56" y1="20.0" x2="840" y2="20.0" class="gridline"/><text x="48" y="24.0" class="axislabel" text-anchor="end">2544</text>
+    <line x1="56" y1="83.5" x2="840" y2="83.5" class="gridline"/><text x="48" y="87.5" class="axislabel" text-anchor="end">1908</text>
+    <line x1="56" y1="147.0" x2="840" y2="147.0" class="gridline"/><text x="48" y="151.0" class="axislabel" text-anchor="end">1272</text>
+    <line x1="56" y1="210.5" x2="840" y2="210.5" class="gridline"/><text x="48" y="214.5" class="axislabel" text-anchor="end">636</text>
+    <line x1="56" y1="274.0" x2="840" y2="274.0" class="gridline"/><text x="48" y="278.0" class="axislabel" text-anchor="end">0</text>
+    <rect x="80.4" y="63.8" width="24" height="210.2" fill="#c2540a" rx="2"/><title>besuLocal (linear) - mint: 2105ms</title>
+    <rect x="108.4" y="20.6" width="24" height="253.4" fill="#6a4fd1" rx="2"/><title>confluxCore (DAG) - mint: 2538ms</title>
+    <rect x="136.4" y="255.9" width="24" height="18.1" fill="#1a9e8f" rx="2"/><title>sui (DAG) - mint: 181ms</title>
+    <rect x="164.4" y="245.9" width="24" height="28.1" fill="#c23b6b" rx="2"/><title>hedera (DAG) - mint: 281ms</title>
+    <text x="134.4" y="294" class="catlabel" text-anchor="middle">mint</text>
+    <rect x="237.2" y="64.9" width="24" height="209.1" fill="#c2540a" rx="2"/><title>besuLocal (linear) - approve: 2094ms</title>
+    <rect x="265.2" y="20.0" width="24" height="254.0" fill="#6a4fd1" rx="2"/><title>confluxCore (DAG) - approve: 2544ms</title>
+    <rect x="321.2" y="245.5" width="24" height="28.5" fill="#c23b6b" rx="2"/><title>hedera (DAG) - approve: 285ms</title>
+    <text x="291.2" y="294" class="catlabel" text-anchor="middle">approve</text>
+    <rect x="394.0" y="63.0" width="24" height="211.0" fill="#c2540a" rx="2"/><title>besuLocal (linear) - list: 2113ms</title>
+    <rect x="422.0" y="21.2" width="24" height="252.8" fill="#6a4fd1" rx="2"/><title>confluxCore (DAG) - list: 2532ms</title>
+    <rect x="450.0" y="257.7" width="24" height="16.3" fill="#1a9e8f" rx="2"/><title>sui (DAG) - list: 163ms</title>
+    <text x="448.0" y="294" class="catlabel" text-anchor="middle">list</text>
+    <rect x="550.8" y="64.2" width="24" height="209.8" fill="#c2540a" rx="2"/><title>besuLocal (linear) - buy: 2101ms</title>
+    <rect x="578.8" y="20.3" width="24" height="253.7" fill="#6a4fd1" rx="2"/><title>confluxCore (DAG) - buy: 2541ms</title>
+    <rect x="606.8" y="255.8" width="24" height="18.2" fill="#1a9e8f" rx="2"/><title>sui (DAG) - buy: 182ms</title>
+    <rect x="634.8" y="245.0" width="24" height="29.0" fill="#c23b6b" rx="2"/><title>hedera (DAG) - buy: 290ms</title>
+    <text x="604.8" y="294" class="catlabel" text-anchor="middle">buy</text>
+    <rect x="707.6" y="64.5" width="24" height="209.5" fill="#c2540a" rx="2"/><title>besuLocal (linear) - cancel: 2098ms</title>
+    <rect x="735.6" y="21.1" width="24" height="252.9" fill="#6a4fd1" rx="2"/><title>confluxCore (DAG) - cancel: 2533ms</title>
+    <rect x="763.6" y="258.2" width="24" height="15.8" fill="#1a9e8f" rx="2"/><title>sui (DAG) - cancel: 158ms</title>
+    <rect x="791.6" y="245.6" width="24" height="28.4" fill="#c23b6b" rx="2"/><title>hedera (DAG) - cancel: 284ms</title>
+    <text x="761.6" y="294" class="catlabel" text-anchor="middle">cancel</text>
+  </svg><div class="chart-legend"><span class="legend-item"><i class="dot" style="background:#c2540a"></i>besuLocal (linear)</span><span class="legend-item"><i class="dot" style="background:#6a4fd1"></i>confluxCore (DAG)</span><span class="legend-item"><i class="dot" style="background:#1a9e8f"></i>sui (DAG)</span><span class="legend-item"><i class="dot" style="background:#c23b6b"></i>hedera (DAG)</span></div></div>
+  <p style="font-family:var(--font-mono);font-size:0.85rem;color:var(--muted)">Median time from submit to receipt/finality, n=25 per bar. Every pairwise comparison is significant at p&lt;0.0001 (Mann-Whitney U, full table in <code>analysis/output/mannwhitney_latency.csv</code>) &mdash; the gaps here aren't noise.</p>
+
+  <div class="callout win">
+    <strong>Sui and Hedera are 7&ndash;13x faster than linear Besu.</strong> Median latency lands at 158&ndash;182ms on Sui and 281&ndash;290ms on Hedera, against 2094&ndash;2113ms on besuLocal. Besu's floor is structural: IBFT2.0 with a fixed 2s block period means every transaction waits for the next block regardless of load. Sui's parallel object-DAG execution and Hedera's asynchronous Byzantine fault-tolerant gossip protocol both reach finality without that fixed-period wait &mdash; this is the DAG architecture doing exactly what the theory predicts, once nothing EVM-shaped stands between the transaction and the chain's own execution engine.
+  </div>
+
+  <div class="callout warn" style="margin-top:1rem">
+    <strong>Conflux Core Space is the slowest chain in this comparison</strong> &mdash; slower than linear Besu on every operation (2532&ndash;2544ms vs. 2094&ndash;2113ms), and nearly identical to its own eSpace numbers from the original EVM-shim comparison. That's the important negative result: removing the EVM layer did <em>not</em> fix Conflux's latency, which means the EVM shim was never the bottleneck for this specific chain. Conflux's Tree-Graph/GHAST consensus is probabilistic-finality, not instant-finality like Sui's or ABFT-style like Hedera's &mdash; on a single local node with this devnet's confirmation-depth requirements, waiting for enough Tree-Graph confirmations to call a transaction final costs about as long as Besu's fixed block period, EVM or no EVM. The user's original hypothesis (EVM shim hides the DAG advantage) is confirmed for two of three chains and specifically <strong>not</strong> confirmed for Conflux &mdash; a real, chain-specific finding, not a rounding error.
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Cost</p>
+  <h2>Real, non-zero fees on every chain &mdash; but not directly comparable across currencies</h2>
+  <p>Each chain's local devnet was verified to charge a genuine, non-zero fee (the original comparison's headline caveat &mdash; besuLocal's <code>--min-gas-price=0</code> genesis silently zeroing cost data &mdash; is the exact failure mode every leg here was built to avoid; see each chain's README for how it was verified). Costs are reported in each chain's own native unit; converting to a common currency would need live market rates for CFX/SUI/HBAR/ETH that a local devnet has no meaningful equivalent of, so this deliberately doesn't force a single "cheapest chain" number.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Chain</th><th>Operation</th><th>Median fee</th><th>Currency</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>besuLocal</td><td>mint</td><td>0.001138</td><td>ETH</td><td>priced at a forced 20 gwei tier &mdash; genesis default is 0</td></tr>
+        <tr><td>besuLocal</td><td>approve</td><td>0.000972</td><td>ETH</td><td></td></tr>
+        <tr><td>besuLocal</td><td>list</td><td>0.001983</td><td>ETH</td><td></td></tr>
+        <tr><td>besuLocal</td><td>buy</td><td>0.001292</td><td>ETH</td><td></td></tr>
+        <tr><td>besuLocal</td><td>cancel</td><td>0.000505</td><td>ETH</td><td></td></tr>
+        <tr><td>confluxCore</td><td>mint</td><td>0.000047</td><td>CFX</td><td>real market gas price (~1 Gdrip), no forcing needed</td></tr>
+        <tr><td>confluxCore</td><td>approve</td><td>0.000033</td><td>CFX</td><td></td></tr>
+        <tr><td>confluxCore</td><td>list</td><td>0.000051</td><td>CFX</td><td></td></tr>
+        <tr><td>confluxCore</td><td>buy</td><td>0.000091</td><td>CFX</td><td></td></tr>
+        <tr><td>confluxCore</td><td>cancel</td><td>0.000031</td><td>CFX</td><td>occasionally near-zero: storage-collateral refund on delete</td></tr>
+        <tr><td>sui</td><td>mint</td><td>0.002453</td><td>SUI</td><td>real gas price (1000 MIST/unit)</td></tr>
+        <tr><td>sui</td><td>list</td><td>0.001526</td><td>SUI</td><td></td></tr>
+        <tr><td>sui</td><td>buy</td><td>0.000537</td><td>SUI</td><td></td></tr>
+        <tr><td>sui</td><td>cancel</td><td>0.000528</td><td>SUI</td><td>can go negative &mdash; Sui refunds storage rebates on object deletion, a real economic property, not a bug (see sui-move/README.md)</td></tr>
+        <tr><td>hedera</td><td>mint</td><td>0.171681</td><td>HBAR</td><td>flat USD-pegged fee, not gas-metered</td></tr>
+        <tr><td>hedera</td><td>approve</td><td>0.682440</td><td>HBAR</td><td>NFT allowance grant &mdash; this is also Hedera's "list" step</td></tr>
+        <tr><td>hedera</td><td>buy</td><td>0.011566</td><td>HBAR</td><td>atomic multi-asset TransferTransaction &mdash; no smart contract involved</td></tr>
+        <tr><td>hedera</td><td>cancel</td><td>0.683580</td><td>HBAR</td><td>allowance revocation</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="finding">First run on both Sui and Hedera actually produced misleading zero-ish costs before being fixed: Sui's naive script clamped a legitimate negative rebate to zero (fixed, reran); Hedera's first pass paid every transaction from the fee-exempt system operator account 0.0.2, which by protocol design pays nothing at all &mdash; a direct hit of DESIGN.md's "don't let this come out to zero by accident" warning, fixed by routing through a non-exempt payer account and rerunning clean.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Native vs. shim, chain by chain</p>
+  <h2>What changed by removing the EVM layer</h2>
+  <div class="chain-grid">
+    <div class="chain-card conflux">
+      <span class="badge conflux">confluxCore</span>
+      <p><strong>Contracts unchanged, execution environment changed.</strong> The Solidity byte-for-byte identical to <code>marketplace-bench/contracts/</code> compiled and ran on the Conflux VM with zero source edits &mdash; Core Space has been EVM-opcode-compatible since the Hydra upgrade. The delta is CoreSpace's own account model, storage-collateral economics, and <code>js-conflux-sdk</code> instead of <code>ethers</code>/eSpace. Latency didn't move (see above) &mdash; the EVM-vs-native distinction turned out not to be where Conflux's bottleneck lives.</p>
+    </div>
+    <div class="chain-card sui">
+      <span class="badge sui">sui</span>
+      <p><strong>Full rewrite in Move.</strong> Object-ownership model replaces Solidity's account/mapping model entirely &mdash; items are owned Move objects, listings are shared objects wrapping them, <code>buy</code> is an atomic coin-for-object swap with no allowance step ever needed. This is the purest native-DAG leg in the comparison, and it shows the largest latency win.</p>
+    </div>
+    <div class="chain-card hedera">
+      <span class="badge hedera">hedera</span>
+      <p><strong>No smart-contract VM used at all.</strong> HTS handles the NFT lifecycle and a single atomic <code>TransferTransaction</code> handles buy &mdash; both-legs-at-once (NFT out, HBAR in) with no contract code, no gas metering, and no allowance-then-separate-transfer round trip. This atomic multi-asset transfer is a genuinely native DAG capability that none of the other three chains in this comparison can express without a contract call.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Process notes</p>
+  <h2>What broke this pass, and how it was fixed</h2>
+  <p>Real infrastructure, real bugs &mdash; documented rather than smoothed over:</p>
+  <ul>
+    <li><strong>besuLocal got wiped mid-run.</strong> A scoped-teardown mistake (<code>docker compose down -v</code> against the whole shared compose file instead of just <code>conflux-local</code>) removed besuLocal's container and volume while its own seed run was in flight. Recreated from the unmodified <code>marketplace-bench/docker/local/</code> config and rerun clean; the mistake is documented in <code>conflux-core/README.md</code> so it isn't repeated.</li>
+    <li><strong>confluxCore <code>buy</code> reverted 7/30 on the first pass</strong> with <code>ExceedStorageLimit</code> &mdash; <code>js-conflux-sdk</code> passes <code>cfx_estimateGasAndCollateral</code>'s estimate straight through as a hard cap with no safety margin. Fixed with a padded-limit helper (1.3x gas, 2x storage); rerun was 150/150 clean.</li>
+    <li><strong>hedera-local-node's consensus container failed to start</strong> (<code>Checking for application.properties presence ..... ERROR</code>) &mdash; a stale bind-mount view under Docker Desktop for Windows. Fixed with a scoped <code>--force-recreate --no-deps network-node</code>, and two real hedera-local-node CLI bugs (a <code>--composedir</code> path-resolution bug, and a hardcoded port-8545 preflight check colliding with besuLocal) were patched around rather than worked past.</li>
+    <li><strong>hedera <code>buy</code> failed on the first pass</strong> with <code>SPENDER_DOES_NOT_HAVE_ALLOWANCE</code> &mdash; an approved-NFT-allowance transfer requires the spender to be the transaction's <em>payer</em>, not just a co-signer. Fixed by making the marketplace account the payer.</li>
+  </ul>
+</section>
+
+<section>
+  <p class="eyebrow">Full data</p>
+  <h2>Summary table, all four chains</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Chain</th><th>Arch</th><th>Op</th><th>n</th><th>Latency median (ms)</th><th>Latency IQR</th><th>Cost median</th><th>Currency</th></tr></thead>
+      <tbody>
+        <tr><td>besuLocal</td><td>linear</td><td>approve</td><td>25</td><td>2094</td><td>525</td><td>0.00097236</td><td>ETH</td></tr>
+        <tr><td>besuLocal</td><td>linear</td><td>buy</td><td>25</td><td>2101</td><td>23</td><td>0.00129224</td><td>ETH</td></tr>
+        <tr><td>besuLocal</td><td>linear</td><td>cancel</td><td>25</td><td>2098</td><td>21</td><td>0.00050486</td><td>ETH</td></tr>
+        <tr><td>besuLocal</td><td>linear</td><td>list</td><td>25</td><td>2113</td><td>11</td><td>0.00198290</td><td>ETH</td></tr>
+        <tr><td>besuLocal</td><td>linear</td><td>mint</td><td>25</td><td>2105</td><td>22</td><td>0.00113794</td><td>ETH</td></tr>
+        <tr><td>confluxCore</td><td>dag</td><td>approve</td><td>25</td><td>2544</td><td>12</td><td>0.00003311</td><td>CFX</td></tr>
+        <tr><td>confluxCore</td><td>dag</td><td>buy</td><td>25</td><td>2541</td><td>3</td><td>0.00009099</td><td>CFX</td></tr>
+        <tr><td>confluxCore</td><td>dag</td><td>cancel</td><td>25</td><td>2533</td><td>12</td><td>0.00003121</td><td>CFX</td></tr>
+        <tr><td>confluxCore</td><td>dag</td><td>list</td><td>25</td><td>2532</td><td>16</td><td>0.00005061</td><td>CFX</td></tr>
+        <tr><td>confluxCore</td><td>dag</td><td>mint</td><td>25</td><td>2538</td><td>3</td><td>0.00004721</td><td>CFX</td></tr>
+        <tr><td>hedera</td><td>dag</td><td>approve</td><td>25</td><td>285</td><td>5</td><td>0.68243991</td><td>HBAR</td></tr>
+        <tr><td>hedera</td><td>dag</td><td>buy</td><td>25</td><td>290</td><td>13</td><td>0.01156637</td><td>HBAR</td></tr>
+        <tr><td>hedera</td><td>dag</td><td>cancel</td><td>25</td><td>284</td><td>9</td><td>0.68357967</td><td>HBAR</td></tr>
+        <tr><td>hedera</td><td>dag</td><td>mint</td><td>25</td><td>281</td><td>4</td><td>0.17168083</td><td>HBAR</td></tr>
+        <tr><td>sui</td><td>dag</td><td>buy</td><td>25</td><td>182</td><td>15</td><td>0.00053746</td><td>SUI</td></tr>
+        <tr><td>sui</td><td>dag</td><td>cancel</td><td>25</td><td>158</td><td>7</td><td>0.00052758</td><td>SUI</td></tr>
+        <tr><td>sui</td><td>dag</td><td>list</td><td>25</td><td>163</td><td>24</td><td>0.00152577</td><td>SUI</td></tr>
+        <tr><td>sui</td><td>dag</td><td>mint</td><td>25</td><td>181</td><td>19</td><td>0.00245266</td><td>SUI</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="finding">All 540 transactions (150 besuLocal, 150 confluxCore, 120 sui, 120 hedera) succeeded &mdash; 0% failure rate everywhere. Full CI bounds, per-operation CSVs, and Mann-Whitney significance tests: <code>analysis/output/</code>.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Scope</p>
+  <h2>What this does and doesn't cover</h2>
+  <ul>
+    <li><strong>1-node/1-validator baseline only</strong> on every chain, same as the original comparison &mdash; no node-count sensitivity data for the native track.</li>
+    <li><strong>No cross-currency cost normalization.</strong> CFX/SUI/HBAR/ETH costs are each real and each in their own unit; there's no live market rate meaningful to a local devnet, so no single "cheapest chain" claim is made here.</li>
+    <li><strong>Operation coverage differs by chain</strong>, deliberately &mdash; forcing a fifth op onto Sui or Hedera where no faithful native equivalent exists would have manufactured data instead of measuring it. See DESIGN.md and each chain's README for the exact mapping and rationale.</li>
+    <li><strong><code>marketplace-bench/</code> (the original EVM-shim comparison) is untouched.</strong> This is an additive, sibling comparison, not a replacement &mdash; the two reports answer different questions ("EVM-compatible DAG vs. linear" vs. "native DAG vs. linear") and both are valid to keep.</li>
+  </ul>
+</section>
+
+<footer>
+  marketplace-bench-native &middot; see <a href="docs/DESIGN.md">docs/DESIGN.md</a> for the full contract, and <code>conflux-core/</code>, <code>sui-move/</code>, <code>hedera-native/</code> for each chain's README/RUNBOOK and exact rerun commands. Analysis pipeline: <code>analysis/analyze.py</code>.
+</footer>
+
+</div>

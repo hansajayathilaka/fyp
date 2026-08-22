@@ -1,0 +1,5 @@
+node_modules
+dist
+deployment-addresses.json
+seed-fixtures*.json
+docker/hedera-start*.log

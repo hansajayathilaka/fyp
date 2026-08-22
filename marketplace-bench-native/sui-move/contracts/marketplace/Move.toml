@@ -1,0 +1,11 @@
+[package]
+name = "marketplace"
+edition = "2024"
+
+[dependencies]
+# Sui framework (0x2) and Move stdlib are resolved implicitly by the toolchain shipped in
+# mysten/sui-tools:testnet — no explicit git dependency needed, mirroring `sui move new`'s
+# own generated template for this CLI version.
+
+[addresses]
+marketplace = "0x0"

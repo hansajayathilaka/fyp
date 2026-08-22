@@ -1,0 +1,6 @@
+# bench-output/*.csv IS committed here, deliberately, unlike ../marketplace-bench's
+# convention — it's the small (~100KB), primary evidence dataset REPORT.html's numbers
+# are drawn from, not build output.
+analysis/output/
+analysis/.venv*
+analysis/__pycache__/

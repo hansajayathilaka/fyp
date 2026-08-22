@@ -1,0 +1,33 @@
+{
+  "name": "sui-move-bench",
+  "version": "1.0.0",
+  "description": "Native Sui (Move) leg of the DAG-vs-linear blockchain benchmark comparison — marketplace-bench-native/sui-move",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "up": "docker compose -f docker/docker-compose.yml up -d",
+    "down": "docker compose -f docker/docker-compose.yml down",
+    "down:clean": "docker compose -f docker/docker-compose.yml down -v",
+    "accounts": "tsx scripts/accounts.ts",
+    "deploy": "tsx scripts/deploy.ts",
+    "seed": "tsx scripts/seed.ts",
+    "bench": "tsx scripts/bench.ts"
+  },
+  "keywords": [
+    "blockchain",
+    "dag",
+    "sui",
+    "move",
+    "benchmark"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "tsx": "^4.23.12",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@mysten/sui": "^2.26.0"
+  }
+}
