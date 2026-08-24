@@ -1,12 +1,25 @@
-# Local DAG-vs-linear comparison: one Besu IBFT2.0 node (linear) + one Conflux dev node
-# (DAG), both fully self-contained — no external services, no secrets. Every config file
-# and key in this directory is a hardcoded, throwaway, local-only dev credential; see
-# ../../RUNBOOK.md for the full walkthrough.
+# Local DAG-vs-linear comparison: two linear-chain nodes on different client
+# implementations (Besu/Java/IBFT2.0, Geth/Go single-sealer PoA dev-mode) + one Conflux
+# dev node (DAG), all fully self-contained — no external services, no secrets. Every
+# config file and key in this directory is a hardcoded, throwaway, local-only dev
+# credential; see ../../RUNBOOK.md for the full walkthrough.
+#
+# Geth note: real multi-signer Clique needs an external signer (Clef) in current Geth
+# releases — the `--unlock`/`--mine`/`--miner.etherbase` CLI flags used for in-process
+# Clique signing in older Geth versions were removed (verified empirically against
+# ethereum/client-go:stable, v1.17.5: `flag provided but not defined` for all three).
+# geth-local instead uses `--dev --dev.period 2` against a *pre-initialized* datadir
+# (genesis.json is applied via `geth init` before `--dev` ever runs), which keeps our
+# custom chainId/alloc/fork-time genesis intact — `--dev` only auto-generates its own
+# genesis when the datadir is empty. This gives a real single-node self-mining PoA chain
+# (fixed 2s block period, not tx-triggered) with the same account funding and EVM fork
+# activation as besuLocal, just without Clique's multi-signer voting mechanics.
 #
 # Ports (host):
 #   Besu     eSpace RPC  -> http://localhost:8545
 #   Conflux  eSpace RPC  -> http://localhost:8546
 #   Conflux  CoreSpace RPC (bootstrap use only) -> http://localhost:12537
+#   Geth     RPC         -> http://localhost:8549
 services:
   besu-local:
     image: hyperledger/besu:latest
@@ -39,6 +52,33 @@ services:
       - ./conflux/genesis_secrets.txt:/conflux/genesis_secrets.txt:ro
       - conflux-local-data:/root/run/blockchain_data
 
+  geth-local:
+    image: ethereum/client-go:stable
+    ports:
+      - "8549:8545"
+    volumes:
+      - ./geth/genesis.json:/config/genesis.json:ro
+      - geth-local-data:/data
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - >
+        if [ ! -d /data/geth/chaindata ]; then
+          geth --datadir /data init /config/genesis.json;
+        fi;
+        exec geth
+        --datadir /data
+        --networkid 4005
+        --http --http.addr 0.0.0.0 --http.port 8545
+        --http.api eth,net,web3,txpool,miner
+        --http.corsdomain "*" --http.vhosts "*"
+        --syncmode full
+        --nodiscover
+        --dev
+        --dev.period 2
+        --miner.gasprice 1000000000
+
 volumes:
   besu-local-data:
   conflux-local-data:
+  geth-local-data:

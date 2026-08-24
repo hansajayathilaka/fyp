@@ -8,6 +8,13 @@
 # Node count matches the Besu cluster: 4 here (bootnode + 3 peers), or drop peer-2 for
 # the 3-node condition — count the bootnode as one of the N nodes for parity with
 # ../besu/docker-compose.yml's N validators.
+#
+# Static IPs (not compose service hostnames): conflux-rust's `public_address` /
+# `bootnodes` fields need a literal, dialable IP — the image's own shipped default
+# conflux.toml documents `public_address` as an IP address, and (mirroring the same
+# constraint Besu's static-nodes.json turned out to have) a DNS hostname is not a safe
+# substitute here either. A fixed-subnet network with static per-service addresses lets
+# conf/*.toml bake in real IPs.
 x-conflux-resources: &conflux-resources
   deploy:
     resources:
@@ -19,39 +26,64 @@ x-conflux-common: &conflux-common
   image: confluxchain/conflux-rust:latest
   <<: *conflux-resources
 
+networks:
+  conflux-net:
+    ipam:
+      config:
+        - subnet: 172.29.0.0/24
+
 services:
   bootnode:
     <<: *conflux-common
+    networks:
+      conflux-net:
+        ipv4_address: 172.29.0.10
     ports:
-      - "8545:8545" # eSpace JSON-RPC — point hardhat.config.ts's dagChain network here
+      - "8548:8545" # eSpace JSON-RPC — point hardhat.config.ts's confluxCluster network here
+      - "12547:12537" # CoreSpace JSON-RPC (bootstrap/funding use only, see fund-conflux-espace.ts)
     volumes:
-      - ./conf/bootnode.toml:/conflux/run/conflux.toml:ro
-      - ./data/bootnode:/conflux/run/blockchain_data
-    command: ["--config", "/conflux/run/conflux.toml"]
+      - ./conf/bootnode.toml:/root/run/conflux.toml
+      - ../local/conflux/genesis_secrets.txt:/conflux/genesis_secrets.txt:ro
+      - ./data/bootnode:/root/run/blockchain_data
 
   peer-0:
     <<: *conflux-common
+    networks:
+      conflux-net:
+        ipv4_address: 172.29.0.11
+    ports:
+      - "12548:12537" # CoreSpace JSON-RPC — diagnostic only, to confirm cross-node consensus convergence
     volumes:
-      - ./conf/peer0.toml:/conflux/run/conflux.toml:ro
-      - ./data/peer0:/conflux/run/blockchain_data
-    command: ["--config", "/conflux/run/conflux.toml"]
+      - ./conf/peer0.toml:/root/run/conflux.toml
+      - ../local/conflux/genesis_secrets.txt:/conflux/genesis_secrets.txt:ro
+      - ./data/peer0:/root/run/blockchain_data
     depends_on:
       - bootnode
 
   peer-1:
     <<: *conflux-common
+    networks:
+      conflux-net:
+        ipv4_address: 172.29.0.12
+    ports:
+      - "12549:12537" # CoreSpace JSON-RPC — diagnostic only, to confirm cross-node consensus convergence
     volumes:
-      - ./conf/peer1.toml:/conflux/run/conflux.toml:ro
-      - ./data/peer1:/conflux/run/blockchain_data
-    command: ["--config", "/conflux/run/conflux.toml"]
+      - ./conf/peer1.toml:/root/run/conflux.toml
+      - ../local/conflux/genesis_secrets.txt:/conflux/genesis_secrets.txt:ro
+      - ./data/peer1:/root/run/blockchain_data
     depends_on:
       - bootnode
 
   peer-2:
     <<: *conflux-common
+    networks:
+      conflux-net:
+        ipv4_address: 172.29.0.13
+    ports:
+      - "12550:12537" # CoreSpace JSON-RPC — diagnostic only, to confirm cross-node consensus convergence
     volumes:
-      - ./conf/peer2.toml:/conflux/run/conflux.toml:ro
-      - ./data/peer2:/conflux/run/blockchain_data
-    command: ["--config", "/conflux/run/conflux.toml"]
+      - ./conf/peer2.toml:/root/run/conflux.toml
+      - ../local/conflux/genesis_secrets.txt:/conflux/genesis_secrets.txt:ro
+      - ./data/peer2:/root/run/blockchain_data
     depends_on:
       - bootnode

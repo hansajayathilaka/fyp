@@ -1,0 +1,49 @@
+# conflux-rust config for the bootnode of a 4-node local devnet (bootnode + 3 peers).
+# Adapted from ../devnode.toml.template and the known-working single-node
+# ../../local/conflux/conflux.toml (chain_id, evm_chain_id, and every hardfork transition
+# height below are copied verbatim from that file — they MUST match across every node in
+# this cluster, since a mismatch produces a different genesis block per node and the
+# cluster can never sync).
+node_type = "archive"
+mode = "dev"
+dev_block_interval_ms = 500
+mining_author = "0xf39fd6e51aad88f6f4ce6ab8827279cffFb92266"
+jsonrpc_http_port = 12537
+jsonrpc_ws_port = 12535
+jsonrpc_http_eth_port = 8545
+public_rpc_apis = "all"
+public_evm_rpc_apis = "evm,ethdebug"
+chain_id = 1024
+evm_chain_id = 1025
+genesis_secrets = "/conflux/genesis_secrets.txt"
+tanzanite_transition_height = 4
+hydra_transition_number = 5
+hydra_transition_height = 5
+cip43_init_end_number = 5
+pos_reference_enable_height = 5
+dao_vote_transition_number = 6
+dao_vote_transition_height = 6
+sigma_fix_transition_number = 6
+cip107_transition_number = 7
+cip112_transition_height = 7
+cip118_transition_number = 7
+cip119_transition_number = 7
+base_fee_burn_transition_number = 10
+base_fee_burn_transition_height = 10
+# Enables PUSH0 (Shanghai) and MCOPY (Cancun) opcodes, which OpenZeppelin 5.x contracts
+# compiled with evmVersion "cancun" (hardhat.config.ts) emit unconditionally.
+cancun_opcodes_transition_number = 10
+c2_fix_transition_height = 11
+eoa_code_transition_height = 12
+
+# --- per-node network identity ---
+# Fixed IP from docker-compose.yml's conflux-net (172.29.0.0/24) — required because
+# conflux-rust's bootnodes/public_address fields need a literal, dialable IP; a compose
+# service hostname is not guaranteed to resolve the same way peer discovery expects (the
+# node's own default conflux.toml explicitly documents public_address as an IP).
+public_address = "172.29.0.10"
+net_key = "1111111111111111111111111111111111111111111111111111111111111111"
+# The bootnode has no bootnodes of its own — it's the first node peers dial into.
+
+enable_discovery = true
+log_level = "info"

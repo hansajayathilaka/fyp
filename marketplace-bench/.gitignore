@@ -14,3 +14,14 @@ analysis/output/
 analysis/.venv*
 analysis/__pycache__/
 
+# generated cluster runtime state (regenerate via generate-genesis.sh /
+# generate-static-nodes.sh; config/keys under these dirs are kept, chain
+# data is not)
+docker/besu/networkFiles/*/database
+docker/besu/networkFiles/*/caches
+docker/besu/networkFiles/*/besu.networks
+docker/besu/networkFiles/*/besu.ports
+docker/besu/networkFiles/*/DATABASE_METADATA.json
+docker/besu/networkFiles/*/VERSION_METADATA.json
+docker/conflux/data/
+

@@ -8,8 +8,15 @@
 // test mnemonic accounts) — safe to commit, never used on a real network.
 import { Conflux, Drip } from "js-conflux-sdk";
 
-const CORESPACE_RPC_URL = "http://127.0.0.1:12537";
-const CORESPACE_CHAIN_ID = 1024;
+// Overridable via env so this same script can fund a fresh chain other than
+// confluxLocal — e.g. the confluxCluster bootnode (docker/conflux/), whose CoreSpace RPC
+// is published on host port 12547, not 12537, to avoid colliding with confluxLocal's own
+// mapping. CORESPACE_CHAIN_ID defaults to 1024 since docker/conflux/conf/bootnode.toml
+// deliberately reuses confluxLocal's chain_id.
+const CORESPACE_RPC_URL = process.env.CORESPACE_RPC_URL ?? "http://127.0.0.1:12537";
+const CORESPACE_CHAIN_ID = process.env.CORESPACE_CHAIN_ID
+  ? Number(process.env.CORESPACE_CHAIN_ID)
+  : 1024;
 
 // The CoreSpace account genesis_secrets.txt funds (docker/local/conflux/genesis_secrets.txt).
 const FUNDER_PRIVATE_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";

@@ -72,6 +72,30 @@ const config: HardhatUserConfig = {
       chainId: 1025,
       accounts: DEV_ACCOUNTS,
     },
+    // Second linear-chain data point, different client than besuLocal (Geth/Go,
+    // single-sealer PoA dev-mode vs Besu/Java, IBFT2.0) — see docker/local/docker-compose.yml.
+    gethLocal: {
+      url: "http://127.0.0.1:8549",
+      chainId: 4005,
+      accounts: DEV_ACCOUNTS,
+    },
+    // Node-count-sensitivity variable (RUNBOOK.md "Beyond this baseline", plan §5/§10
+    // phase 5): 4-validator Besu IBFT2.0 cluster, docker/besu/. Same chainId as besuLocal
+    // (generate-genesis.sh hardcodes 4004) — a different network/port, so no collision.
+    besuCluster: {
+      url: "http://127.0.0.1:8547",
+      chainId: 4004,
+      accounts: DEV_ACCOUNTS,
+    },
+    // Node-count-sensitivity variable, DAG side: conflux-rust bootnode + peers,
+    // docker/conflux/. Same chain_id/evm_chain_id as confluxLocal (1024/1025) — see
+    // docker/conflux/conf/bootnode.toml. RPC talks to the bootnode; see RUNBOOK.md /
+    // docker/conflux/README.md for the peer topology and its node-count caveat.
+    confluxCluster: {
+      url: "http://127.0.0.1:8548",
+      chainId: 1025,
+      accounts: DEV_ACCOUNTS,
+    },
     // Track A: public linear-chain testnet. Requires PRIVATE_KEY + SEPOLIA_RPC_URL in .env.
     ...(PRIVATE_KEY && SEPOLIA_RPC_URL
       ? {

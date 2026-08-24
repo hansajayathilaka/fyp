@@ -9,12 +9,35 @@ NODE_COUNT="${1:-4}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT_DIR="${SCRIPT_DIR}/networkFiles"
 
+# Git-for-Windows' MSYS runtime auto-rewrites any argument that looks like a leading-slash
+# absolute path (e.g. "/config/ibftConfigFile.json") into a Windows path before exec'ing
+# docker.exe, which mangles the *container-side* half of `-v host:/config` and any
+# --config-file=/config/... flag. Disable that globally for this script and, when running
+# under that MSYS runtime, resolve the host side of bind mounts to a real Windows path
+# (`pwd -W`) ourselves instead — this combination is what actually mounts correctly.
+export MSYS_NO_PATHCONV=1
+DOCKER_SCRIPT_DIR="$(cd "${SCRIPT_DIR}" && pwd -W 2>/dev/null || echo "${SCRIPT_DIR}")"
+
+# Prefer python3, but fall back to python/py — on some environments (e.g. Windows with
+# only the python.org installer, no Microsoft Store python3 alias) `python3` resolves to
+# a non-functional App Execution Alias stub rather than a real interpreter.
+PYTHON_BIN="python3"
+if ! command -v python3 >/dev/null 2>&1 || ! python3 --version >/dev/null 2>&1; then
+  if command -v python >/dev/null 2>&1 && python --version >/dev/null 2>&1; then
+    PYTHON_BIN="python"
+  elif command -v py >/dev/null 2>&1; then
+    PYTHON_BIN="py"
+  fi
+fi
+
 rm -rf "${OUT_DIR}"
-mkdir -p "${OUT_DIR}"
+# NOTE: do not pre-create OUT_DIR — `besu operator generate-blockchain-config --to`
+# refuses to write into a directory that already exists (even empty), so it has to
+# create it itself.
 
 # Same 20 well-known Hardhat dev accounts as docker/local/ (see hardhat.config.ts's
 # DEV_ACCOUNTS) — funded here via genesis alloc, same pattern, same addresses.
-ALLOC_JSON=$(python3 - <<'PYEOF'
+ALLOC_JSON=$("${PYTHON_BIN}" - <<'PYEOF'
 import json
 addresses = [
     "f39Fd6e51aad88F6F4ce6aB8827279cffFb92266", "70997970C51812dc3A010C7d01b50e0d17dc79C8",
@@ -63,13 +86,21 @@ cat > "${SCRIPT_DIR}/ibftConfigFile.json" <<EOF
 }
 EOF
 
+# NOTE: `--to` must NOT point directly at a path under the bind-mounted /config volume —
+# on Docker Desktop for Windows, `operator generate-blockchain-config` reliably fails with
+# "Output directory already exists" (a filesystem-metadata quirk of the Windows bind mount,
+# reproducible even against a brand-new, never-before-existing directory; confirmed to work
+# fine when writing to the container's own filesystem instead). Work around it by writing to
+# a container-local path, then copying the result onto the bind mount.
 docker run --rm \
-  -v "${SCRIPT_DIR}:/config" \
+  --entrypoint sh \
+  -v "${DOCKER_SCRIPT_DIR}:/config" \
   hyperledger/besu:latest \
-  operator generate-blockchain-config \
-  --config-file=/config/ibftConfigFile.json \
-  --to=/config/networkFiles \
-  --private-key-file-name=key
+  -c "besu operator generate-blockchain-config \
+        --config-file=/config/ibftConfigFile.json \
+        --to=/tmp/networkFiles \
+        --private-key-file-name=key \
+      && cp -r /tmp/networkFiles /config/networkFiles"
 
 # Besu names each key dir by validator address, which isn't known in advance — re-lay
 # them out as node0..nodeN-1 so docker-compose.yml can mount fixed, predictable paths.

@@ -1,0 +1,32 @@
+# User-compose override for hashgraph/hedera-local-node.
+#
+# Picked up automatically by `npx @hashgraph/hedera-local start` when invoked with this
+# directory's parent (`hedera-native/docker/`) as the working directory (the CLI's
+# `--composedir` defaults to `./overrides/` and merges every *.yml file it finds there
+# on top of the upstream docker-compose.yml via `docker compose -f ... -f ...`).
+#
+# Why this file exists: hedera-local-node's stock compose file publishes three ports
+# that collide with services this repo's `marketplace-bench` track already owns
+# (see marketplace-bench-native/docs/DESIGN.md's port table):
+#   - mirror-node-web3 publishes 8545  -> collides with besuLocal's Besu JSON-RPC.
+#   - json-rpc-relay-ws publishes 8546 -> collides with confluxLocal's eSpace RPC.
+#   - minio (record-stream object storage) publishes 9000/9001 -> collides with the
+#     sui-move leg's sui-local container (also 9000/9123/9184).
+#
+# None of web3 (EVM eth_call debugging), relay/relay-ws (JSON-RPC relay), or minio's
+# host-side port are needed by this track: everything here talks to the consensus node
+# (gRPC :50211) and the mirror node REST API (:5551) directly via the Hedera SDK, never
+# through JSON-RPC/EVM. `!reset`/`!override` (Compose Specification merge tags) force a
+# full replace of the `ports:` list instead of Compose's default array-concatenation
+# merge, which would otherwise still leave the colliding entry in place.
+services:
+  web3:
+    ports: !reset []
+  relay:
+    ports: !reset []
+  relay-ws:
+    ports: !reset []
+  minio:
+    ports: !override
+      - "19000:9000"
+      - "19001:9001"

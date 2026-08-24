@@ -1,0 +1,25 @@
+{
+  "name": "conflux-core-bench",
+  "version": "1.0.0",
+  "description": "Conflux Core Space (native CVM, no eSpace/EVM shim) leg of the DAG-vs-linear marketplace benchmark comparison",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "ts-node scripts/deploy.ts",
+    "fund": "ts-node scripts/fund-conflux-core.ts",
+    "seed": "ts-node scripts/seed.ts",
+    "bench": "ts-node scripts/bench.ts",
+    "clean": "hardhat clean"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "hardhat": "^2.29.0",
+    "@types/node": "^24.13.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
+    "js-conflux-sdk": "^2.6.0"
+  }
+}
